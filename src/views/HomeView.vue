@@ -13,6 +13,12 @@
       <SkeletonModel cast-shadow />
     </Suspense>
     <Suspense>
+      <EnemyModel cast-shadow />
+    </Suspense>
+    <Suspense>
+      <EnemyModel cast-shadow />
+    </Suspense>
+    <Suspense>
       <BattleFloor />
     </Suspense>
   </TresCanvas>
@@ -26,6 +32,7 @@
   import BattleFloor from "@/components/BattleFloor.vue";
   import {computed, onMounted, shallowRef} from "vue";
   import BattleBase from "@/components/BattleBase.vue";
+  import EnemyModel from "@/components/EnemyModel.vue";
 
 
   const rendererProps = {

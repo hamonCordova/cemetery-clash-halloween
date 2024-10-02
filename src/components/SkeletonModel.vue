@@ -9,12 +9,16 @@
   import {SkeletonAnimationEnum} from "../../enum/skeleton-animation.enum";
   import {AnimationAction, Mesh, Quaternion, Vector3} from "three";
   import {useRenderLoop, useTresContext} from "@tresjs/core";
+  import {usePlayerStore} from "@/stores/playerStore";
+  import {useEnemyStore} from "@/stores/enemyStore";
 
   const {scene: model, animations} = await useGLTF('../static/models/Skeleton.glb');
   const { actions, mixer } = useAnimations(animations, model)
   const { scene, camera } = useTresContext()
   const skeletonRef = shallowRef<Mesh>();
   const { onLoop } = useRenderLoop()
+  const playerStore = usePlayerStore();
+  const enemyStore = useEnemyStore();
 
   let currentAnimation: AnimationAction | undefined;
   let keysPressed = [];
@@ -133,11 +137,12 @@
         animate(running ? SkeletonAnimationEnum.Run : SkeletonAnimationEnum.Walk, 0.5);
       }
 
-      const speed = running ? 5 : 3;
+      const speed = running ? 8 : 5;
       direction.normalize().multiplyScalar(speed * delta);
 
       skeletonRef.value.position.x += direction.x;
       skeletonRef.value.position.z += direction.z;
+      playerStore.updatePlayerPosition(skeletonRef.value.position);
 
       const targetRotationY = Math.atan2(direction.x, direction.z);
 
@@ -155,16 +160,53 @@
   }
 
   const attack = () => {
-
     if (isAttacking) return;
 
     isAttacking = true;
     animate(SkeletonAnimationEnum.Sword, 0.1);
 
+    // Delay hit detection to match attack animation timing
+    setTimeout(() => {
+      checkAttackHit();
+    }, 100); // Adjust timing as needed
+
     setTimeout(() => {
       isAttacking = false;
-    }, 400)
-  }
+    }, 400);
+  };
+
+  const checkAttackHit = () => {
+    const playerPos = skeletonRef.value.position;
+    const playerQuaternion = skeletonRef.value.quaternion;
+
+    const enemies = enemyStore.enemies;
+
+    const attackRange = 2; // Adjust as needed
+    const attackAngle = Math.cos(45 * (Math.PI / 180)); // 45 degrees
+
+    enemies.forEach((enemy) => {
+      const enemyPos = enemy.position;
+
+      const distance = playerPos.distanceTo(enemyPos);
+      if (distance > attackRange) {
+        console.warn('enemy out of range')
+        return; // Enemy is out of range
+      }
+
+      // Check if enemy is in front of player
+      const playerForward = new Vector3(0, 0, 1).applyQuaternion(playerQuaternion);
+      const directionToEnemy = new Vector3().subVectors(enemyPos, playerPos).normalize();
+
+      const dot = playerForward.dot(directionToEnemy);
+
+      if (dot > attackAngle) {
+        // Enemy is within 45 degrees in front of player
+        // Attack hits
+        console.warn('enemy hit')
+        enemyStore.damageEnemy(enemy.id, 10);
+      }
+    });
+  };
 
   const jump = () => {
     if (isJumping) return;
