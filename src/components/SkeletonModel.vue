@@ -1,0 +1,195 @@
+<template>
+  <primitive ref="skeletonRef" :object="model" :scale="[1.5, 1.5, 1.5]" cast-shadow :position="[0, 0.01, 0]"></primitive>
+</template>
+
+<script setup lang="ts">
+  import gsap from 'gsap'
+  import {onMounted, shallowRef} from "vue";
+  import {useAnimations, useGLTF} from "@tresjs/cientos";
+  import {SkeletonAnimationEnum} from "../../enum/skeleton-animation.enum";
+  import {AnimationAction, Mesh, Quaternion, Vector3} from "three";
+  import {useRenderLoop, useTresContext} from "@tresjs/core";
+
+  const {scene: model, animations} = await useGLTF('../static/models/Skeleton.glb');
+  const { actions, mixer } = useAnimations(animations, model)
+  const { scene, camera } = useTresContext()
+  const skeletonRef = shallowRef<Mesh>();
+  const { onLoop } = useRenderLoop()
+
+  let currentAnimation: AnimationAction | undefined;
+  let keysPressed = [];
+
+  let isAttacking = false;
+
+  let isJumping = false;
+  const jumpDuration = 0.8;
+
+  onMounted(() => {
+    animate(SkeletonAnimationEnum.Idle);
+    enableShadow();
+    initEventListeners();
+  })
+
+  onLoop(({delta, elapsed, clock}) => {
+    move(delta)
+    moveCamera();
+  })
+
+  const enableShadow = () => {
+    model.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+      }
+    });
+  }
+
+  const initEventListeners = () => {
+    window.addEventListener("keydown", (event) => {
+      keysPressed[event.code] = true;
+    })
+
+    window.addEventListener("keyup", (event) => {
+      keysPressed[event.code] = false;
+    })
+
+    window.addEventListener(('click'), () => {
+      attack();
+    })
+  }
+
+  const moveCamera = () => {
+    if (skeletonRef.value && camera.value) {
+      const cameraOffset = new Vector3(0, 5, 10);
+      const characterPosition = skeletonRef.value.position.clone();
+      const cameraTargetPosition = characterPosition.add(cameraOffset);
+
+      camera.value.position.lerp(cameraTargetPosition, 0.1);
+
+      const targetPosition = skeletonRef.value.position.clone();
+      targetPosition.y += 1;
+
+      camera.value.lookAt(targetPosition);
+    }
+  }
+
+  const animate = (animationName, duration = 1) => {
+    const newAnimation = actions[animationName];
+    const oldAnimation = currentAnimation;
+
+    if (currentAnimation === newAnimation) {
+      return;
+    }
+
+    currentAnimation = newAnimation;
+
+    newAnimation.reset();
+    newAnimation.play();
+
+    if (animationName === SkeletonAnimationEnum.Jump_Land) {
+      const animationClipDuration = newAnimation.getClip().duration;
+      newAnimation.setEffectiveTimeScale(animationClipDuration / (jumpDuration * 4));
+    }
+
+    if (oldAnimation) {
+      newAnimation.crossFadeFrom(oldAnimation, duration, false);
+    }
+  };
+
+  const move = (delta: number) => {
+
+    const direction = new Vector3(0, 0, 0);
+
+    let moving = false;
+    const jumping = keysPressed['Space'];
+    const running = keysPressed['ShiftLeft'] || keysPressed['ShiftRight'];
+
+    if (keysPressed['ArrowUp'] || keysPressed['KeyW']) {
+      direction.z -= 1;
+      moving = true;
+    }
+
+    if (keysPressed['ArrowDown'] || keysPressed['KeyS']) {
+      direction.z += 1;
+      moving = true;
+    }
+
+    if (keysPressed['ArrowLeft'] || keysPressed['KeyA']) {
+      direction.x -= 1;
+      moving = true;
+    }
+
+    if (keysPressed['ArrowRight'] || keysPressed['KeyD']) {
+      direction.x += 1;
+      moving = true;
+    }
+
+    if (jumping) {
+      jump();
+    }
+
+    if (moving) {
+
+      if (!isAttacking && !jumping) {
+        animate(running ? SkeletonAnimationEnum.Run : SkeletonAnimationEnum.Walk, 0.5);
+      }
+
+      const speed = running ? 5 : 3;
+      direction.normalize().multiplyScalar(speed * delta);
+
+      skeletonRef.value.position.x += direction.x;
+      skeletonRef.value.position.z += direction.z;
+
+      const targetRotationY = Math.atan2(direction.x, direction.z);
+
+      const currentQuaternion = skeletonRef.value.quaternion.clone();
+      const targetQuaternion = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), targetRotationY);
+
+      currentQuaternion.rotateTowards(targetQuaternion, delta * 10);
+
+      skeletonRef.value.quaternion.copy(currentQuaternion);
+
+    } else {
+      if (isAttacking) return;
+      animate(SkeletonAnimationEnum.Idle, 0.5)
+    }
+  }
+
+  const attack = () => {
+
+    if (isAttacking) return;
+
+    isAttacking = true;
+    animate(SkeletonAnimationEnum.Sword, 0.1);
+
+    setTimeout(() => {
+      isAttacking = false;
+    }, 400)
+  }
+
+  const jump = () => {
+    if (isJumping) return;
+
+    const timeline = gsap.timeline({
+      onStart: () => {
+        isJumping = true;
+        animate(SkeletonAnimationEnum.Jump_Land, 0.1);
+      },
+      onComplete: () => {
+        isJumping = false;
+      }
+    });
+
+    timeline.to(skeletonRef.value.position, {
+      y: 2,
+      duration: jumpDuration / 2,
+      ease: 'power1.out'
+    });
+
+    timeline.to(skeletonRef.value.position, {
+      y: 0,
+      duration: (jumpDuration / 2) * jumpDuration,
+      ease: 'circ.in'
+    });
+  };
+
+</script>
