@@ -5,13 +5,24 @@
       :scale="[1.5, 1.5, 1.5]"
       cast-shadow
       :position="[positioningConfig.spawnPosition.x, positioningConfig.spawnPosition.y, positioningConfig.spawnPosition.z]"
-  ></primitive>
+  >
+    <Html
+      center
+      transform
+      :distance-factor="4"
+      :position="[0, 1.6, -0.1]"
+    >
+    <div class="enemy-health" :class="{'enemy-health--dead': isDead}">
+      <div class="enemy-health__progress"  :style="{width: (enemyStoreInstance?.health || 0) + '%'}"></div>
+    </div>
+    </Html>
+  </primitive>
 </template>
 
 <script setup lang="ts">
-  import {onMounted, onUnmounted, reactive, ref, shallowRef, watch} from 'vue';
-  import {useAnimations, useGLTF} from '@tresjs/cientos';
-  import {AnimationAction, Mesh, Quaternion, Vector3} from 'three';
+import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from 'vue';
+  import {useAnimations, useGLTF, Html} from '@tresjs/cientos';
+  import {AnimationAction, Box3, Mesh, Quaternion, Vector3} from 'three';
   import {useRenderLoop} from '@tresjs/core';
   import {usePlayerStore} from '@/stores/playerStore';
   import {useEnemyStore} from '@/stores/enemyStore';
@@ -53,6 +64,10 @@
     nextAttackTimeout: undefined,
   })
 
+  const enemyStoreInstance = computed(() => {
+    return enemyStore.enemies.find(e => e.id === enemyId);
+  })
+
   onMounted(() => {
     spawnEnemy();
     listenEvents();
@@ -82,6 +97,9 @@
         child.receiveShadow = true;
       }
     })
+
+    const box = new Box3().setFromObject(enemyRef.value);
+    console.warn(box.max.y - box.min.y)
   }
 
   const attack = () => {
@@ -274,3 +292,26 @@
   };
 
 </script>
+<style>
+.enemy-health {
+  background: #ccc;
+  width: 70px;
+  height: 5px;
+  border-radius: 5px;
+  padding: 1px;
+  opacity: 100;
+  transition: opacity ease-out 120ms;
+}
+
+.enemy-health--dead {
+  opacity: 0;
+}
+
+.enemy-health__progress {
+  background: red;
+  border-radius: 5px;
+  height: 100%;
+  width: 100%;
+  transition: width ease-in 120ms;
+}
+</style>
