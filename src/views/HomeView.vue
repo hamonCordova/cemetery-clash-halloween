@@ -1,5 +1,7 @@
 <template>
   <TresCanvas window-size v-bind="rendererProps">
+    <StatsGl />
+    <Stars />
     <TresPerspectiveCamera :args="[85, 1, 0.1, 10000]" :position="[0, 10, 10]" />
     <BattleBase />
     <TresAmbientLight :intensity="1" />
@@ -25,14 +27,13 @@
 </template>
 
 <script lang="ts" setup>
-  import {TresCanvas, useTresContext, vLightHelper} from '@tresjs/core'
-  import {OrbitControls, Sky, Smoke} from "@tresjs/cientos";
+  import {TresCanvas, vLightHelper} from '@tresjs/core'
   import SkeletonModel from "@/components/SkeletonModel.vue";
-  import {DoubleSide, FogExp2, NoToneMapping, PCFShadowMap, PCFSoftShadowMap, SRGBColorSpace} from "three";
+  import {NoToneMapping, PCFSoftShadowMap, SRGBColorSpace} from "three";
   import BattleFloor from "@/components/BattleFloor.vue";
-  import {computed, onMounted, shallowRef} from "vue";
   import BattleBase from "@/components/BattleBase.vue";
   import EnemyModel from "@/components/EnemyModel.vue";
+  import {StatsGl, Stars} from "@tresjs/cientos";
 
 
   const rendererProps = {

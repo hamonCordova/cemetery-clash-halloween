@@ -1,10 +1,13 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { Vector3 } from 'three';
+import {useEventBus} from "@vueuse/core";
 
 export const useEnemyStore = defineStore('enemyStore', () => {
+
+
     const enemies = ref<Array<{ id: string; position: Vector3; health: number, isDead: boolean }>>([]);
-    let onDieCallBack: (id) => void;
+    const enemyDiedEventBus = useEventBus('enemyEventBus');
 
     const registerEnemy = (id: string, position: Vector3) => {
         enemies.value.push({ id, position, health: 100 });
@@ -26,19 +29,16 @@ export const useEnemyStore = defineStore('enemyStore', () => {
         if (enemy && !enemy.isDead) {
             enemy.health -= damage;
             if (enemy.health <= 0) {
-             //   removeEnemy(id);
-                if (onDieCallBack) {
-                    onDieCallBack();
-                }
+                removeEnemy(id);
+                enemyDiedEventBus.emit('die', id)
+
                 enemy.isDead = true;
                 console.warn('ENEMY DIED')
+                // Aqui você pode emitir um evento para remover o inimigo da cena, se necessário.
             }
         }
     };
 
-    const setOnDieCallback = (onDie?: (id: string) => void) => {
-        onDieCallBack = onDie;
-    }
 
     return {
         enemies,
@@ -46,6 +46,5 @@ export const useEnemyStore = defineStore('enemyStore', () => {
         updateEnemyPosition,
         removeEnemy,
         damageEnemy,
-        setOnDieCallback
     };
 });

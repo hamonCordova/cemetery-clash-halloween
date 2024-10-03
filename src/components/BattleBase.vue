@@ -6,6 +6,5 @@
   const { scene } = useTresContext()
 
   onMounted(() => {
-    scene.value.fog = new FogExp2('rgb(255,91,6)', 0.02);
   })
 </script>

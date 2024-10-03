@@ -203,7 +203,7 @@
         // Enemy is within 45 degrees in front of player
         // Attack hits
         console.warn('enemy hit')
-        enemyStore.damageEnemy(enemy.id, 10);
+        enemyStore.damageEnemy(enemy.id, 30);
       }
     });
   };
