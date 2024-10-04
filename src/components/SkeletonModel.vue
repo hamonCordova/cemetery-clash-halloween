@@ -99,8 +99,7 @@
     }
   };
 
-  const move = (delta: number) => {
-
+  const move = (delta) => {
     const direction = new Vector3(0, 0, 0);
 
     let moving = false;
@@ -132,32 +131,85 @@
     }
 
     if (moving) {
-
       if (!isAttacking && !jumping) {
         animate(running ? SkeletonAnimationEnum.Run : SkeletonAnimationEnum.Walk, 0.5);
       }
 
       const speed = running ? 8 : 5;
-      direction.normalize().multiplyScalar(speed * delta);
+      direction.normalize();
 
-      skeletonRef.value.position.x += direction.x;
-      skeletonRef.value.position.z += direction.z;
+      // Movimento pretendido
+      let movement = direction.clone().multiplyScalar(speed * delta);
+
+      // Zera o componente Y do movimento
+      movement.y = 0;
+
+      let movementDirection = movement.clone().normalize();
+
+      const characterPos = skeletonRef.value.position.clone();
+      characterPos.y = 0;
+
+      // Variável para acumular as normais de colisão
+      let collisionNormal = new Vector3(0, 0, 0);
+
+      enemyStore.enemies.forEach(enemy => {
+        // Clonar a posição do inimigo antes de usá-la
+        const enemyPos = enemy.position.clone();
+        enemyPos.y = 0;
+
+        const collisionDistance = 1.5; // Ajuste conforme necessário
+
+        // Calcular o vetor do personagem para o inimigo
+        const toEnemy = enemyPos.clone().sub(characterPos);
+
+        const distanceSquared = toEnemy.lengthSq();
+        const collisionDistanceSquared = collisionDistance * collisionDistance;
+
+        if (distanceSquared < collisionDistanceSquared) {
+          const normalizedToEnemy = toEnemy.clone().normalize();
+          const dotProduct = movementDirection.dot(normalizedToEnemy);
+
+          if (dotProduct > 0) {
+            // Acumular a normal de colisão
+            collisionNormal.add(normalizedToEnemy);
+          }
+        }
+      });
+
+      // Se houver colisões, ajustar o movimento
+      if (collisionNormal.lengthSq() > 0) {
+        collisionNormal.normalize();
+
+        // Remover a componente do movimento na direção da normal de colisão acumulada
+        const movementIntoCollision = movementDirection.clone().projectOnVector(collisionNormal);
+        movementDirection.sub(movementIntoCollision);
+        movementDirection.normalize();
+
+        // Recalcular o movimento ajustado, assegurando que Y permaneça zero
+        movement = movementDirection.clone().multiplyScalar(speed * delta);
+        movement.y = 0;
+      }
+
+      // Atualiza a posição com o movimento permitido
+      skeletonRef.value.position.add(movement);
       playerStore.updatePlayerPosition(skeletonRef.value.position);
 
+      // Atualiza a rotação do personagem
       const targetRotationY = Math.atan2(direction.x, direction.z);
-
       const currentQuaternion = skeletonRef.value.quaternion.clone();
       const targetQuaternion = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), targetRotationY);
-
       currentQuaternion.rotateTowards(targetQuaternion, delta * 10);
-
       skeletonRef.value.quaternion.copy(currentQuaternion);
 
     } else {
       if (isAttacking) return;
-      animate(SkeletonAnimationEnum.Idle, 0.5)
+      animate(SkeletonAnimationEnum.Idle, 0.5);
     }
-  }
+  };
+
+
+
+
 
   const attack = () => {
     if (isAttacking) return;
