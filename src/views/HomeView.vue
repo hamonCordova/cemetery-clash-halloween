@@ -11,15 +11,7 @@
         :position="[0, 12, 9]"
         v-light-helper
     />
-    <Suspense>
-      <SkeletonModel cast-shadow />
-    </Suspense>
-    <Suspense>
-      <EnemyModel cast-shadow />
-    </Suspense>
-    <Suspense>
-      <EnemyModel cast-shadow />
-    </Suspense>
+    <BattleManager />
     <Suspense>
       <BattleFloor />
     </Suspense>
@@ -34,6 +26,7 @@
   import BattleBase from "@/components/BattleBase.vue";
   import EnemyModel from "@/components/EnemyModel.vue";
   import {StatsGl, Stars} from "@tresjs/cientos";
+  import BattleManager from "@/components/BattleManager.vue";
 
 
   const rendererProps = {

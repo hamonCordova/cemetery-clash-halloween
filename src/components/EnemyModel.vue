@@ -1,10 +1,9 @@
 <template>
   <primitive
+      v-if="config"
       ref="enemyRef"
       :object="model"
-      :scale="[1.5, 1.5, 1.5]"
       cast-shadow
-      :position="[positioningConfig.spawnPosition.x, positioningConfig.spawnPosition.y, positioningConfig.spawnPosition.z]"
   >
     <Html
       center
@@ -20,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from 'vue';
+  import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from 'vue';
   import {useAnimations, useGLTF, Html} from '@tresjs/cientos';
   import {AnimationAction, Box3, Mesh, Quaternion, Vector3} from 'three';
   import {useRenderLoop} from '@tresjs/core';
@@ -31,13 +30,20 @@ import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from
   import {LoopOnce, LoopRepeat} from "three/src/constants";
   import gsap from 'gsap';
   import {useEventBus} from "@vueuse/core";
+  import type {Enemy} from "@/components/BattleManager.vue";
 
+  const emit = defineEmits(['die'])
+  const {config} = defineProps({
+    config: {
+      type: Object as Enemy,
+      required: true
+    }
+  })
 
   const { scene: model, animations } = await useGLTF('../static/models/Skeleton.glb');
   const { actions, mixer } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
 
-  const enemyId = generateUUID();
   const enemyRef = shallowRef<Mesh>();
 
   const playerStore = usePlayerStore();
@@ -48,24 +54,15 @@ import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from
   const isIdle = ref(false);
   const isDead = ref(false);
 
-  const positioningConfig = reactive({
-    moveSpeed: 1.5,
-    spawnPosition: new Vector3(
-    Math.random() * 20 - 10,
-    0,
-    Math.random() * 20 - 10
-    )
-  })
-
   const attackConfig = reactive({
     isAttacking: false,
     attackDistance: 2,
-    nextAttackDelay: 5000,
+    nextAttackDelay: config.attackDelay || 1000,
     nextAttackTimeout: undefined,
   })
 
   const enemyStoreInstance = computed(() => {
-    return enemyStore.enemies.find(e => e.id === enemyId);
+    return enemyStore.enemies.find(e => e.id === config.enemyId);
   })
 
   onMounted(() => {
@@ -74,7 +71,7 @@ import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from
   });
 
   onUnmounted(() => {
-    enemyStore.removeEnemy(enemyId);
+    enemyStore.removeEnemy(config.enemyId);
   });
 
   onLoop(({ delta }) => {
@@ -83,23 +80,32 @@ import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from
 
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
-      if (event === 'die' && enemyId === payload) {
+      if (event === 'die' && config.enemyId === payload) {
         die()
       }
     });
   }
 
   const spawnEnemy = () => {
-    enemyStore.registerEnemy(enemyId, positioningConfig.spawnPosition);
+    enemyStore.registerEnemy(config.enemyId, config.spawnPosition);
+    enemyRef.value.position.set(
+        config.spawnPosition.x,
+        config.spawnPosition.y,
+        config.spawnPosition.z,
+    )
+
+    enemyRef.value.scale.set(
+        config.scale || 1.5,
+        config.scale || 1.5,
+        config.scale || 1.5,
+    )
+
     model.traverse((child) => {
       if (child.isMesh) {
         child.castShadow = true;
         child.receiveShadow = true;
       }
     })
-
-    const box = new Box3().setFromObject(enemyRef.value);
-    console.warn(box.max.y - box.min.y)
   }
 
   const attack = () => {
@@ -184,7 +190,10 @@ import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from
     stopAttack();
 
     setTimeout(() => {
-      gsap.to(enemyRef.value.position, {y: -2, duration: 2, ease: 'power2.in'})
+      gsap.to(
+          enemyRef.value.position,
+          {y: -2, duration: 2, ease: 'power2.in', onComplete() {emit('die', config.enemyId)}},
+      )
     }, 1000)
 
   }
@@ -201,7 +210,9 @@ import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from
     // Change rotation smoothly using quaternion
     const enemyQuaternion = enemyRef.value.quaternion.clone()
     const targetQuaternion = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), targetAngle);
-    enemyQuaternion.rotateTowards(targetQuaternion, delta * 5);
+
+    const rotationSpeed = config.rotationSpeed || 5;
+    enemyQuaternion.rotateTowards(targetQuaternion, delta * rotationSpeed);
 
     // Apply enemy quaternion
     enemyRef.value.quaternion.copy(enemyQuaternion);
@@ -256,7 +267,7 @@ import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from
 
       // Implement separation behavior to avoid overlapping with other enemies
       const separationForce = new Vector3(0, 0, 0);
-      const neighbors = enemyStore.enemies.filter((e) => e.id !== enemyId);
+      const neighbors = enemyStore.enemies.filter((e) => e.id !== config.enemyId);
       const separationDistance = 2; // Adjust as needed
 
       for (const neighbor of neighbors) {
@@ -278,7 +289,7 @@ import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from
 
       // Normalize and move enemy towards player, considering separation
       combinedDirection.normalize();
-      enemyPos.add(combinedDirection.multiplyScalar(positioningConfig.moveSpeed * delta));
+      enemyPos.add(combinedDirection.multiplyScalar(config.moveSpeed * delta));
 
       // Rotate enemy to face movement direction
       followPlayerRotation(enemyPos.clone().add(combinedDirection), delta);
@@ -287,7 +298,7 @@ import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from
       walk()
 
       // Update enemy position in the store
-      enemyStore.updateEnemyPosition(enemyId, enemyPos);
+      enemyStore.updateEnemyPosition(config.enemyId, enemyPos);
     }
   };
 

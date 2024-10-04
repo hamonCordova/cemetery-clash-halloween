@@ -1,0 +1,170 @@
+<template>
+  <Suspense>
+    <SkeletonModel />
+  </Suspense>
+  <template v-if="currentRound">
+    <template v-for="enemy in currentRoundStage.enemies" :key="enemy.enemyId">
+      <Suspense v-if="!enemy.isDead">
+        <EnemyModel :config="enemy" @die="enemyDied($event)" />
+      </Suspense>
+    </template>
+  </template>
+</template>
+
+<script lang="ts">
+export interface Round {
+  num: number;
+  stages: Stage[]
+}
+
+export interface RoundStage {
+  enemies: Enemy[]
+}
+
+export interface Enemy {
+  enemyId: string;
+  moveSpeed: number;
+  rotationSpeed: number;
+  spawnPosition: Vector3;
+  attackDelay: number;
+  scale: number;
+  isDead: boolean;
+}
+
+</script>
+
+<script setup lang="ts">
+  import SkeletonModel from "@/components/SkeletonModel.vue";
+  import EnemyModel from "@/components/EnemyModel.vue";
+  import {onMounted, ref, watch} from "vue";
+  import {generateUUID} from "three/src/math/MathUtils";
+  import {Vector3} from "three";
+
+  const rounds = ref<Round[]>([]);
+
+  const currentRoundNum = ref<number>(1);
+  const currentRoundStageNum = ref<number>(3);
+
+  const currentRound = ref<Round>();
+  const currentRoundStage = ref<RoundStage>();
+
+  onMounted(() => {
+    createRounds();
+    startRound();
+  })
+
+  const createRounds = () => {
+    rounds.value = [getRound1()]
+  }
+
+  const startRound = () => {
+    console.warn(currentRoundStageNum.value, currentRoundStageNum.value - 1)
+    currentRound.value = rounds.value[currentRoundNum.value - 1];
+    currentRoundStage.value = currentRound.value.stages[currentRoundStageNum.value - 1];
+    console.warn(currentRoundStage.value?.enemies.length)
+  }
+
+  const getRandomSpawnPosition = () => {
+    return new Vector3(
+        Math.random() * 20 - 10,
+        0,
+        Math.random() * 20 - 10
+    )
+  }
+
+  const enemyDied = (enemyId: string) => {
+    const enemy = currentRoundStage.value?.enemies.find(e => e.enemyId === enemyId);
+    if (enemy) {
+      enemy.isDead = true;
+      checkRoundProgress();
+    }
+  }
+
+  const checkRoundProgress = () => {
+    if (currentRoundStage.value?.enemies.every(e => e.isDead)) {
+
+      console.warn(currentRound.value?.stages.length, currentRoundStageNum.value)
+
+      if (currentRound.value?.stages.length === currentRoundStageNum.value) {
+        currentRoundNum.value = currentRoundNum.value + 1;
+        currentRoundStageNum.value = 1;
+      } else {
+        currentRoundStageNum.value = currentRoundStageNum.value + 1;
+      }
+
+      startRound();
+    }
+  }
+
+  const getRound1 = () => {
+    const stages = [
+      {
+        enemies: [
+          {
+            enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 5000,
+            moveSpeed: 1.5,
+            rotationSpeed: 2,
+            isDead: false
+          },
+          {
+            enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 5000,
+            rotationSpeed: 2,
+            moveSpeed: 2.5,
+          },
+        ]
+      } as RoundStage,
+      {
+        enemies: [
+          {
+            enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 3000,
+            rotationSpeed: 3,
+            moveSpeed: 3.5,
+          },
+          {
+            enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 5000,
+            rotationSpeed: 3,
+            moveSpeed: 1.5,
+          },
+          {
+            enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 400,
+            rotationSpeed: 4,
+            moveSpeed: 2.5,
+          },
+        ]
+      } as RoundStage,
+      {
+        enemies: [
+          {
+            enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 600,
+            rotationSpeed: 5,
+            moveSpeed: 6.5,
+            scale: 0.9
+          },
+          {
+            enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 2000,
+            rotationSpeed: 2,
+            moveSpeed: 1.5,
+            scale: 4,
+          },
+        ]
+      } as RoundStage
+    ]
+
+    return {num: 1, stages} as Round;
+  }
+
+</script>
