@@ -43,7 +43,7 @@ export interface Enemy {
   const rounds = ref<Round[]>([]);
 
   const currentRoundNum = ref<number>(1);
-  const currentRoundStageNum = ref<number>(3);
+  const currentRoundStageNum = ref<number>(1);
 
   const currentRound = ref<Round>();
   const currentRoundStage = ref<RoundStage>();

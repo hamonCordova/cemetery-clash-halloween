@@ -21,8 +21,8 @@
 <script setup lang="ts">
   import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from 'vue';
   import {useAnimations, useGLTF, Html} from '@tresjs/cientos';
-  import {AnimationAction, Box3, Mesh, Quaternion, Vector3} from 'three';
-  import {useRenderLoop} from '@tresjs/core';
+  import {AnimationAction, Box3, BoxGeometry, Mesh, MeshBasicMaterial, Quaternion, Vector3} from 'three';
+  import {useRenderLoop, useTresContext} from '@tresjs/core';
   import {usePlayerStore} from '@/stores/playerStore';
   import {useEnemyStore} from '@/stores/enemyStore';
   import {SkeletonAnimationEnum} from '../../enum/skeleton-animation.enum';
@@ -31,6 +31,7 @@
   import gsap from 'gsap';
   import {useEventBus} from "@vueuse/core";
   import type {Enemy} from "@/components/BattleManager.vue";
+  import useCharacter from "@/composable/useCharacter";
 
   const emit = defineEmits(['die'])
   const {config} = defineProps({
@@ -49,17 +50,26 @@
   const playerStore = usePlayerStore();
   const enemyStore = useEnemyStore();
   const enemyEventBus = useEventBus('enemyEventBus');
+  const { attack, stopWalk, walk, die, isDead } = useCharacter(
+    enemyRef,
+    actions,
+    {
+      walk: SkeletonAnimationEnum.Walk,
+      idle: SkeletonAnimationEnum.Idle,
+      attack: SkeletonAnimationEnum.Sword,
+      die: SkeletonAnimationEnum.Death
+    },
+    {
+     nextAttackDelay: config.attackDelay || 1000
+    },
+    {
+      finishAttack: () => checkAttackHit(),
+      onDie: () => emit('die', config.enemyId)
+    },
+  )
 
-  const isWalking = ref(false);
-  const isIdle = ref(false);
-  const isDead = ref(false);
-
-  const attackConfig = reactive({
-    isAttacking: false,
-    attackDistance: 2,
-    nextAttackDelay: config.attackDelay || 1000,
-    nextAttackTimeout: undefined,
-  })
+  // TODO this should be dynamic. Remember to pass to useCharacter
+  const attackDistance = 2;
 
   const enemyStoreInstance = computed(() => {
     return enemyStore.enemies.find(e => e.id === config.enemyId);
@@ -106,95 +116,6 @@
         child.receiveShadow = true;
       }
     })
-  }
-
-  const attack = () => {
-
-    if (attackConfig.isAttacking || isDead.value) return;
-    attackConfig.isAttacking = true;
-
-    if (attackConfig.nextAttackTimeout) {
-      clearTimeout(attackConfig.nextAttackTimeout);
-    }
-
-    const attackAction = actions[SkeletonAnimationEnum.Sword].setLoop(LoopOnce);
-    const attackActionDuration = attackAction.getClip().duration / attackAction.timeScale;
-
-    attackAction.reset();
-    attackAction.play();
-    attackAction.crossFadeFrom(actions[isWalking.value ? SkeletonAnimationEnum.Walk : SkeletonAnimationEnum.Idle], 0.1);
-
-    setTimeout(() => {
-      checkAttackHit();
-      idle();
-    }, attackActionDuration * 1000)
-
-    attackConfig.nextAttackTimeout = setTimeout(() => {
-      attackConfig.isAttacking = false;
-    }, attackConfig.nextAttackDelay);
-  }
-
-  const stopAttack = () => {
-    const attackAction = actions[SkeletonAnimationEnum.Sword];
-    attackAction.stop();
-  }
-
-  const idle = () => {
-
-    if (isDead.value) return;
-
-    const idleAction = actions[SkeletonAnimationEnum.Idle];
-
-    idleAction.reset();
-    idleAction.play();
-    idleAction.crossFadeFrom(actions[SkeletonAnimationEnum.Sword], 0.5);
-    isIdle.value = true;
-  }
-
-  const stopIdle = () => {
-    actions[SkeletonAnimationEnum.Idle].stop();
-  }
-
-  const walk = () => {
-    if (isWalking.value || isDead.value) return;
-
-    const walkAction = actions[SkeletonAnimationEnum.Walk].setLoop(LoopRepeat);
-    walkAction.reset();
-    walkAction.play();
-
-    walkAction.crossFadeFrom(actions[attackConfig.isAttacking ? SkeletonAnimationEnum.Sword : SkeletonAnimationEnum.Idle], 0.5);
-    isWalking.value = true;
-
-    attackConfig.isAttacking = false;
-  }
-
-  const stopWalk = () => {
-    if (!isWalking.value) return;
-
-    actions[SkeletonAnimationEnum.Walk].stop();
-    isWalking.value = false;
-  }
-
-  const die = () => {
-
-    if (isDead.value) return;
-
-    const dieAction = actions[SkeletonAnimationEnum.Death];
-    dieAction.reset();
-    dieAction.setLoop(LoopOnce);
-    dieAction.clampWhenFinished = true;
-    dieAction.play();
-    isDead.value = true;
-    stopIdle();
-    stopWalk();
-    stopAttack();
-
-    setTimeout(() => {
-      gsap.to(
-          enemyRef.value.position,
-          {y: -2, duration: 2, ease: 'power2.in', onComplete() {emit('die', config.enemyId)}},
-      )
-    }, 1000)
 
   }
 
@@ -258,7 +179,7 @@
       const directionToPlayer = new Vector3().subVectors(playerPos, enemyPos);
       const distanceToPlayer = enemyPos.distanceTo(playerPos);
 
-      if (distanceToPlayer <= attackConfig.attackDistance) {
+      if (distanceToPlayer <= attackDistance) {
         attack()
         stopWalk();
         followPlayerRotation(playerPos, delta);
