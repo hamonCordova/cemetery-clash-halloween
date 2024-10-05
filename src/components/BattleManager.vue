@@ -4,14 +4,21 @@
   </Suspense>
   <template v-if="currentRound">
     <template v-for="enemy in currentRoundStage.enemies" :key="enemy.enemyId">
-      <Suspense v-if="!enemy.isDead">
+      <Suspense v-if="!enemy.isDead && enemy.type === 'SKELETON'">
         <EnemyModel :config="enemy" @die="enemyDied($event)" />
+      </Suspense>
+      <Suspense v-if="!enemy.isDead && enemy.type === 'SPIDER'">
+        <SpiderEnemyModel :config="enemy" @die="enemyDied($event)" />
+      </Suspense>
+      <Suspense v-if="!enemy.isDead && enemy.type === 'ZOMBIE'">
+        <ZombieEnemey :config="enemy" @die="enemyDied($event)" />
       </Suspense>
     </template>
   </template>
 </template>
 
 <script lang="ts">
+
 export interface Round {
   num: number;
   stages: Stage[]
@@ -29,6 +36,7 @@ export interface Enemy {
   attackDelay: number;
   scale: number;
   isDead: boolean;
+  type: EnemyTypeEnum
 }
 
 </script>
@@ -39,6 +47,9 @@ export interface Enemy {
   import {onMounted, ref, watch} from "vue";
   import {generateUUID} from "three/src/math/MathUtils";
   import {Vector3} from "three";
+  import SpiderEnemyModel from "@/components/SpiderEnemyModel.vue";
+  import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
+  import ZombieEnemey from "@/components/ZombieEnemey.vue";
 
   const rounds = ref<Round[]>([]);
 
@@ -106,14 +117,26 @@ export interface Enemy {
             attackDelay: 5000,
             moveSpeed: 1.5,
             rotationSpeed: 2,
-            isDead: false
+            isDead: false,
+            type: EnemyTypeEnum.SKELETON
           },
           {
             enemyId: generateUUID(),
             spawnPosition: getRandomSpawnPosition(),
             attackDelay: 5000,
             rotationSpeed: 2,
+            scale: 0.5,
             moveSpeed: 2.5,
+            type: EnemyTypeEnum.SPIDER
+          },
+          {
+            enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 5000,
+            rotationSpeed: 2,
+            scale: 1.5,
+            moveSpeed: 2.5,
+            type: EnemyTypeEnum.ZOMBIE
           },
         ]
       } as RoundStage,
@@ -125,6 +148,7 @@ export interface Enemy {
             attackDelay: 3000,
             rotationSpeed: 3,
             moveSpeed: 3.5,
+            type: EnemyTypeEnum.SKELETON
           },
           {
             enemyId: generateUUID(),
@@ -132,6 +156,7 @@ export interface Enemy {
             attackDelay: 5000,
             rotationSpeed: 3,
             moveSpeed: 1.5,
+            type: EnemyTypeEnum.SKELETON
           },
           {
             enemyId: generateUUID(),
@@ -139,6 +164,7 @@ export interface Enemy {
             attackDelay: 400,
             rotationSpeed: 4,
             moveSpeed: 2.5,
+            type: EnemyTypeEnum.SKELETON
           },
         ]
       } as RoundStage,
@@ -150,7 +176,8 @@ export interface Enemy {
             attackDelay: 600,
             rotationSpeed: 5,
             moveSpeed: 6.5,
-            scale: 0.9
+            scale: 0.9,
+            type: EnemyTypeEnum.SKELETON
           },
           {
             enemyId: generateUUID(),
@@ -159,6 +186,7 @@ export interface Enemy {
             rotationSpeed: 2,
             moveSpeed: 1.5,
             scale: 4,
+            type: EnemyTypeEnum.SKELETON
           },
         ]
       } as RoundStage

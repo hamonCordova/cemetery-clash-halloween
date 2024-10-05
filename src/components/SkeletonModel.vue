@@ -11,6 +11,7 @@
   import {useRenderLoop, useTresContext} from "@tresjs/core";
   import {usePlayerStore} from "@/stores/playerStore";
   import {useEnemyStore} from "@/stores/enemyStore";
+  import {EnemyTypeDamageRangeEnum} from "../../enum/enemy-type-damage-range.enum";
 
   const {scene: model, animations} = await useGLTF('../static/models/Skeleton.glb');
   const { actions, mixer } = useAnimations(animations, model)
@@ -208,9 +209,6 @@
   };
 
 
-
-
-
   const attack = () => {
     if (isAttacking) return;
 
@@ -233,11 +231,12 @@
 
     const enemies = enemyStore.enemies;
 
-    const attackRange = 2; // Adjust as needed
     const attackAngle = Math.cos(45 * (Math.PI / 180)); // 45 degrees
 
     enemies.forEach((enemy) => {
       const enemyPos = enemy.position;
+      const enemyType = enemy.type;
+      const attackRange = EnemyTypeDamageRangeEnum[enemyType];
 
       const distance = playerPos.distanceTo(enemyPos);
       if (distance > attackRange) {

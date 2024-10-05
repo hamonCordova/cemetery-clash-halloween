@@ -2,15 +2,23 @@ import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { Vector3 } from 'three';
 import {useEventBus} from "@vueuse/core";
+import type {EnemyTypeEnum} from "../../enum/enemy-type.enum";
+
+interface EnemyAlive {
+    id: string;
+    position: Vector3;
+    health: number,
+    isDead: boolean,
+    type: EnemyTypeEnum
+}
 
 export const useEnemyStore = defineStore('enemyStore', () => {
 
-
-    const enemies = ref<Array<{ id: string; position: Vector3; health: number, isDead: boolean }>>([]);
+    const enemies = ref<Array<EnemyAlive>>([]);
     const enemyDiedEventBus = useEventBus('enemyEventBus');
 
-    const registerEnemy = (id: string, position: Vector3) => {
-        enemies.value.push({ id, position, health: 100 });
+    const registerEnemy = (id: string, position: Vector3, type: EnemyTypeEnum) => {
+        enemies.value.push({ id, position, health: 100, type });
     };
 
     const updateEnemyPosition = (id: string, position: Vector3) => {

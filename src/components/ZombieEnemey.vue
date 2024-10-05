@@ -25,7 +25,7 @@ import {Mesh, Quaternion, Vector3} from 'three';
 import {useRenderLoop} from '@tresjs/core';
 import {usePlayerStore} from '@/stores/playerStore';
 import {useEnemyStore} from '@/stores/enemyStore';
-import {SkeletonAnimationEnum} from '../../enum/skeleton-animation.enum';
+import {ZombieAnimationEnum} from '../../enum/zombie-animation.enum';
 import {useEventBus} from "@vueuse/core";
 import type {Enemy} from "@/components/BattleManager.vue";
 import useCharacter from "@/composable/useCharacter";
@@ -39,7 +39,7 @@ const emit = defineEmits(['die'])
     }
   })
 
-  const { scene: model, animations } = await useGLTF('../static/models/Skeleton.glb');
+  const { scene: model, animations } = await useGLTF('../static/models/Zombie.glb');
   const { actions, mixer } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
 
@@ -52,10 +52,10 @@ const emit = defineEmits(['die'])
     enemyRef,
     actions,
     {
-      walk: SkeletonAnimationEnum.Walk,
-      idle: SkeletonAnimationEnum.Idle,
-      attack: SkeletonAnimationEnum.Sword,
-      die: SkeletonAnimationEnum.Death
+      walk: ZombieAnimationEnum.Walk,
+      idle: ZombieAnimationEnum.Idle,
+      attack: ZombieAnimationEnum.Attack,
+      die: ZombieAnimationEnum.Death
     },
     {
      nextAttackDelay: config.attackDelay || 1000
@@ -76,6 +76,7 @@ const emit = defineEmits(['die'])
   onMounted(() => {
     spawnEnemy();
     listenEvents();
+    console.warn(actions)
   });
 
   onUnmounted(() => {
@@ -95,7 +96,7 @@ const emit = defineEmits(['die'])
   }
 
   const spawnEnemy = () => {
-    enemyStore.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.SKELETON);
+    enemyStore.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.ZOMBIE);
     enemyRef.value.position.set(
         config.spawnPosition.x,
         config.spawnPosition.y,

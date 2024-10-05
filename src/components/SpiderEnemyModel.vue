@@ -19,19 +19,22 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, onUnmounted, shallowRef} from 'vue';
-import {Html, useAnimations, useGLTF} from '@tresjs/cientos';
-import {Mesh, Quaternion, Vector3} from 'three';
-import {useRenderLoop} from '@tresjs/core';
-import {usePlayerStore} from '@/stores/playerStore';
-import {useEnemyStore} from '@/stores/enemyStore';
-import {SkeletonAnimationEnum} from '../../enum/skeleton-animation.enum';
-import {useEventBus} from "@vueuse/core";
-import type {Enemy} from "@/components/BattleManager.vue";
-import useCharacter from "@/composable/useCharacter";
-import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
+  import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from 'vue';
+  import {useAnimations, useGLTF, Html} from '@tresjs/cientos';
+  import {AnimationAction, Box3, BoxGeometry, Mesh, MeshBasicMaterial, Quaternion, Vector3} from 'three';
+  import {useRenderLoop, useTresContext} from '@tresjs/core';
+  import {usePlayerStore} from '@/stores/playerStore';
+  import {useEnemyStore} from '@/stores/enemyStore';
+  import {SpiderAnimationEnum} from '../../enum/spider-animation.enum';
+  import {generateUUID} from 'three/src/math/MathUtils';
+  import {LoopOnce, LoopRepeat} from "three/src/constants";
+  import gsap from 'gsap';
+  import {useEventBus} from "@vueuse/core";
+  import type {Enemy} from "@/components/BattleManager.vue";
+  import useCharacter from "@/composable/useCharacter";
+  import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
 
-const emit = defineEmits(['die'])
+  const emit = defineEmits(['die'])
   const {config} = defineProps({
     config: {
       type: Object as Enemy,
@@ -39,7 +42,7 @@ const emit = defineEmits(['die'])
     }
   })
 
-  const { scene: model, animations } = await useGLTF('../static/models/Skeleton.glb');
+  const { scene: model, animations } = await useGLTF('../static/models/Spider.glb');
   const { actions, mixer } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
 
@@ -52,10 +55,10 @@ const emit = defineEmits(['die'])
     enemyRef,
     actions,
     {
-      walk: SkeletonAnimationEnum.Walk,
-      idle: SkeletonAnimationEnum.Idle,
-      attack: SkeletonAnimationEnum.Sword,
-      die: SkeletonAnimationEnum.Death
+      walk: SpiderAnimationEnum.Walk,
+      idle: SpiderAnimationEnum.Idle,
+      attack: SpiderAnimationEnum.Attack,
+      die: SpiderAnimationEnum.Death
     },
     {
      nextAttackDelay: config.attackDelay || 1000
@@ -67,13 +70,14 @@ const emit = defineEmits(['die'])
   )
 
   // TODO this should be dynamic. Remember to pass to useCharacter
-  const attackDistance = 2;
+  const attackDistance = 3;
 
   const enemyStoreInstance = computed(() => {
     return enemyStore.enemies.find(e => e.id === config.enemyId);
   })
 
   onMounted(() => {
+    console.warn(actions)
     spawnEnemy();
     listenEvents();
   });
@@ -95,7 +99,7 @@ const emit = defineEmits(['die'])
   }
 
   const spawnEnemy = () => {
-    enemyStore.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.SKELETON);
+    enemyStore.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.SPIDER);
     enemyRef.value.position.set(
         config.spawnPosition.x,
         config.spawnPosition.y,
