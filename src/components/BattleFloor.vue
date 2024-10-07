@@ -2,6 +2,7 @@
   <TresMesh receive-shadow>
     <TresPlaneGeometry :args="[50, 50, 50]" :rotate-x="Math.PI / 2" />
     <TresMeshStandardMaterial
+        color="#42475f"
         :side="DoubleSide"
     />
   </TresMesh>

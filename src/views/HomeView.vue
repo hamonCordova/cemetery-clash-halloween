@@ -1,7 +1,9 @@
 <template>
   <TresCanvas window-size v-bind="rendererProps">
     <StatsGl />
-    <Stars />
+    <Suspense>
+      <BattleScene />
+    </Suspense>
     <TresPerspectiveCamera :args="[85, 1, 0.1, 10000]" :position="[0, 10, 10]" />
     <BattleBase />
     <TresAmbientLight :intensity="1" />
@@ -25,8 +27,9 @@
   import BattleFloor from "@/components/BattleFloor.vue";
   import BattleBase from "@/components/BattleBase.vue";
   import EnemyModel from "@/components/EnemyModel.vue";
-  import {StatsGl, Stars} from "@tresjs/cientos";
+  import {StatsGl, Stars, OrbitControls} from "@tresjs/cientos";
   import BattleManager from "@/components/BattleManager.vue";
+  import BattleScene from "@/components/BattleScene.vue";
 
 
   const rendererProps = {
