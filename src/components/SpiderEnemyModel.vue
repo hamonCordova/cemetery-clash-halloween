@@ -21,7 +21,16 @@
 <script setup lang="ts">
   import {computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch} from 'vue';
   import {useAnimations, useGLTF, Html} from '@tresjs/cientos';
-  import {AnimationAction, Box3, BoxGeometry, Mesh, MeshBasicMaterial, Quaternion, Vector3} from 'three';
+  import {
+    AnimationAction,
+    Box3,
+    BoxGeometry,
+    CircleGeometry,
+    Mesh,
+    MeshBasicMaterial, MeshStandardMaterial, MeshToonMaterial,
+    Quaternion, SphereGeometry,
+    Vector3
+  } from 'three';
   import {useRenderLoop, useTresContext} from '@tresjs/core';
   import {usePlayerStore} from '@/stores/playerStore';
   import {useEnemyStore} from '@/stores/enemyStore';
@@ -43,15 +52,15 @@
   })
 
   const { scene: model, animations } = await useGLTF('../static/models/Spider.glb');
+  const { scene: bloodSplat } = await useGLTF('../static/models/BloodSplat.glb');
   const { actions, mixer } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
-
+  const { scene } = useTresContext();
   const enemyRef = shallowRef<Mesh>();
-
   const playerStore = usePlayerStore();
   const enemyStore = useEnemyStore();
   const enemyEventBus = useEventBus('enemyEventBus');
-  const { attack, stopWalk, walk, die, isDead } = useCharacter(
+  const { attack, stopWalk, walk, die, idle, isDead } = useCharacter(
     enemyRef,
     actions,
     {
@@ -71,6 +80,18 @@
 
   // TODO this should be dynamic. Remember to pass to useCharacter
   const attackDistance = 3;
+  const distantAttackDistance = 9;
+
+  const longRangeMeshes = ref<Mesh[]>([]);
+  const isAttackingByDistance = ref(false);
+  const longRangeDelay = 4000;
+
+  const spiderBallMesh = new Mesh(
+      new SphereGeometry(0.3, 40),
+      new MeshToonMaterial({
+        color: '#6a262c',
+      })
+  )
 
   const enemyStoreInstance = computed(() => {
     return enemyStore.enemies.find(e => e.id === config.enemyId);
@@ -168,6 +189,102 @@
     }
   };
 
+  const checkProjectileHit = (projectilePosition: Vector3) => {
+    const playerPos = new Vector3().copy(playerStore.playerPosition);
+    const distance = projectilePosition.distanceTo(playerPos);
+
+    if (distance <= 1) {
+      playerStore.takeDamage(10);
+    } else {
+      const bloodSplatInstance = bloodSplat.clone();
+      bloodSplatInstance.position.set(projectilePosition.x, 0, projectilePosition.z);
+      scene.value.add(bloodSplatInstance);
+
+      setTimeout(() => {
+        scene.value.remove(bloodSplatInstance);
+        bloodSplatInstance.geometry.dispose();
+        bloodSplatInstance.material.dispose();
+      }, 5000);
+    }
+  };
+
+  const longRangeAttack = () => {
+
+    if (isAttackingByDistance.value) return
+
+    isAttackingByDistance.value = true;
+    stopWalk();
+
+    const attackAction = actions[SpiderAnimationEnum.Attack];
+    attackAction.setLoop(LoopOnce);
+    attackAction.reset();
+    attackAction.play();
+
+    const attackDuration = (attackAction.getClip().duration / attackAction.timeScale) * 0.7;
+
+    setTimeout(() => {
+
+      idle();
+
+      const spiderPosition = enemyRef.value.position.clone();
+      spiderBallMesh.position.set(spiderPosition.x, 1, spiderPosition.z);
+
+      longRangeMeshes.value.push(spiderBallMesh)
+      scene.value.add(spiderBallMesh)
+
+      const playerPosition = playerStore.playerPosition;
+      const duration = 0.8;
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          onLongRangeAttackComplete(spiderBallMesh);
+          checkProjectileHit(spiderBallMesh.position);
+        }
+      });
+
+
+      tl.to(spiderBallMesh.position, {
+        duration: duration,
+        x: playerPosition.x,
+        ease: "linear"
+      }, 0);
+
+      tl.to(spiderBallMesh.position, {
+        duration: duration,
+        z: playerPosition.z,
+        ease: "linear"
+      }, 0);
+
+      tl.to(spiderBallMesh.position, {
+        duration: duration / 2,
+        y: 4 ,
+        ease: "power1.out"
+      }, 0);
+
+      tl.to(spiderBallMesh.position, {
+        duration: duration / 2,
+        y: 0,
+        ease: "power1.in"
+      }, duration / 2);
+
+      setTimeout(() => {
+        isAttackingByDistance.value = false;
+      }, longRangeDelay)
+    }, attackDuration * 1000)
+
+  }
+
+  const onLongRangeAttackComplete = (mesh: Mesh) => {
+    const meshReferenceIndex = longRangeMeshes.value.findIndex(m => m.uuid === mesh.uuid);
+    if (meshReferenceIndex === -1) return;
+
+    mesh.geometry.dispose();
+    mesh.material.dispose();
+    scene.value.remove(mesh);
+    scene.value.needsUpdate = true;
+    longRangeMeshes.value.splice(meshReferenceIndex, 1);
+  }
+
   const moveTowardsPlayer = (delta: number) => {
 
     if (isDead.value) return;
@@ -180,6 +297,13 @@
 
       const directionToPlayer = new Vector3().subVectors(playerPos, enemyPos);
       const distanceToPlayer = enemyPos.distanceTo(playerPos);
+
+      if (distanceToPlayer >= distantAttackDistance) {
+        stopWalk();
+        longRangeAttack();
+        followPlayerRotation(playerPos, delta)
+        return;
+      }
 
       if (distanceToPlayer <= attackDistance) {
         attack()

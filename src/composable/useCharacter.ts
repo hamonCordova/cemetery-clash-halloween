@@ -97,7 +97,7 @@ export default function useCharacter(
     const stopWalk = () => {
         if (!isWalking.value) return;
 
-        actions[actionsName.die].stop();
+        actions[actionsName.walk].stop();
         isWalking.value = false;
     }
 
