@@ -1,15 +1,9 @@
 <template>
-  <Suspense>
-    <SkeletonModel />
-  </Suspense>
+  <SkeletonModel />
   <template v-if="currentRound">
     <template v-for="enemy in currentRoundStage.enemies" :key="enemy.enemyId">
-      <Suspense v-if="!enemy.isDead && enemy.type === 'SKELETON'">
-        <EnemyModel :config="enemy" @die="enemyDied($event)" />
-      </Suspense>
-      <Suspense v-if="!enemy.isDead && enemy.type === 'SPIDER'">
-        <SpiderEnemyModel :config="enemy" @die="enemyDied($event)" />
-      </Suspense>
+      <EnemyModel :config="enemy" @die="enemyDied($event)" v-if="!enemy.isDead && enemy.type === 'SKELETON'" />
+      <SpiderEnemyModel :config="enemy" @die="enemyDied($event)" v-if="!enemy.isDead && enemy.type === 'SPIDER'" />
       <Suspense v-if="!enemy.isDead && enemy.type === 'ZOMBIE'">
         <ZombieEnemey :config="enemy" @die="enemyDied($event)" />
       </Suspense>

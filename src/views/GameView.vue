@@ -2,10 +2,13 @@
   <template v-if="resources.isLoaded.value">
     <TresCanvas window-size v-bind="rendererProps">
       <StatsGl />
+      <Stars />
+      <TresFogExp2 color="red" density="900" />
       <Suspense>
         <BattleScene />
       </Suspense>
-      <TresPerspectiveCamera :args="[85, 1, 0.1, 10000]" :position="[0, 10, 10]" />
+      <TresPerspectiveCamera :args="[70, 1, 0.1, 10000]" :position="[0, 10, 10]" />
+<!--      <OrbitControls />-->
       <BattleBase />
       <TresAmbientLight :intensity="1" />
       <TresPointLight
@@ -29,7 +32,7 @@
   import BattleFloor from "@/components/BattleFloor.vue";
   import BattleBase from "@/components/BattleBase.vue";
   import EnemyModel from "@/components/EnemyModel.vue";
-  import {StatsGl, Stars, OrbitControls} from "@tresjs/cientos";
+  import {StatsGl, Stars, OrbitControls, Smoke} from "@tresjs/cientos";
   import BattleManager from "@/components/BattleManager.vue";
   import BattleScene from "@/components/BattleScene.vue";
   import {onMounted} from "vue";

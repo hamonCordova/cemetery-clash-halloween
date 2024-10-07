@@ -1,5 +1,5 @@
 <template>
-  <primitive ref="skeletonRef" :object="model" :scale="[1.5, 1.5, 1.5]" cast-shadow :position="[0, 0.01, 0]"></primitive>
+  <primitive v-if="model" ref="skeletonRef" :object="model" :scale="[1.5, 1.5, 1.5]" cast-shadow :position="[0, 0.01, 0]"></primitive>
 </template>
 
 <script setup lang="ts">
@@ -7,13 +7,15 @@
   import {onMounted, shallowRef} from "vue";
   import {useAnimations, useGLTF} from "@tresjs/cientos";
   import {SkeletonAnimationEnum} from "../../enum/skeleton-animation.enum";
-  import {AnimationAction, Mesh, Quaternion, Vector3} from "three";
+  import {AnimationAction, MathUtils, Mesh, Quaternion, Vector3} from "three";
   import {useRenderLoop, useTresContext} from "@tresjs/core";
   import {usePlayerStore} from "@/stores/playerStore";
   import {useEnemyStore} from "@/stores/enemyStore";
   import {EnemyTypeDamageRangeEnum} from "../../enum/enemy-type-damage-range.enum";
+  import {useResources} from "@/composable/useResources";
 
-  const {scene: model, animations} = await useGLTF('../static/models/Skeleton.glb');
+  const resources = useResources();
+  const {scene: model, animations} = resources.get('skeleton');
   const { actions, mixer } = useAnimations(animations, model)
   const { scene, camera } = useTresContext()
   const skeletonRef = shallowRef<Mesh>();
@@ -30,6 +32,7 @@
   const jumpDuration = 0.8;
 
   onMounted(() => {
+    console.warn(model)
     animate(SkeletonAnimationEnum.Idle);
     enableShadow();
     initEventListeners();
@@ -64,7 +67,7 @@
 
   const moveCamera = () => {
     if (skeletonRef.value && camera.value) {
-      const cameraOffset = new Vector3(0, 5, 10);
+      const cameraOffset = new Vector3(0, 7, 15);
       const characterPosition = skeletonRef.value.position.clone();
       const cameraTargetPosition = characterPosition.add(cameraOffset);
 
@@ -193,6 +196,12 @@
 
       // Atualiza a posição com o movimento permitido
       skeletonRef.value.position.add(movement);
+
+      // Clamp the position to stay within the 25x25 area
+      const halfSize = 11.5; // Half of 25
+      skeletonRef.value.position.x = MathUtils.clamp(skeletonRef.value.position.x, -halfSize, halfSize);
+      skeletonRef.value.position.z = MathUtils.clamp(skeletonRef.value.position.z, -halfSize, halfSize);
+
       playerStore.updatePlayerPosition(skeletonRef.value.position);
 
       // Atualiza a rotação do personagem

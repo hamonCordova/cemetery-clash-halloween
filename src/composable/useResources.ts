@@ -2,11 +2,13 @@ import {createGlobalState, useEventBus} from "@vueuse/core";
 import {LoadingManager} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {ref} from "vue";
+import {useAnimations} from "@tresjs/cientos";
+import {clone} from "three/examples/jsm/utils/SkeletonUtils";
 
 export const useResources = createGlobalState(() => {
 
     const isLoaded = ref(false);
-    let resources = {}
+    let resources = {};
 
     const sources = [
         {
@@ -65,6 +67,36 @@ export const useResources = createGlobalState(() => {
             type: 'GLTFLoader'
         },
         {
+            name: 'fence',
+            path: '../static/models/scene/Fence.glb',
+            type: 'GLTFLoader'
+        },
+        {
+            name: 'fenceGate',
+            path: '../static/models/scene/FenceGate.glb',
+            type: 'GLTFLoader'
+        },
+        {
+            name: 'fenceBroken',
+            path: '../static/models/scene/FenceBroken.glb',
+            type: 'GLTFLoader'
+        },
+        {
+            name: 'rockPathSmall',
+            path: '../static/models/scene/RockPathSmall.glb',
+            type: 'GLTFLoader'
+        },
+        {
+            name: 'rockPathThin',
+            path: '../static/models/scene/RockPathThin.glb',
+            type: 'GLTFLoader'
+        },
+        {
+            name: 'floorSmall',
+            path: '../static/models/scene/FloorSmall.glb',
+            type: 'GLTFLoader'
+        },
+        {
             name: 'skeleton',
             path: '../static/models/Skeleton.glb',
             type: 'GLTFLoader'
@@ -104,8 +136,22 @@ export const useResources = createGlobalState(() => {
         })
     }
 
+    const get = (resourceName: string) => {
+        const resource = resources[resourceName];
+        const resourceType = sources.find(s => s.name === resourceName)?.type
+        if (resourceType === 'GLTFLoader') {
+            return {
+                scene: clone(resource.scene),
+                animations: resource.animations
+            }
+        }
+
+        return resource;
+    }
+
     return {
         load,
+        get,
         isLoaded,
         resources,
     }

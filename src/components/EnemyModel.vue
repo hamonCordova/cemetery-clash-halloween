@@ -30,6 +30,7 @@ import {useEventBus} from "@vueuse/core";
 import type {Enemy} from "@/components/BattleManager.vue";
 import useCharacter from "@/composable/useCharacter";
 import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
+import {useResources} from "@/composable/useResources";
 
 const emit = defineEmits(['die'])
   const {config} = defineProps({
@@ -39,7 +40,8 @@ const emit = defineEmits(['die'])
     }
   })
 
-  const { scene: model, animations } = await useGLTF('../static/models/Skeleton.glb');
+  const resources = useResources();
+  const { scene: model, animations } = resources.get('skeleton');
   const { actions, mixer } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
 

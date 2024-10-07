@@ -42,6 +42,7 @@
   import type {Enemy} from "@/components/BattleManager.vue";
   import useCharacter from "@/composable/useCharacter";
   import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
+  import {useResources} from "@/composable/useResources";
 
   const emit = defineEmits(['die'])
   const {config} = defineProps({
@@ -51,8 +52,8 @@
     }
   })
 
-  const { scene: model, animations } = await useGLTF('../static/models/Spider.glb');
-  const { scene: bloodSplat } = await useGLTF('../static/models/BloodSplat.glb');
+  const resources = useResources();
+  const { scene: model, animations } = resources.get('spider');
   const { actions, mixer } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
   const { scene } = useTresContext();
@@ -196,7 +197,7 @@
     if (distance <= 1) {
       playerStore.takeDamage(10);
     } else {
-      const bloodSplatInstance = bloodSplat.clone();
+      const bloodSplatInstance = resources.get('bloodSplate').scene;
       bloodSplatInstance.position.set(projectilePosition.x, 0, projectilePosition.z);
       scene.value.add(bloodSplatInstance);
 
