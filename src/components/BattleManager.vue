@@ -123,6 +123,14 @@ export interface Enemy {
             moveSpeed: 2.5,
             type: EnemyTypeEnum.SPIDER
           },
+          {
+            enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 3000,
+            rotationSpeed: 3,
+            moveSpeed: 3.5,
+            type: EnemyTypeEnum.SKELETON
+          },
         ]
       } as RoundStage,
       {

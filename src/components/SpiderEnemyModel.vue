@@ -133,14 +133,6 @@
         config.scale || 1.5,
         config.scale || 1.5,
     )
-
-    model.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    })
-
   }
 
   const followPlayerRotation = (targetPosition: Vector3, delta: number) => {

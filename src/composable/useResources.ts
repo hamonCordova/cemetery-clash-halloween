@@ -19,27 +19,32 @@ export const useResources = createGlobalState(() => {
         {
             name: 'candles',
             path: '../static/models/scene/Candles.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: true
         },
         {
             name: 'cobweb',
             path: '../static/models/scene/Cobweb.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: true
         },
         {
             name: 'crypt',
             path: '../static/models/scene/Crypt.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: true
         },
         {
             name: 'damagedGrave',
             path: '../static/models/scene/DamagedGrave.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: true
         },
         {
             name: 'deadTree',
             path: '../static/models/scene/DeadTree.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: true
         },
         {
             name: 'grass',
@@ -47,38 +52,98 @@ export const useResources = createGlobalState(() => {
             type: 'GLTFLoader'
         },
         {
+            name: 'graveUnder',
+            path: '../static/models/scene/GraveUnder.glb',
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
             name: 'grave',
             path: '../static/models/scene/Grave.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: true
         },
         {
             name: 'gravestone',
             path: '../static/models/scene/Gravestone.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: true
         },
         {
             name: 'postWithSkull',
             path: '../static/models/scene/PostWithSkull.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: true
         },
         {
             name: 'pumpkin',
             path: '../static/models/scene/Pumpkin.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
+            name: 'coffin',
+            path: '../static/models/scene/Coffin.glb',
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
+            name: 'skull',
+            path: '../static/models/scene/Skull.glb',
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
+            name: 'bone',
+            path: '../static/models/scene/Bone.glb',
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
+            name: 'smallDeadTree',
+            path: '../static/models/scene/SmallDeadTree.glb',
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
+            name: 'plaqueCandles',
+            path: '../static/models/scene/PlaqueDeadCandles.glb',
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
+            name: 'shovel',
+            path: '../static/models/scene/Shovel.glb',
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
+            name: 'lantern',
+            path: '../static/models/scene/Lantern.glb',
+            type: 'GLTFLoader',
+            castShadow: true
         },
         {
             name: 'fence',
             path: '../static/models/scene/Fence.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: true
         },
         {
             name: 'fenceGate',
             path: '../static/models/scene/FenceGate.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: true
         },
         {
             name: 'fenceBroken',
             path: '../static/models/scene/FenceBroken.glb',
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
+            name: 'path',
+            path: '../static/models/scene/Path.glb',
             type: 'GLTFLoader'
         },
         {
@@ -99,17 +164,20 @@ export const useResources = createGlobalState(() => {
         {
             name: 'skeleton',
             path: '../static/models/Skeleton.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: false
         },
         {
             name: 'spider',
             path: '../static/models/Spider.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: false
         },
         {
             name: 'zombie',
             path: '../static/models/Zombie.glb',
-            type: 'GLTFLoader'
+            type: 'GLTFLoader',
+            castShadow: false
         },
         {
             name: 'bloodSplate',
@@ -130,6 +198,16 @@ export const useResources = createGlobalState(() => {
         sources.forEach(source => {
             if (source.type === 'GLTFLoader') {
                 gltfLoader.load(source.path, (gltf) => {
+
+                    if (source.castShadow) {
+                        gltf.scene.traverse(obj => {
+                            if (obj.isMesh) {
+                                obj.castShadow = true;
+                                obj.receiveShadow = true;
+                            }
+                        })
+                    }
+
                     resources[source.name] = gltf;
                 })
             }

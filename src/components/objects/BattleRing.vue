@@ -7,12 +7,6 @@
   </TresMesh>
 -->
 
-  <!-- Tree -->
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.7, 0.7, 0.7]" :position="[13, 0, -15]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.7, 0.7, 0.7]" :position="[17, 0, -16]"></primitive>
-  <!--PumpKin-->
-  <Pumpkin :position="[10, 0.7, -14]" />
-  <Pumpkin :position="[14, 0.7, 8]" />
 
   <!-- Fences on the left side (-X), spaced by 6 units -->
   <primitive :object="resources.get('fence').scene" :scale="[1.5, 1.5, 1.5]" :position="[-12.5, 0, 9]" :rotate-y="Math.PI / 2"></primitive>

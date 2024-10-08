@@ -32,9 +32,7 @@
   const jumpDuration = 0.8;
 
   onMounted(() => {
-    console.warn(model)
     animate(SkeletonAnimationEnum.Idle);
-    enableShadow();
     initEventListeners();
   })
 
@@ -42,14 +40,6 @@
     move(delta)
     moveCamera();
   })
-
-  const enableShadow = () => {
-    model.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-      }
-    });
-  }
 
   const initEventListeners = () => {
     window.addEventListener("keydown", (event) => {
