@@ -44,11 +44,16 @@ export const useResources = createGlobalState(() => {
             name: 'deadTree',
             path: '../static/models/scene/DeadTree.glb',
             type: 'GLTFLoader',
-            castShadow: true
+            castShadow: true,
         },
         {
             name: 'grass',
             path: '../static/models/scene/Grass.glb',
+            type: 'GLTFLoader'
+        },
+        {
+            name: 'rockGrass',
+            path: '../static/models/scene/RockGrass.glb',
             type: 'GLTFLoader'
         },
         {
@@ -90,6 +95,12 @@ export const useResources = createGlobalState(() => {
         {
             name: 'skull',
             path: '../static/models/scene/Skull.glb',
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
+            name: 'ribcage',
+            path: '../static/models/scene/Ribcage.glb',
             type: 'GLTFLoader',
             castShadow: true
         },
@@ -214,12 +225,24 @@ export const useResources = createGlobalState(() => {
         })
     }
 
-    const get = (resourceName: string) => {
+    const get = (resourceName: string, opacity?: number) => {
         const resource = resources[resourceName];
         const resourceType = sources.find(s => s.name === resourceName)?.type
         if (resourceType === 'GLTFLoader') {
+
+            const scene = clone(resource.scene);
+            if (opacity) {
+                scene.traverse((obj) => {
+                    if (obj.isMesh) {
+                        obj.material = obj.material.clone();
+                        obj.material.transparent = true;
+                        obj.material.opacity = opacity;
+                    }
+                })
+            }
+
             return {
-                scene: clone(resource.scene),
+                scene,
                 animations: resource.animations
             }
         }
