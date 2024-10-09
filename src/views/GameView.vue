@@ -45,7 +45,7 @@
     shadowMapType: PCFSoftShadowMap,
     outputColorSpace: SRGBColorSpace,
     toneMapping: ACESFilmicToneMapping,
-    powerPreference: 'high-performance'
+    powerPreference: 'high-performance',
   }
 
   onMounted(() => {

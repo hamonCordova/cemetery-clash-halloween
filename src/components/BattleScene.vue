@@ -7,36 +7,36 @@
   <TresDirectionalLight :args="['#fff', 2]" :position="[-27, 10, -27]" cast-shadow :shadow-mapSize-height="512" :shadow-mapSize-width="512" />
 
   <!-- Tree -->
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.9, 0.9, 0.9]" :position="[24, 0, -21]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.8, 0.8, 0.8]" :position="[20, 0, -23]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.6, 0.6, 0.6]" :position="[5, 0, -30]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.6, 0.6, 0.6]" :position="[9, 0, -30]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.75, 0.75, 0.75]" :position="[15, 0, -24]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[1, 1, 1]" :position="[10, 0, -27]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.9, 1.9, 1.9]" :position="[24, 0, -21]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.9, 1.9, 1.9]" :position="[20, 0, -23]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.4, 1.4, 1.4]" :position="[5, 0, -30]"></primitive>
+  <primitive :object="resources.get('deadTree2').scene" :scale="[0.7, 0.7, 0.7]" :position="[9, 0, -30]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.6, 1.6, 1.6]" :position="[15, 0, -24]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.9, 1.9, 1.9]" :position="[10, 0, -27]"></primitive>
   <primitive :object="resources.get('smallDeadTree').scene" :scale="[1, 1, 1]" :position="[14, 0, -29]"></primitive>
-  <primitive :object="resources.get('smallDeadTree').scene" :scale="[1.2, 1.2, 1.2]" :position="[18, 0, -22]"></primitive>
-  <primitive :object="resources.get('deadTree', 0.3).scene" :scale="[0.8, 0.8, 0.8]" :position="[18, 0, -35]"></primitive>
-  <primitive :object="resources.get('deadTree', 0.4).scene" :scale="[0.8, 0.8, 0.8]" :position="[13, 0, -32]"></primitive>
-  <primitive :object="resources.get('deadTree', 0.4).scene" :scale="[0.8, 0.8, 0.8]" :position="[22, 0, -32]"></primitive>
+  <primitive :object="resources.get('smallDeadTree').scene" :scale="[1.4, 1.4, 1.4]" :position="[18, 0, -22]"></primitive>
+  <primitive :object="resources.get('deadTree', 0.3).scene" :scale="[1.4, 1.4, 1.4]" :position="[18, 0, -35]"></primitive>
+  <primitive :object="resources.get('deadTree', 0.4).scene" :scale="[1.4, 1.4, 1.4]" :position="[13, 0, -32]"></primitive>
+  <primitive :object="resources.get('deadTree2', 0.4).scene" :scale="[0.8, 0.8, 0.8]" :position="[22, 0, -32]"></primitive>
 
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.7, 0.7, 0.7]" :position="[-24, 0, -21]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.8, 0.8, 0.8]" :position="[-20, 0, -23]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.6, 0.6, 0.6]" :position="[-5, 0, -30]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.6, 0.6, 0.6]" :position="[-9, 0, -30]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.75, 0.75, 0.75]" :position="[-15, 0, -24]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[1, 1, 1]" :position="[-10, 0, -27]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.4, 1.4, 1.4]" :position="[-24, 0, -21]"></primitive>
+  <primitive :object="resources.get('deadTree2').scene" :scale="[0.9, 0.9, 0.9]" :position="[-20, 0, -23]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.4, 1.4, 1.4]" :position="[-5, 0, -30]"></primitive>
+  <primitive :object="resources.get('deadTree2').scene" :scale="[0.65, 0.65, 0.65]" :position="[-9, 0, -30]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.6, 1.6, 1.6]" :position="[-15, 0, -24]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.9, 1.9, 1.9]" :position="[-10, 0, -27]"></primitive>
   <primitive :object="resources.get('smallDeadTree').scene" :scale="[1, 1, 1]" :position="[-14, 0, -29]"></primitive>
-  <primitive :object="resources.get('smallDeadTree').scene" :scale="[1.2, 1.2, 1.2]" :position="[-18, 0, -22]"></primitive>
-  <primitive :object="resources.get('deadTree', 0.3).scene" :scale="[0.8, 0.8, 0.8]" :position="[-18, 0, -35]"></primitive>
-  <primitive :object="resources.get('deadTree', 0.4).scene" :scale="[0.8, 0.8, 0.8]" :position="[-13, 0, -32]"></primitive>
-  <primitive :object="resources.get('deadTree', 0.4).scene" :scale="[0.8, 0.8, 0.8]" :position="[-22, 0, -32]"></primitive>
+  <primitive :object="resources.get('smallDeadTree').scene" :scale="[1.4, 1.4, 1.4]" :position="[-18, 0, -22]"></primitive>
+  <primitive :object="resources.get('deadTree', 0.3).scene" :scale="[1.4, 1.4, 1.4]" :position="[-18, 0, -35]"></primitive>
+  <primitive :object="resources.get('deadTree', 0.4).scene" :scale="[1.4, 1.4, 1.4]" :position="[-13, 0, -32]"></primitive>
+  <primitive :object="resources.get('deadTree', 0.4).scene" :scale="[1.4, 1.4, 1.4]" :position="[-22, 0, -32]"></primitive>
 
+  <primitive :object="resources.get('deadTree2', 0.2).scene" :scale="[1, 1, 1]" :position="[-2, 0, -35]"></primitive>
+  <primitive :object="resources.get('deadTree', 0.5).scene" :scale="[1.4, 1.4, 1.4]" :position="[13, 0, -35]"></primitive>
+  <primitive :object="resources.get('deadTree2', 0.5).scene" :scale="[1.1, 1.1, 1.1]" :position="[-5, 0, -32]"></primitive>
+  <primitive :object="resources.get('deadTree', 0.2).scene" :scale="[1.4, 1.4, 1.4]" :position="[-1, 0, -39]"></primitive>
+  <primitive :object="resources.get('deadTree', 0.2).scene" :scale="[1.4, 1.4, 1.4]" :position="[7, 0, -39]"></primitive>
 
-  <primitive :object="resources.get('deadTree', 0.2).scene" :scale="[0.6, 0.6, 0.6]" :position="[-2, 0, -35]"></primitive>
-  <primitive :object="resources.get('deadTree', 0.5).scene" :scale="[0.8, 0.8, 0.8]" :position="[13, 0, -35]"></primitive>
-  <primitive :object="resources.get('deadTree', 0.5).scene" :scale="[0.8, 0.8, 0.8]" :position="[-5, 0, -32]"></primitive>
-  <primitive :object="resources.get('deadTree', 0.2).scene" :scale="[0.8, 0.8, 0.8]" :position="[-1, 0, -39]"></primitive>
-  <primitive :object="resources.get('deadTree', 0.2).scene" :scale="[0.8, 0.8, 0.8]" :position="[7, 0, -39]"></primitive>
 
 
 
@@ -45,6 +45,7 @@
 
   <!-- Crypt -->
   <primitive :object="resources.get('crypt').scene" :scale="[1.3, 1.3, 1.3]" :position="[-5, 0, -22]"></primitive>
+  <primitive :object="resources.get('cobweb').scene" :scale="[2, 2, 2]" :position="[-2, 0, -17]" :rotation="[0, -0.5, 0]"></primitive>
   <primitive :object="resources.get('skull').scene" :position="[-7, 0.01, -16]" :rotation="[0, 0.6, 0]"></primitive>
   <primitive :object="resources.get('bone').scene" :position="[-10, 0.01, -18]"></primitive>
   <primitive :object="resources.get('bone').scene" :position="[-9.5, 0.01, -18.2]" :rotation="[0, 2.3, 0]"></primitive>
@@ -83,12 +84,24 @@
   <Lantern :position="[14, 0.01, -18.5]" />
 
   <!-- Tree -->
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.7, 0.7, 0.7]" :position="[13, 0, -15]"></primitive>
-  <primitive :object="resources.get('deadTree').scene" :scale="[0.7, 0.7, 0.7]" :position="[17, 0, -16]"></primitive>
-  <!--PumpKin-->
+  <primitive :object="resources.get('deadTree2').scene" :scale="[1, 1, 1]" :position="[13, 0, -15]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.2, 1.2, 1.2]" :position="[17, 0, -16]"></primitive>
   <Pumpkin :position="[10, 0.7, -15]" />
   <Pumpkin :position="[14, 0.7, 8]" />
 
+  <!-- Left side -->
+  <primitive :object="resources.get('cemetary').scene" :scale="[4, 4, 4]" :position="[-20, 1, -10]"></primitive>
+  <primitive :object="resources.get('cobweb').scene" :scale="[2.6, 2.6, 2.6]" :position="[-20, 1, -10]"></primitive>
+  <Pumpkin :position="[-14.5, 0.65, -4]" :rotation="[0, -2, 0]" />
+  <Lantern :position="[-16.5, 1, -10]" />
+
+  <template v-for="item in 10" :key="item">
+    <primitive :object="resources.get('path').scene" :scale="[1.3, 1.3, 1.3]" :position="[-19.5, 0.01, (-7.5 - (2.5 * -item))]"></primitive>
+  </template>
+  <primitive :object="resources.get('crypt').scene" :scale="[1.3, 1.3, 1.3]" :position="[-27, 0, -2]" :rotation="[0, 1.3, 0]"></primitive>
+  <primitive :object="resources.get('crypt').scene" :scale="[1.3, 1.3, 1.3]" :position="[-27, 0, 9]" :rotation="[0, 1.6, 0]"></primitive>
+  <PostLantern :position="[-22, 0, 3.5]" :rotation="[0, 0.7, 0]" />
+  <Pumpkin :position="[-21.5, 0.65, 13]" :rotation="[0, -2.5, 0]" />
 
   <BattleRing />
 
@@ -108,6 +121,7 @@ import {useRenderLoop, useTresContext, vLightHelper} from "@tresjs/core";
   import {GammaCorrectionShader} from "three/examples/jsm/shaders/GammaCorrectionShader";
   import Candles from "@/components/objects/Candles.vue";
   import Lantern from "@/components/objects/Lantern.vue";
+import PostLantern from "@/components/objects/PostLantern.vue";
 
   const resources = useResources();
   const { renderer, scene, camera } = useTresContext();

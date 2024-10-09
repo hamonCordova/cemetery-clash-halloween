@@ -1,5 +1,5 @@
 import {createGlobalState, useEventBus} from "@vueuse/core";
-import {LoadingManager} from "three";
+import {LoadingManager, MeshBasicMaterial} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {ref} from "vue";
 import {useAnimations} from "@tresjs/cientos";
@@ -42,7 +42,19 @@ export const useResources = createGlobalState(() => {
         },
         {
             name: 'deadTree',
+            path: '../static/models/scene/DeadTree2.glb',
+            type: 'GLTFLoader',
+            castShadow: true,
+        },
+        {
+            name: 'deadTree2',
             path: '../static/models/scene/DeadTree.glb',
+            type: 'GLTFLoader',
+            castShadow: true,
+        },
+        {
+            name: 'postLantern',
+            path: '../static/models/scene/PostLantern.glb',
             type: 'GLTFLoader',
             castShadow: true,
         },
@@ -170,6 +182,11 @@ export const useResources = createGlobalState(() => {
         {
             name: 'floorSmall',
             path: '../static/models/scene/FloorSmall.glb',
+            type: 'GLTFLoader'
+        },
+        {
+            name: 'cemetary',
+            path: '../static/models/scene/Cemetary.glb',
             type: 'GLTFLoader'
         },
         {

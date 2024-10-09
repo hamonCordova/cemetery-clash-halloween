@@ -220,14 +220,13 @@
       idle();
 
       const spiderPosition = enemyRef.value.position.clone();
-      spiderBallMesh.position.set(spiderPosition.x, 1, spiderPosition.z);
+      spiderBallMesh.position.set(spiderPosition.x, 1, spiderPosition.z - 1.5);
 
       const playerPosition = playerStore.playerPosition;
       const duration = 0.8;
 
       const tl = gsap.timeline({
         onComplete: () => {
-          onLongRangeAttackComplete(spiderBallMesh);
           checkProjectileHit(spiderBallMesh.position);
         }
       });
