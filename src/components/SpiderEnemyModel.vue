@@ -263,10 +263,6 @@
 
   }
 
-  const onLongRangeAttackComplete = (mesh: Mesh) => {
-
-  }
-
   const moveTowardsPlayer = (delta: number) => {
 
     if (isDead.value) return;
