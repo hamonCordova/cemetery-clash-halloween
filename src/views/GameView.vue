@@ -7,8 +7,8 @@
       <Suspense>
         <BattleScene />
       </Suspense>
-      <TresPerspectiveCamera :args="[60, 1, 0.1, 10000]" :position="[0, 10, 10]" />
-<!--     <OrbitControls />-->
+      <TresPerspectiveCamera :args="[50, 1, 0.1, 10000]" :position="[0, 10, 10]" />
+      <OrbitControls />
       <TresAmbientLight :intensity="0.5" />
 <!--      <TresPointLight
           :args="['#fff', 40, 20, 1]"
@@ -16,7 +16,7 @@
           :position="[0, 12, 9]"
           v-light-helper
       />-->
-      <BattleManager />
+<!--      <BattleManager />-->
       <Suspense>
         <BattleFloor />
       </Suspense>

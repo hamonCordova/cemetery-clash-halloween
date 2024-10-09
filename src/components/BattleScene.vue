@@ -25,8 +25,12 @@
   <primitive :object="resources.get('deadTree2').scene" :scale="[0.65, 0.65, 0.65]" :position="[-9, 0, -30]"></primitive>
   <primitive :object="resources.get('deadTree').scene" :scale="[1.6, 1.6, 1.6]" :position="[-15, 0, -24]"></primitive>
   <primitive :object="resources.get('deadTree').scene" :scale="[1.9, 1.9, 1.9]" :position="[-10, 0, -27]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.7, 1.7, 1.7]" :position="[-32, 0, -17]"></primitive>
+  <primitive :object="resources.get('deadTree2').scene" :scale="[0.9, 0.9, 0.9]" :position="[-32, 0, -25]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[2.1, 2.1, 2.1]" :position="[-32, 0, -10]"></primitive>
+  <primitive :object="resources.get('smallDeadTree').scene" :scale="[1, 1, 1]" :position="[-28, 0, -10]"></primitive>
   <primitive :object="resources.get('smallDeadTree').scene" :scale="[1, 1, 1]" :position="[-14, 0, -29]"></primitive>
-  <primitive :object="resources.get('smallDeadTree').scene" :scale="[1.4, 1.4, 1.4]" :position="[-18, 0, -22]"></primitive>
+  <primitive :object="resources.get('smallDeadTree').scene" :scale="[1.4, 1.4, 1.4]" :position="[-16, 0, -22]"></primitive>
   <primitive :object="resources.get('deadTree', 0.3).scene" :scale="[1.4, 1.4, 1.4]" :position="[-18, 0, -35]"></primitive>
   <primitive :object="resources.get('deadTree', 0.4).scene" :scale="[1.4, 1.4, 1.4]" :position="[-13, 0, -32]"></primitive>
   <primitive :object="resources.get('deadTree', 0.4).scene" :scale="[1.4, 1.4, 1.4]" :position="[-22, 0, -32]"></primitive>
@@ -90,18 +94,23 @@
   <Pumpkin :position="[14, 0.7, 8]" />
 
   <!-- Left side -->
-  <primitive :object="resources.get('cemetary').scene" :scale="[4, 4, 4]" :position="[-20, 1, -10]"></primitive>
-  <primitive :object="resources.get('cobweb').scene" :scale="[2.6, 2.6, 2.6]" :position="[-20, 1, -10]"></primitive>
+  <primitive :object="resources.get('cemetary').scene" :scale="[4, 4, 4]" :position="[-19, 1, -12]"></primitive>
+  <primitive :object="resources.get('cobweb').scene" :scale="[2.6, 2.6, 2.6]" :position="[-19.5, 1, -12.5]"></primitive>
+  <Candles :position="[-15.5, 1, -10.5]" />
   <Pumpkin :position="[-14.5, 0.65, -4]" :rotation="[0, -2, 0]" />
-  <Lantern :position="[-16.5, 1, -10]" />
 
   <template v-for="item in 10" :key="item">
-    <primitive :object="resources.get('path').scene" :scale="[1.3, 1.3, 1.3]" :position="[-19.5, 0.01, (-7.5 - (2.5 * -item))]"></primitive>
+    <primitive :object="resources.get('path').scene" :scale="[1.3, 1.3, 1.3]" :position="[-18.5, 0.01, (-9.5 - (2.5 * -item))]"></primitive>
   </template>
-  <primitive :object="resources.get('crypt').scene" :scale="[1.3, 1.3, 1.3]" :position="[-27, 0, -2]" :rotation="[0, 1.3, 0]"></primitive>
-  <primitive :object="resources.get('crypt').scene" :scale="[1.3, 1.3, 1.3]" :position="[-27, 0, 9]" :rotation="[0, 1.6, 0]"></primitive>
-  <PostLantern :position="[-22, 0, 3.5]" :rotation="[0, 0.7, 0]" />
+  <PostLantern :position="[-21.5, 0, -7]" :rotation="[0, 0.7, 0]" />
+  <primitive :object="resources.get('crypt').scene" :scale="[1.3, 1.3, 1.3]" :position="[-26, 0, -2]" :rotation="[0, 1.3, 0]"></primitive>
+  <primitive :object="resources.get('crypt').scene" :scale="[1.3, 1.3, 1.3]" :position="[-26, 0, 9]" :rotation="[0, 1.6, 0]"></primitive>
+  <PostLantern :position="[-21, 0, 3.5]" :rotation="[0, 1, 0]" />
   <Pumpkin :position="[-21.5, 0.65, 13]" :rotation="[0, -2.5, 0]" />
+  <primitive :object="resources.get('coffin2').scene" :scale="[1, 1, 1]" :position="[-21, 1.5, 6]" :rotation="[Math.PI / 2, 0.2, -1.2]"></primitive>
+  <primitive :object="resources.get('graveMarker').scene" :scale="[1, 1, 1]" :position="[-15, 0, 6]" :rotation="[0, 0.5, 0]"></primitive>
+  <primitive :object="resources.get('graveMarker').scene" :scale="[1, 1, 1]" :position="[-15, 0, 9]" :rotation="[0, 0.2, 0]"></primitive>
+  <primitive :object="resources.get('graveMarker').scene" :scale="[1, 1, 1]" :position="[-15, 0, 2]" :rotation="[0, 1.5, 0]"></primitive>
 
   <BattleRing />
 
@@ -141,7 +150,7 @@ import PostLantern from "@/components/objects/PostLantern.vue";
     bloomPass.radius = 0.45;
    // composer.addPass(bloomPass);
 
-   // generateGrass();
+   //generateGrass();
 
     setTimeout(() => {
       renderer.value.shadowMap.autoUpdate = false;

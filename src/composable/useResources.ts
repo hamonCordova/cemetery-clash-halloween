@@ -105,6 +105,12 @@ export const useResources = createGlobalState(() => {
             castShadow: true
         },
         {
+            name: 'coffin2',
+            path: '../static/models/scene/Coffin2.glb',
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
             name: 'skull',
             path: '../static/models/scene/Skull.glb',
             type: 'GLTFLoader',
@@ -119,6 +125,12 @@ export const useResources = createGlobalState(() => {
         {
             name: 'bone',
             path: '../static/models/scene/Bone.glb',
+            type: 'GLTFLoader',
+            castShadow: true
+        },
+        {
+            name: 'graveMarker',
+            path: '../static/models/scene/GraveMarker.glb',
             type: 'GLTFLoader',
             castShadow: true
         },
