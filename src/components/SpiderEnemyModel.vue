@@ -83,7 +83,6 @@
   const attackDistance = 3;
   const distantAttackDistance = 9;
 
-  const longRangeMeshes = ref<Mesh[]>([]);
   const isAttackingByDistance = ref(false);
   const longRangeDelay = 4000;
 
@@ -99,7 +98,8 @@
   })
 
   onMounted(() => {
-    console.warn(actions)
+    scene.value.add(spiderBallMesh)
+
     spawnEnemy();
     listenEvents();
   });
@@ -222,9 +222,6 @@
       const spiderPosition = enemyRef.value.position.clone();
       spiderBallMesh.position.set(spiderPosition.x, 1, spiderPosition.z);
 
-      longRangeMeshes.value.push(spiderBallMesh)
-      scene.value.add(spiderBallMesh)
-
       const playerPosition = playerStore.playerPosition;
       const duration = 0.8;
 
@@ -234,7 +231,6 @@
           checkProjectileHit(spiderBallMesh.position);
         }
       });
-
 
       tl.to(spiderBallMesh.position, {
         duration: duration,
@@ -256,7 +252,7 @@
 
       tl.to(spiderBallMesh.position, {
         duration: duration / 2,
-        y: 0,
+        y: -1,
         ease: "power1.in"
       }, duration / 2);
 
@@ -268,14 +264,7 @@
   }
 
   const onLongRangeAttackComplete = (mesh: Mesh) => {
-    const meshReferenceIndex = longRangeMeshes.value.findIndex(m => m.uuid === mesh.uuid);
-    if (meshReferenceIndex === -1) return;
 
-    mesh.geometry.dispose();
-    mesh.material.dispose();
-    scene.value.remove(mesh);
-    scene.value.needsUpdate = true;
-    longRangeMeshes.value.splice(meshReferenceIndex, 1);
   }
 
   const moveTowardsPlayer = (delta: number) => {

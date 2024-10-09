@@ -127,7 +127,7 @@ import {useRenderLoop, useTresContext, vLightHelper} from "@tresjs/core";
     bloomPass.radius = 0.45;
    // composer.addPass(bloomPass);
 
-    generateGrass();
+   // generateGrass();
 
     setTimeout(() => {
       renderer.value.shadowMap.autoUpdate = false;
