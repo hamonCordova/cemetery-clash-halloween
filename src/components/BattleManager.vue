@@ -1,5 +1,5 @@
 <template>
-  <SkeletonModel />
+  <PlayerCharacter />
   <template v-if="currentRound">
     <template v-for="enemy in currentRoundStage.enemies" :key="enemy.enemyId">
       <EnemyModel :config="enemy" @die="enemyDied($event)" v-if="!enemy.isDead && enemy.type === 'SKELETON'" />
@@ -12,7 +12,6 @@
 </template>
 
 <script lang="ts">
-
 export interface Round {
   num: number;
   stages: Stage[]
@@ -36,14 +35,14 @@ export interface Enemy {
 </script>
 
 <script setup lang="ts">
-  import SkeletonModel from "@/components/SkeletonModel.vue";
   import EnemyModel from "@/components/EnemyModel.vue";
-  import {onMounted, ref, watch} from "vue";
+  import {onMounted, ref} from "vue";
   import {generateUUID} from "three/src/math/MathUtils";
   import {Vector3} from "three";
   import SpiderEnemyModel from "@/components/SpiderEnemyModel.vue";
   import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
   import ZombieEnemey from "@/components/ZombieEnemey.vue";
+  import PlayerCharacter from "@/components/PlayerCharacter.vue";
 
   const rounds = ref<Round[]>([]);
 
@@ -55,7 +54,7 @@ export interface Enemy {
 
   onMounted(() => {
     createRounds();
-    startRound();
+  //  startRound();
   })
 
   const createRounds = () => {

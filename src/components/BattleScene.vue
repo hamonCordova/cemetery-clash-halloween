@@ -117,45 +117,32 @@
 </template>
 
 <script setup lang="ts">
-import {useRenderLoop, useTresContext, vLightHelper} from "@tresjs/core";
+  import {useRenderLoop, useTresContext} from "@tresjs/core";
   import {onMounted} from "vue";
   import {useResources} from "@/composable/useResources";
   import Pumpkin from "@/components/objects/Pumpkin.vue";
   import BattleRing from "@/components/objects/BattleRing.vue";
   import {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
-  import {RenderPass} from "three/examples/jsm/postprocessing/RenderPass";
-  import {UnrealBloomPass} from "three/examples/jsm/postprocessing/UnrealBloomPass";
-  import {ShaderPass} from "three/examples/jsm/postprocessing/ShaderPass";
-  import {Mesh, Vector2} from "three";
-  import {GammaCorrectionShader} from "three/examples/jsm/shaders/GammaCorrectionShader";
   import Candles from "@/components/objects/Candles.vue";
   import Lantern from "@/components/objects/Lantern.vue";
-import PostLantern from "@/components/objects/PostLantern.vue";
+  import PostLantern from "@/components/objects/PostLantern.vue";
+  import gsap from 'gsap';
+  import {Euler, Vector3} from "three";
+  import {useGameState} from "@/composable/useGameState";
 
   const resources = useResources();
   const { renderer, scene, camera } = useTresContext();
   const composer = new EffectComposer(renderer.value);
   const {onLoop} = useRenderLoop();
-
+  const gameState = useGameState();
 
   onMounted(() => {
-
-    const renderPass = new RenderPass(scene.value, camera.value);
-    composer.addPass(renderPass);
-
-    // Adicionar efeito de Bloom
-    const bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-    bloomPass.threshold = 0.21;
-    bloomPass.strength = 0.2; // Você pode ajustar a intensidade aqui
-    bloomPass.radius = 0.45;
-   // composer.addPass(bloomPass);
 
    //generateGrass();
 
     setTimeout(() => {
       renderer.value.shadowMap.autoUpdate = false;
     }, 1000)
-
 
   })
 
@@ -184,10 +171,43 @@ import PostLantern from "@/components/objects/PostLantern.vue";
 
   }
 
-  onLoop(() => {
-    if (composer) {
-      composer.render()
-    }
+  const startIntro = () => {
+    // Definir a posição inicial da câmera
+    camera.value.position.set(-40, 20, 50);
+    camera.value.rotation.set(0, -Math.PI / 4, 0); // Rotação inicial (em Euler angles)
+
+    // Definir a posição e rotação final da câmera
+    const finalPosition = new Vector3(0, 2, 10);
+    const finalRotation = new Euler(0, 0, 0); // Rotação final
+
+    // Timeline GSAP para animar a posição e a rotação da câmera
+    const timeline = gsap.timeline({
+      onComplete() {
+        gameState.isPlaying.value = true;
+      }
+    });
+
+    // Animação da posição
+    timeline.to(camera.value.position, {
+      x: finalPosition.x,
+      y: finalPosition.y,
+      z: finalPosition.z,
+      duration: 3,
+      ease: 'power2.out',
+    });
+
+    // Animação da rotação
+    timeline.to(camera.value.rotation, {
+      x: finalRotation.x,
+      y: finalRotation.y,
+      z: finalRotation.z,
+      duration: 3,
+      ease: 'power2.out',
+    }, '<'); // O '<' faz com que a rotação comece ao mesmo tempo que a posição
+  };
+
+  defineExpose({
+    startIntro
   })
 
 </script>

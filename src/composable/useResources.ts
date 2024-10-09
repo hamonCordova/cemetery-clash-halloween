@@ -142,7 +142,7 @@ export const useResources = createGlobalState(() => {
         },
         {
             name: 'plaqueCandles',
-            path: '../static/models/scene/PlaqueDeadCandles.glb',
+            path: '../static/models/scene/PlaqueCandles.glb',
             type: 'GLTFLoader',
             castShadow: true
         },
@@ -226,11 +226,18 @@ export const useResources = createGlobalState(() => {
         },
     ];
 
-    const load = (onLoad: () => void) => {
+    const load = (onLoad: () => void, onProgress: (total: number) => void) => {
+
+        const totalSources = sources.length;
 
         const loadingManager = new LoadingManager(() => {
             if (onLoad) onLoad();
             isLoaded.value = true;
+        }, () => {
+            const totalLoaded = Object.keys(resources).length
+            if (onProgress) onProgress((totalLoaded / totalSources) * 100);
+        }, (url) => {
+            console.error(url)
         })
 
         const gltfLoader = new GLTFLoader(loadingManager);

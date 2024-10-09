@@ -1,14 +1,16 @@
 <template>
+
+  <GameLoader v-if="isLoading" @start="startGame()" />
+
   <template v-if="resources.isLoaded.value">
     <TresCanvas window-size v-bind="rendererProps" render-mode="on-demand">
       <StatsGl />
       <Stars />
-      <TresFogExp2 color="red" density="900" />
       <Suspense>
-        <BattleScene />
+        <BattleScene ref="battleSceneRef" />
       </Suspense>
       <TresPerspectiveCamera :args="[50, 1, 0.1, 10000]" :position="[0, 10, 10]" />
-      <OrbitControls />
+<!--      <OrbitControls />-->
       <TresAmbientLight :intensity="0.5" />
 <!--      <TresPointLight
           :args="['#fff', 40, 20, 1]"
@@ -16,7 +18,7 @@
           :position="[0, 12, 9]"
           v-light-helper
       />-->
-<!--      <BattleManager />-->
+      <BattleManager />
       <Suspense>
         <BattleFloor />
       </Suspense>
@@ -31,11 +33,14 @@
   import {StatsGl, Stars, OrbitControls, Smoke} from "@tresjs/cientos";
   import BattleScene from "@/components/BattleScene.vue";
   import BattleManager from "@/components/BattleManager.vue";
-  import {onMounted} from "vue";
+  import {onMounted, ref} from "vue";
   import {useResources} from "@/composable/useResources";
   import router from "@/router";
+  import GameLoader from "@/components/page/GameLoader.vue";
 
   const resources = useResources();
+  const isLoading = ref(true);
+  const battleSceneRef = ref();
 
   const rendererProps = {
     shadows: true,
@@ -48,12 +53,9 @@
     powerPreference: 'high-performance',
   }
 
-  onMounted(() => {
-    console.warn(resources.isLoaded.value)
-    if (!resources.isLoaded.value) {
-      router.push('/')
-    }
-  })
-
+  const startGame = () => {
+    isLoading.value = false;
+    battleSceneRef.value.startIntro();
+  }
 
 </script>

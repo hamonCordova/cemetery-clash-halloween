@@ -13,6 +13,7 @@
   import {useEnemyStore} from "@/stores/enemyStore";
   import {EnemyTypeDamageRangeEnum} from "../../enum/enemy-type-damage-range.enum";
   import {useResources} from "@/composable/useResources";
+  import {useGameState} from "@/composable/useGameState";
 
   const resources = useResources();
   const {scene: model, animations} = resources.get('skeleton');
@@ -22,6 +23,7 @@
   const { onLoop } = useRenderLoop()
   const playerStore = usePlayerStore();
   const enemyStore = useEnemyStore();
+  const gameState = useGameState();
 
   let currentAnimation: AnimationAction | undefined;
   let keysPressed = [];
@@ -56,7 +58,7 @@
   }
 
   const moveCamera = () => {
-    if (skeletonRef.value && camera.value) {
+    if (skeletonRef.value && camera.value && gameState.isPlaying.value) {
       const cameraOffset = new Vector3(0, 7, 15);
       const characterPosition = skeletonRef.value.position.clone();
       const cameraTargetPosition = characterPosition.add(cameraOffset);
