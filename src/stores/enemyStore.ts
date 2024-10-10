@@ -15,7 +15,7 @@ interface EnemyAlive {
 export const useEnemyStore = defineStore('enemyStore', () => {
 
     const enemies = ref<Array<EnemyAlive>>([]);
-    const enemyDiedEventBus = useEventBus('enemyEventBus');
+    const enemyEventBus = useEventBus('enemyEventBus');
 
     const registerEnemy = (id: string, position: Vector3, type: EnemyTypeEnum) => {
         enemies.value.push({ id, position, health: 100, type });
@@ -36,13 +36,13 @@ export const useEnemyStore = defineStore('enemyStore', () => {
         const enemy = enemies.value.find((e) => e.id === id);
         if (enemy && !enemy.isDead) {
             enemy.health -= damage;
+            enemyEventBus.emit('damageReceived', id);
             if (enemy.health <= 0) {
                 removeEnemy(id);
-                enemyDiedEventBus.emit('die', id)
+                enemyEventBus.emit('die', id)
 
                 enemy.isDead = true;
                 console.warn('ENEMY DIED')
-                // Aqui você pode emitir um evento para remover o inimigo da cena, se necessário.
             }
         }
     };

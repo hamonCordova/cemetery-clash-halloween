@@ -50,14 +50,15 @@ const emit = defineEmits(['die'])
   const playerStore = usePlayerStore();
   const enemyStore = useEnemyStore();
   const enemyEventBus = useEventBus('enemyEventBus');
-  const { attack, stopWalk, walk, die, isDead } = useCharacter(
+  const { attack, stopWalk, walk, die, receiveHit, isDead } = useCharacter(
     enemyRef,
     actions,
     {
       walk: SkeletonAnimationEnum.Walk,
       idle: SkeletonAnimationEnum.Idle,
       attack: SkeletonAnimationEnum.Sword,
-      die: SkeletonAnimationEnum.Death
+      die: SkeletonAnimationEnum.Death,
+      hitReact: SkeletonAnimationEnum.HitReact
     },
     {
      nextAttackDelay: config.attackDelay || 1000
@@ -92,6 +93,12 @@ const emit = defineEmits(['die'])
     enemyEventBus.on((event, payload) => {
       if (event === 'die' && config.enemyId === payload) {
         die()
+      }
+    });
+
+    enemyEventBus.on((event, payload) => {
+      if (event === 'damageReceived' && config.enemyId === payload) {
+        receiveHit()
       }
     });
   }

@@ -8,6 +8,7 @@ interface CharacterActionsName {
     walk: string;
     attack: string;
     die: string;
+    hitReact: string;
 }
 
 interface CharacterAttackConfig {
@@ -31,6 +32,7 @@ export default function useCharacter(
     const isIdle = ref(false);
     const isDead = ref(false);
     const isAttacking = ref(false);
+    const isReceivingHit = ref(false);
 
     let nextAttackTimeout;
 
@@ -101,6 +103,15 @@ export default function useCharacter(
         isWalking.value = false;
     }
 
+    const receiveHit = () => {
+        if (!actionsName.hitReact) return;
+
+        const hitReactAction = actions[actionsName.hitReact];
+        hitReactAction.setLoop(LoopOnce);
+        hitReactAction.reset();
+        hitReactAction.play();
+    }
+
     const die = () => {
 
         if (isDead.value) return;
@@ -143,5 +154,6 @@ export default function useCharacter(
         idle,
         stopIdle,
         die,
+        receiveHit
     }
 }

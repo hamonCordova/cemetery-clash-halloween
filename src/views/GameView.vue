@@ -1,18 +1,18 @@
 <template>
 
-  <GameLoader v-if="isLoading" @start="startGame()" />
+  <GameLoader v-if="isLoading" @loaded="showIntro()" />
 
   <template v-if="resources.isLoaded.value">
     <TresCanvas window-size v-bind="rendererProps">
       <StatsGl v-if="!isProductionGameMode" />
       <Stars />
       <Suspense>
-        <BattleScene ref="battleSceneRef" />
+        <BattleScene ref="battleSceneRef" @start="startBattle()" />
       </Suspense>
       <TresPerspectiveCamera :args="[50, 1, 0.1, 10000]" :position="[0, 10, 10]" />
       <OrbitControls v-if="isDevScenarioMode" />
       <TresAmbientLight :intensity="0.5" />
-      <BattleManager v-if="!isDevScenarioMode" />
+      <BattleManager v-if="!isDevScenarioMode" ref="battleManagerRef" />
       <Suspense>
         <BattleFloor />
       </Suspense>
@@ -38,6 +38,7 @@
   const resources = useResources();
   const isLoading = ref(true);
   const battleSceneRef = ref();
+  const battleManagerRef = ref();
 
   const rendererProps = {
     shadows: true,
@@ -58,7 +59,11 @@
     return gameState.mode.value === GameStateModeEnum.DEV_SCENARIO
   })
 
-  const startGame = () => {
+  const startBattle = () => {
+    battleManagerRef.value.startRound();
+  }
+
+  const showIntro = () => {
     isLoading.value = false;
 
     if (isProductionGameMode.value) {
@@ -67,6 +72,7 @@
     }
 
     gameState.isPlaying.value = true;
+    startBattle();
   }
 
 </script>

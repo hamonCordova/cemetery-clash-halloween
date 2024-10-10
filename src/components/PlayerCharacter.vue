@@ -14,6 +14,7 @@
   import {EnemyTypeDamageRangeEnum} from "../../enum/enemy-type-damage-range.enum";
   import {useResources} from "@/composable/useResources";
   import {useGameState} from "@/composable/useGameState";
+  import {LoopOnce} from "three/src/constants";
 
   const resources = useResources();
   const {scene: model, animations} = resources.get('skeleton');
@@ -209,17 +210,18 @@
     }
   };
 
-
   const attack = () => {
     if (isAttacking) return;
-
     isAttacking = true;
-    animate(SkeletonAnimationEnum.Sword, 0.1);
 
-    // Delay hit detection to match attack animation timing
+    const currentAttackAnimationEnum = Math.floor((Math.random() * 10)) % 2 === 0 ? SkeletonAnimationEnum.Sword : SkeletonAnimationEnum.Punch;
+    const attackAnimation = actions[currentAttackAnimationEnum];
+    const animationDuration = attackAnimation.getClip().duration / attackAnimation.timeScale;
+    animate(currentAttackAnimationEnum, 0.1);
+
     setTimeout(() => {
       checkAttackHit();
-    }, 100); // Adjust timing as needed
+    }, (animationDuration * 1000) * 0.6);
 
     setTimeout(() => {
       isAttacking = false;

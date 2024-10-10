@@ -187,4 +187,8 @@ export interface Enemy {
     return {num: 1, stages} as Round;
   }
 
+  defineExpose({
+    startRound
+  })
+
 </script>

@@ -16,7 +16,7 @@
   import {useGameState} from "@/composable/useGameState";
   import {GameStateModeEnum} from "../../../enum/game-mode.enum";
 
-  const emit = defineEmits(['start'])
+  const emit = defineEmits(['loaded'])
 
   const resources = useResources();
   const gameState = useGameState();
@@ -28,7 +28,7 @@
       resources.load(() => {
         isWaitingRender.value = true;
         setTimeout(() => {
-          emit('start');
+          emit('loaded');
         }, gameState.mode.value === GameStateModeEnum.PRODUCTION ? 5000 : 500)
       }, (total: number) => {
         loadingCounter.value = total;

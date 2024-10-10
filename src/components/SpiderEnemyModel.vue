@@ -68,7 +68,7 @@
       walk: SpiderAnimationEnum.Walk,
       idle: SpiderAnimationEnum.Idle,
       attack: SpiderAnimationEnum.Attack,
-      die: SpiderAnimationEnum.Death
+      die: SpiderAnimationEnum.Death,
     },
     {
      nextAttackDelay: config.attackDelay || 1000
@@ -79,7 +79,7 @@
     },
   )
 
-  // TODO this should be dynamic. Remember to pass to useCharacter
+  // TODO this should be dynamic. Remember passing to useCharacter
   const attackDistance = 3;
   const distantAttackDistance = 9;
 
@@ -99,7 +99,6 @@
 
   onMounted(() => {
     scene.value.add(spiderBallMesh)
-
     spawnEnemy();
     listenEvents();
   });

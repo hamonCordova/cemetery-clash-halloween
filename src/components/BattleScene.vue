@@ -117,12 +117,11 @@
 </template>
 
 <script setup lang="ts">
-  import {useRenderLoop, useTresContext} from "@tresjs/core";
+  import {useTresContext} from "@tresjs/core";
   import {onMounted} from "vue";
   import {useResources} from "@/composable/useResources";
   import Pumpkin from "@/components/objects/Pumpkin.vue";
   import BattleRing from "@/components/objects/BattleRing.vue";
-  import {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
   import Candles from "@/components/objects/Candles.vue";
   import Lantern from "@/components/objects/Lantern.vue";
   import PostLantern from "@/components/objects/PostLantern.vue";
@@ -130,46 +129,18 @@
   import {Euler, Vector3} from "three";
   import {useGameState} from "@/composable/useGameState";
 
+  const emit = defineEmits(['start'])
+
   const resources = useResources();
   const { renderer, scene, camera } = useTresContext();
-  const composer = new EffectComposer(renderer.value);
-  const {onLoop} = useRenderLoop();
   const gameState = useGameState();
 
   onMounted(() => {
-
-   //generateGrass();
-
     setTimeout(() => {
       renderer.value.shadowMap.autoUpdate = false;
     }, 1000)
 
   })
-
-  const generateGrass = () => {
-
-    for (let i = 0; i < 100; i++) {
-      const isGrassRock = i % 5 === 0;
-      const grassScene = resources.get(
-           isGrassRock ? 'rockGrass' : 'grass'
-      ).scene;
-
-      const angle = Math.random() * Math.PI * 2;
-      const radius =  25 * Math.random() + 4;
-
-      grassScene.position.x = Math.sin(angle) * radius;
-      grassScene.position.z = Math.cos(angle) * radius;
-      grassScene.position.y = Math.random() * 0.2;
-
-      if (!isGrassRock) {
-        grassScene.scale.set(0.5, 0.5, 0.5)
-        grassScene.position.y = Math.random() - 0.8
-      }
-
-      scene.value.add(grassScene);
-    }
-
-  }
 
   const startIntro = () => {
     camera.value.position.set(-40, 20, 50);
@@ -181,6 +152,10 @@
     const timeline = gsap.timeline({
       onComplete() {
         gameState.isPlaying.value = true;
+        // TODO remove this after implement play screen
+        setTimeout(() => {
+          emit('start');
+        }, 1000)
       }
     });
 
@@ -206,8 +181,3 @@
   })
 
 </script>
-<style>
-a {
-  background: rgba(255, 167, 5, 0.67);
-}
-</style>
