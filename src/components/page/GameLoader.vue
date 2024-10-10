@@ -13,10 +13,13 @@
   import {onMounted, ref} from "vue";
   import router from "@/router";
   import {useEventBus} from "@vueuse/core";
+  import {useGameState} from "@/composable/useGameState";
+  import {GameStateModeEnum} from "../../../enum/game-mode.enum";
 
   const emit = defineEmits(['start'])
 
   const resources = useResources();
+  const gameState = useGameState();
   const isWaitingRender = ref(false);
   const loadingCounter = ref(0);
 
@@ -26,7 +29,7 @@
         isWaitingRender.value = true;
         setTimeout(() => {
           emit('start');
-        }, 500)
+        }, gameState.mode.value === GameStateModeEnum.PRODUCTION ? 5000 : 500)
       }, (total: number) => {
         loadingCounter.value = total;
       });

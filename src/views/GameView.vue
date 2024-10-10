@@ -3,22 +3,16 @@
   <GameLoader v-if="isLoading" @start="startGame()" />
 
   <template v-if="resources.isLoaded.value">
-    <TresCanvas window-size v-bind="rendererProps" render-mode="on-demand">
-      <StatsGl />
+    <TresCanvas window-size v-bind="rendererProps">
+      <StatsGl v-if="!isProductionGameMode" />
       <Stars />
       <Suspense>
         <BattleScene ref="battleSceneRef" />
       </Suspense>
       <TresPerspectiveCamera :args="[50, 1, 0.1, 10000]" :position="[0, 10, 10]" />
-<!--      <OrbitControls />-->
+      <OrbitControls v-if="isDevScenarioMode" />
       <TresAmbientLight :intensity="0.5" />
-<!--      <TresPointLight
-          :args="['#fff', 40, 20, 1]"
-          cast-shadow
-          :position="[0, 12, 9]"
-          v-light-helper
-      />-->
-      <BattleManager />
+      <BattleManager v-if="!isDevScenarioMode" />
       <Suspense>
         <BattleFloor />
       </Suspense>
@@ -33,11 +27,14 @@
   import {StatsGl, Stars, OrbitControls, Smoke} from "@tresjs/cientos";
   import BattleScene from "@/components/BattleScene.vue";
   import BattleManager from "@/components/BattleManager.vue";
-  import {onMounted, ref} from "vue";
+  import {computed, onMounted, ref} from "vue";
   import {useResources} from "@/composable/useResources";
   import router from "@/router";
   import GameLoader from "@/components/page/GameLoader.vue";
+  import {useGameState} from "@/composable/useGameState";
+  import {GameStateModeEnum} from "../../enum/game-mode.enum";
 
+  const gameState = useGameState();
   const resources = useResources();
   const isLoading = ref(true);
   const battleSceneRef = ref();
@@ -53,9 +50,23 @@
     powerPreference: 'high-performance',
   }
 
+  const isProductionGameMode = computed(() => {
+    return gameState.mode.value === GameStateModeEnum.PRODUCTION
+  })
+
+  const isDevScenarioMode = computed(() => {
+    return gameState.mode.value === GameStateModeEnum.DEV_SCENARIO
+  })
+
   const startGame = () => {
     isLoading.value = false;
-    battleSceneRef.value.startIntro();
+
+    if (isProductionGameMode.value) {
+      battleSceneRef.value.startIntro();
+      return;
+    }
+
+    gameState.isPlaying.value = true;
   }
 
 </script>

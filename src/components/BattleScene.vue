@@ -172,22 +172,18 @@
   }
 
   const startIntro = () => {
-    // Definir a posição inicial da câmera
     camera.value.position.set(-40, 20, 50);
-    camera.value.rotation.set(0, -Math.PI / 4, 0); // Rotação inicial (em Euler angles)
+    camera.value.rotation.set(0, -Math.PI / 4, 0);
 
-    // Definir a posição e rotação final da câmera
     const finalPosition = new Vector3(0, 2, 10);
-    const finalRotation = new Euler(0, 0, 0); // Rotação final
+    const finalRotation = new Euler(0, 0, 0);
 
-    // Timeline GSAP para animar a posição e a rotação da câmera
     const timeline = gsap.timeline({
       onComplete() {
         gameState.isPlaying.value = true;
       }
     });
 
-    // Animação da posição
     timeline.to(camera.value.position, {
       x: finalPosition.x,
       y: finalPosition.y,
@@ -196,14 +192,13 @@
       ease: 'power2.out',
     });
 
-    // Animação da rotação
     timeline.to(camera.value.rotation, {
       x: finalRotation.x,
       y: finalRotation.y,
       z: finalRotation.z,
       duration: 3,
       ease: 'power2.out',
-    }, '<'); // O '<' faz com que a rotação comece ao mesmo tempo que a posição
+    }, '<');
   };
 
   defineExpose({
