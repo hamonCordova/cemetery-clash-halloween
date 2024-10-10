@@ -99,40 +99,42 @@
   const move = (delta) => {
     const direction = new Vector3(0, 0, 0);
 
-    let moving = false;
-    const jumping = keysPressed['Space'];
-    const running = keysPressed['ShiftLeft'] || keysPressed['ShiftRight'];
+    let isMoving = false;
+    const isFreezed = playerStore.isFreezed();
+    const isJumping = keysPressed['Space'];
+    const isRunning = keysPressed['ShiftLeft'] || keysPressed['ShiftRight'];
 
     if (keysPressed['ArrowUp'] || keysPressed['KeyW']) {
       direction.z -= 1;
-      moving = true;
+      isMoving = true;
     }
 
     if (keysPressed['ArrowDown'] || keysPressed['KeyS']) {
       direction.z += 1;
-      moving = true;
+      isMoving = true;
     }
 
     if (keysPressed['ArrowLeft'] || keysPressed['KeyA']) {
       direction.x -= 1;
-      moving = true;
+      isMoving = true;
     }
 
     if (keysPressed['ArrowRight'] || keysPressed['KeyD']) {
       direction.x += 1;
-      moving = true;
+      isMoving = true;
     }
 
-    if (jumping) {
+    if (isJumping && !isFreezed) {
       jump();
     }
 
-    if (moving) {
-      if (!isAttacking && !jumping) {
-        animate(running ? SkeletonAnimationEnum.Run : SkeletonAnimationEnum.Walk, 0.5);
+    if (isMoving) {
+
+      if (!isAttacking && !isJumping) {
+        animate(isRunning ? SkeletonAnimationEnum.Run : SkeletonAnimationEnum.Walk, 0.5);
       }
 
-      const speed = running ? 8 : 5;
+      const speed = isRunning ? 8 : 5;
       direction.normalize();
 
       // Movimento pretendido
@@ -187,15 +189,17 @@
         movement.y = 0;
       }
 
-      // Atualiza a posição com o movimento permitido
-      skeletonRef.value.position.add(movement);
+      if (!isFreezed) {
+        // Atualiza a posição com o movimento permitido
+        skeletonRef.value.position.add(movement);
 
-      // Clamp the position to stay within the 25x25 area
-      const halfSize = 11.5; // Half of 25
-      skeletonRef.value.position.x = MathUtils.clamp(skeletonRef.value.position.x, -halfSize, halfSize);
-      skeletonRef.value.position.z = MathUtils.clamp(skeletonRef.value.position.z, -halfSize, halfSize);
+        // Clamp the position to stay within the 25x25 area
+        const battleArenaHalfSize = 25 / 2;
+        skeletonRef.value.position.x = MathUtils.clamp(skeletonRef.value.position.x, -battleArenaHalfSize, battleArenaHalfSize);
+        skeletonRef.value.position.z = MathUtils.clamp(skeletonRef.value.position.z, -battleArenaHalfSize, battleArenaHalfSize);
 
-      playerStore.updatePlayerPosition(skeletonRef.value.position);
+        playerStore.updatePlayerPosition(skeletonRef.value.position);
+      }
 
       // Atualiza a rotação do personagem
       const targetRotationY = Math.atan2(direction.x, direction.z);

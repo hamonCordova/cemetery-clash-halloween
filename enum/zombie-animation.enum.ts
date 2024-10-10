@@ -1,4 +1,5 @@
 export enum ZombieAnimationEnum {
+    Crawl = 'CharacterArmature|Crawl',
     Death = 'CharacterArmature|Death',
     Idle = 'CharacterArmature|Idle',
     Jump = 'CharacterArmature|Jump',

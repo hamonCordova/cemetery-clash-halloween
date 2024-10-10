@@ -106,6 +106,54 @@ export interface Enemy {
         enemies: [
           {
             enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 3000,
+            rotationSpeed: 2,
+            scale: 1.5,
+            moveSpeed: 1,
+            type: EnemyTypeEnum.ZOMBIE
+          },
+          {
+            enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 3000,
+            rotationSpeed: 2,
+            scale: 1.5,
+            moveSpeed: 0.5,
+            type: EnemyTypeEnum.ZOMBIE
+          },
+          {
+            enemyId: generateUUID(),
+            spawnPosition: getRandomSpawnPosition(),
+            attackDelay: 1000,
+            rotationSpeed: 4,
+            moveSpeed: 2.5,
+            type: EnemyTypeEnum.SKELETON
+          },
+          {
+            enemyId: generateUUID(),
+            spawnPosition: new Vector3(-4, 0, -9),
+            attackDelay: 5000,
+            rotationSpeed: 2,
+            scale: 0.5,
+            moveSpeed: 2.5,
+            type: EnemyTypeEnum.SPIDER
+          },
+          {
+            enemyId: generateUUID(),
+            spawnPosition: new Vector3(7, 0, 7),
+            attackDelay: 5000,
+            rotationSpeed: 2,
+            scale: 0.5,
+            moveSpeed: 2.5,
+            type: EnemyTypeEnum.SPIDER
+          },
+        ]
+      } as RoundStage,
+      {
+        enemies: [
+          {
+            enemyId: generateUUID(),
             spawnPosition: new Vector3(-4, 0, -9),
             attackDelay: 5000,
             rotationSpeed: 2,

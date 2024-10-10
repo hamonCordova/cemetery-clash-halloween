@@ -12,14 +12,14 @@
       :position="[0, 1.6, -0.1]"
     >
     <div class="enemy-health" :class="{'enemy-health--dead': isDead}">
-      <div class="enemy-health__progress"  :style="{width: (enemyStoreInstance?.health || 0) + '%'}"></div>
+      <div class="enemy-health__progress" :style="{width: (enemyStoreInstance?.health || 0) + '%'}"></div>
     </div>
     </Html>
   </primitive>
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, onUnmounted, shallowRef} from 'vue';
+import {computed, onMounted, onUnmounted, shallowRef, toValue} from 'vue';
 import {Html, useAnimations, useGLTF} from '@tresjs/cientos';
 import {Mesh, Quaternion, Vector3} from 'three';
 import {useRenderLoop} from '@tresjs/core';
@@ -30,6 +30,8 @@ import {useEventBus} from "@vueuse/core";
 import type {Enemy} from "@/components/BattleManager.vue";
 import useCharacter from "@/composable/useCharacter";
 import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
+import {LoopRepeat} from "three/src/constants";
+import gsap from "gsap";
 
 const emit = defineEmits(['die'])
   const {config} = defineProps({
@@ -40,34 +42,18 @@ const emit = defineEmits(['die'])
   })
 
   const { scene: model, animations } = await useGLTF('../static/models/Zombie.glb');
-  const { actions, mixer } = useAnimations(animations, model);
+  const { actions } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
-
-  const enemyRef = shallowRef<Mesh>();
 
   const playerStore = usePlayerStore();
   const enemyStore = useEnemyStore();
   const enemyEventBus = useEventBus('enemyEventBus');
-  const { attack, stopWalk, walk, die, isDead } = useCharacter(
-    enemyRef,
-    actions,
-    {
-      walk: ZombieAnimationEnum.Walk,
-      idle: ZombieAnimationEnum.Idle,
-      attack: ZombieAnimationEnum.Attack,
-      die: ZombieAnimationEnum.Death
-    },
-    {
-     nextAttackDelay: config.attackDelay || 1000
-    },
-    {
-      finishAttack: () => checkAttackHit(),
-      onDie: () => emit('die', config.enemyId)
-    },
-  )
 
-  // TODO this should be dynamic. Remember to pass to useCharacter
-  const attackDistance = 2;
+  const enemyRef = shallowRef<Mesh>();
+  const freezeDistance = 2;
+  let isCrawling = false;
+  let isFreezing= false;
+  let isDead = false;
 
   const enemyStoreInstance = computed(() => {
     return enemyStore.enemies.find(e => e.id === config.enemyId);
@@ -76,7 +62,6 @@ const emit = defineEmits(['die'])
   onMounted(() => {
     spawnEnemy();
     listenEvents();
-    console.warn(actions)
   });
 
   onUnmounted(() => {
@@ -110,6 +95,42 @@ const emit = defineEmits(['die'])
     )
   }
 
+  const die = () => {
+
+    isDead = true;
+    playerStore.unfreeze(config.enemyId);
+
+    gsap.to(
+        enemyRef.value.position,
+        {
+          y: -2,
+          duration: 2,
+          ease: 'power2.in',
+          onComplete: () => {
+            emit('die', config.enemyId)
+          }
+        }
+    )
+  }
+
+  const crawl = () => {
+    if (isCrawling || isDead) return;
+
+    const crawlAction = actions[ZombieAnimationEnum.Crawl].setLoop(LoopRepeat);
+    crawlAction.reset();
+    crawlAction.play();
+
+    isCrawling = true;
+    isFreezing = false;
+  }
+
+  const stopCrawling = () => {
+    if (!isCrawling) return;
+
+    actions[ZombieAnimationEnum.Crawl].paused = true;
+    isCrawling = false;
+  }
+
   const followPlayerRotation = (targetPosition: Vector3, delta: number) => {
 
     // Get enemy position and subtract from the target
@@ -130,19 +151,17 @@ const emit = defineEmits(['die'])
     enemyRef.value.quaternion.copy(enemyQuaternion);
   };
 
-  const checkAttackHit = () => {
+  const freezePlayer = () => {
     const enemyPos = enemyRef.value.position;
     const enemyQuaternion = enemyRef.value.quaternion;
 
     const playerPos = new Vector3().copy(playerStore.playerPosition);
 
     const distance = enemyPos.distanceTo(playerPos);
-    const attackRange = 2; // Adjust as needed
-    if (distance > attackRange) {
-      return; // Player is out of range
+    if (distance > freezeDistance) {
+      return;
     }
 
-    // Check if player is in front of enemy
     const enemyForward = new Vector3(0, 0, 1).applyQuaternion(enemyQuaternion);
     const directionToPlayer = new Vector3().subVectors(playerPos, enemyPos).normalize();
 
@@ -151,15 +170,14 @@ const emit = defineEmits(['die'])
     const attackAngle = Math.cos(45 * (Math.PI / 180)); // 45 degrees
 
     if (dot > attackAngle) {
-      // Player is within 45 degrees in front of enemy
-      // Attack hits
-      playerStore.takeDamage(10); // or any function to apply damage
+      isFreezing = true;
+      playerStore.freeze(config.enemyId);
     }
   };
 
   const moveTowardsPlayer = (delta: number) => {
 
-    if (isDead.value) return;
+    if (isDead) return;
 
     if (enemyRef.value && playerStore.playerPosition) {
 
@@ -170,9 +188,14 @@ const emit = defineEmits(['die'])
       const directionToPlayer = new Vector3().subVectors(playerPos, enemyPos);
       const distanceToPlayer = enemyPos.distanceTo(playerPos);
 
-      if (distanceToPlayer <= attackDistance) {
-        attack()
-        stopWalk();
+      if (isFreezing) {
+        followPlayerRotation(playerPos, delta);
+        return;
+      }
+
+      if (distanceToPlayer <= freezeDistance) {
+        freezePlayer();
+        stopCrawling();
         followPlayerRotation(playerPos, delta);
         return;
       }
@@ -207,7 +230,7 @@ const emit = defineEmits(['die'])
       followPlayerRotation(enemyPos.clone().add(combinedDirection), delta);
 
       // Set walking animation
-      walk()
+      crawl()
 
       // Update enemy position in the store
       enemyStore.updateEnemyPosition(config.enemyId, enemyPos);
