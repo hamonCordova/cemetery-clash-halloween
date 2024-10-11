@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <img src="../../../static/img/cemetery-clash-halloween-logo.webp" alt="Cemetery Clash: Halloween game logo">
+    <div class="logo-container">
+      <img src="../../../static/img/cemetery-clash-halloween-logo.webp" alt="Cemetery Clash: Halloween game logo" class="logo-img" >
+    </div>
     <h1 class="font-metal">{{ isWaitingRender ? 'Preparing your game...' : 'Loading...' }}</h1>
     <div class="loading-progress-container">
       <div class="loading-progress__bar" :style="{width: loadingCounter + '%'}"></div>
@@ -52,9 +54,16 @@
     z-index: 9;
   }
 
-  img {
-    max-width: 100%;
+  .logo-container {
     width: 600px;
+    aspect-ratio: 3 / 2;
+    max-width: 95vw;
+  }
+
+  .logo-img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
   }
 
   h1 {

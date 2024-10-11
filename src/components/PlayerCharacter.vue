@@ -225,7 +225,7 @@
 
     setTimeout(() => {
       checkAttackHit();
-    }, (animationDuration * 1000) * 0.6);
+    }, (animationDuration * 1000) * 0.4);
 
     setTimeout(() => {
       isAttacking = false;

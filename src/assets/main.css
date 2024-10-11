@@ -7,6 +7,10 @@
   font-family: 'Coda', system-ui;
 }
 
+img {
+  display: block;
+}
+
 .font-metal {
   font-family: "Metal Mania", system-ui;
   font-weight: 400;
