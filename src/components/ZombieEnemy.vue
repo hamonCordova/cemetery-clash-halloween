@@ -28,10 +28,10 @@ import {useEnemyStore} from '@/stores/enemyStore';
 import {ZombieAnimationEnum} from '../../enum/zombie-animation.enum';
 import {useEventBus} from "@vueuse/core";
 import type {Enemy} from "@/components/BattleManager.vue";
-import useCharacter from "@/composable/useCharacter";
 import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
 import {LoopRepeat} from "three/src/constants";
 import gsap from "gsap";
+import {useResources} from "@/composable/useResources";
 
 const emit = defineEmits(['die'])
   const {config} = defineProps({
@@ -41,7 +41,8 @@ const emit = defineEmits(['die'])
     }
   })
 
-  const { scene: model, animations } = await useGLTF('../static/models/Zombie.glb');
+  const resources = useResources();
+  const { scene: model, animations } = resources.get('zombie');
   const { actions } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
 

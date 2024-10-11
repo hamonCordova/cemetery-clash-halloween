@@ -220,6 +220,12 @@ export const useResources = createGlobalState(() => {
             castShadow: false
         },
         {
+            name: 'slime',
+            path: '../static/models/Slime.glb',
+            type: 'GLTFLoader',
+            castShadow: false
+        },
+        {
             name: 'bloodSplate',
             path: '../static/models/BloodSplat.glb',
             type: 'GLTFLoader'

@@ -86,19 +86,14 @@
   const isAttackingByDistance = ref(false);
   const longRangeDelay = 4000;
 
-  const spiderBallMesh = new Mesh(
-      new SphereGeometry(0.3, 40),
-      new MeshToonMaterial({
-        color: '#6a262c',
-      })
-  )
+  let spiderBallMesh: Mesh | undefined;
 
   const enemyStoreInstance = computed(() => {
     return enemyStore.enemies.find(e => e.id === config.enemyId);
   })
 
   onMounted(() => {
-    scene.value.add(spiderBallMesh)
+    createSpiderBall();
     spawnEnemy();
     listenEvents();
   });
@@ -110,6 +105,19 @@
   onLoop(({ delta }) => {
     moveTowardsPlayer(delta);
   });
+
+  const createSpiderBall = () => {
+
+    spiderBallMesh = new Mesh(
+        new SphereGeometry(0.3, 40),
+        new MeshToonMaterial({
+          color: '#6a262c',
+        })
+    )
+
+    scene.value.add(spiderBallMesh)
+    spiderBallMesh.position.y = -2;
+  }
 
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
@@ -194,8 +202,8 @@
 
       setTimeout(() => {
         scene.value.remove(bloodSplatInstance);
-        bloodSplatInstance.geometry.dispose();
-        bloodSplatInstance.material.dispose();
+        bloodSplatInstance.geometry?.dispose();
+        bloodSplatInstance.material?.dispose();
       }, 5000);
     }
   };

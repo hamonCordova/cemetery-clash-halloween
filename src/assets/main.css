@@ -7,6 +7,10 @@
   font-family: 'Coda', system-ui;
 }
 
+body {
+  background: #000;
+}
+
 img {
   display: block;
 }

@@ -1,7 +1,4 @@
 <template>
-
-  <GameLoader v-if="isLoading" @loaded="showIntro()" />
-
   <template v-if="resources.isLoaded.value">
     <TresCanvas window-size v-bind="rendererProps">
       <StatsGl v-if="!isProductionGameMode" />
@@ -18,6 +15,8 @@
       </Suspense>
     </TresCanvas>
   </template>
+
+  <GameLoader v-if="isLoading" @loaded="showIntro()" />
 </template>
 
 <script lang="ts" setup>

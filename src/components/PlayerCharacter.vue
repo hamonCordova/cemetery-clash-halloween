@@ -194,7 +194,8 @@
         skeletonRef.value.position.add(movement);
 
         // Clamp the position to stay within the 25x25 area
-        const battleArenaHalfSize = 25 / 2;
+        const battleArenaOffset = 1;
+        const battleArenaHalfSize = (25 - battleArenaOffset) / 2;
         skeletonRef.value.position.x = MathUtils.clamp(skeletonRef.value.position.x, -battleArenaHalfSize, battleArenaHalfSize);
         skeletonRef.value.position.z = MathUtils.clamp(skeletonRef.value.position.z, -battleArenaHalfSize, battleArenaHalfSize);
 
