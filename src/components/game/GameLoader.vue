@@ -30,7 +30,7 @@
       resources.load(() => {
         isWaitingRender.value = true;
         setTimeout(() => {
-      //    emit('loaded');
+          emit('loaded');
         }, gameState.mode.value === GameStateModeEnum.PRODUCTION ? 5000 : 500)
       }, (total: number) => {
         loadingCounter.value = total;

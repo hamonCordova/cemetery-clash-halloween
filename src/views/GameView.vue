@@ -16,6 +16,7 @@
     </TresCanvas>
   </template>
 
+  <GameControls />
   <GameLoader v-if="isLoading" @loaded="showIntro()" />
 </template>
 
@@ -29,15 +30,18 @@
   import {computed, onMounted, ref} from "vue";
   import {useResources} from "@/composable/useResources";
   import router from "@/router";
-  import GameLoader from "@/components/page/GameLoader.vue";
+  import GameLoader from "@/components/game/GameLoader.vue";
   import {useGameState} from "@/composable/useGameState";
   import {GameStateModeEnum} from "../../enum/game-mode.enum";
+  import GameControls from "@/components/game/GameControls.vue";
+  import {DocumentUtils} from "@/utils/document-utils";
 
   const gameState = useGameState();
   const resources = useResources();
   const isLoading = ref(true);
   const battleSceneRef = ref();
   const battleManagerRef = ref();
+  const isMobile = DocumentUtils.isMobile();
 
   const rendererProps = {
     shadows: true,

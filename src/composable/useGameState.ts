@@ -2,11 +2,10 @@ import {createGlobalState} from "@vueuse/core";
 import {computed, ref} from "vue";
 import {GameStateModeEnum} from "../../enum/game-mode.enum";
 
-
 export const useGameState = createGlobalState(() => {
 
     const _isPlaying = ref(false);
-    const mode = ref<GameStateModeEnum>(GameStateModeEnum.PRODUCTION);
+    const mode = ref<GameStateModeEnum>(GameStateModeEnum.DEV);
 
     const isPlaying = computed({
         get() {
@@ -19,7 +18,7 @@ export const useGameState = createGlobalState(() => {
 
     return {
         isPlaying,
-        mode
+        mode,
     }
 
 })

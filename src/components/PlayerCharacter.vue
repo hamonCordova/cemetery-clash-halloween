@@ -15,6 +15,7 @@
   import {useResources} from "@/composable/useResources";
   import {useGameState} from "@/composable/useGameState";
   import {LoopOnce} from "three/src/constants";
+  import {usePlayer} from "@/composable/usePlayer";
 
   const resources = useResources();
   const {scene: model, animations} = resources.get('skeleton');
@@ -22,41 +23,25 @@
   const { scene, camera } = useTresContext()
   const skeletonRef = shallowRef<Mesh>();
   const { onLoop } = useRenderLoop()
+  const { activeMovements } = usePlayer();
   const playerStore = usePlayerStore();
   const enemyStore = useEnemyStore();
   const gameState = useGameState();
 
   let currentAnimation: AnimationAction | undefined;
-  let keysPressed = [];
 
-  let isAttacking = false;
-
-  let isJumping = false;
   const jumpDuration = 0.8;
+  let isJumping = false;
+  let isAttacking = false;
 
   onMounted(() => {
     animate(SkeletonAnimationEnum.Idle);
-    initEventListeners();
   })
 
   onLoop(({delta, elapsed, clock}) => {
     move(delta)
     moveCamera();
   })
-
-  const initEventListeners = () => {
-    window.addEventListener("keydown", (event) => {
-      keysPressed[event.code] = true;
-    })
-
-    window.addEventListener("keyup", (event) => {
-      keysPressed[event.code] = false;
-    })
-
-    window.addEventListener(('click'), () => {
-      attack();
-    })
-  }
 
   const moveCamera = () => {
     if (skeletonRef.value && camera.value && gameState.isPlaying.value) {
@@ -101,27 +86,43 @@
 
     let isMoving = false;
     const isFreezed = playerStore.isFreezed();
-    const isJumping = keysPressed['Space'];
-    const isRunning = keysPressed['ShiftLeft'] || keysPressed['ShiftRight'];
+    const isJumping = activeMovements.jump;
+    const isRunning = activeMovements.run;
 
-    if (keysPressed['ArrowUp'] || keysPressed['KeyW']) {
-      direction.z -= 1;
-      isMoving = true;
-    }
+    const speed = isRunning ? 8 : 5;
 
-    if (keysPressed['ArrowDown'] || keysPressed['KeyS']) {
-      direction.z += 1;
-      isMoving = true;
-    }
+    if (activeMovements.usingJoystick && activeMovements.joystickMovement && activeMovements.joystickMovement.lengthSq() > 0) {
 
-    if (keysPressed['ArrowLeft'] || keysPressed['KeyA']) {
-      direction.x -= 1;
-      isMoving = true;
-    }
+      direction.copy(activeMovements.joystickMovement);
+      direction.multiplyScalar(speed * delta);
 
-    if (keysPressed['ArrowRight'] || keysPressed['KeyD']) {
-      direction.x += 1;
       isMoving = true;
+    } else {
+
+      if (activeMovements.up) {
+        direction.z -= 1;
+        isMoving = true;
+      }
+
+      if (activeMovements.down) {
+        direction.z += 1;
+        isMoving = true;
+      }
+
+      if (activeMovements.left) {
+        direction.x -= 1;
+        isMoving = true;
+      }
+
+      if (activeMovements.right) {
+        direction.x += 1;
+        isMoving = true;
+      }
+
+      if (isMoving) {
+        const speed = isRunning ? 8 : 5;
+        direction.normalize().multiplyScalar(speed * delta);
+      }
     }
 
     if (isJumping && !isFreezed) {
