@@ -1,14 +1,19 @@
 <template>
   <TresGroup  :scale="[1, 1, 1]" :rotation="[0, 2.5, 0]" :position="[0, 0.7, 0]">
-    <TresPointLight :args="['#ffdc07', 20, 20, 0.6]" :power="200" :position="[0, 0.2, 0]"  cast-shadow :shadow-mapSize-height="512" :shadow-mapSize-width="512"></TresPointLight>
+    <TresPointLight :args="['#ffdc07', 20, 20, 0.6]" :power="200" :position="[0, 0.2, 0]"  cast-shadow :mapSize="[256, 256]"></TresPointLight>
     <primitive :object="resources.get('pumpkin').scene"></primitive>
   </TresGroup>
 </template>
 
 <script setup lang="ts">
 import {useResources} from "@/composable/useResources";
-import {vLightHelper} from '@tresjs/core'
-import {SpotLight as TresSpotLight} from "three";
+
+const props = defineProps({
+  renderLight: {
+    type: Boolean,
+    default: true
+  }
+})
 
 const resources = useResources();
 

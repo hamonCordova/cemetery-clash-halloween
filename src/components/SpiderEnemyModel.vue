@@ -32,17 +32,16 @@
     Vector3
   } from 'three';
   import {useRenderLoop, useTresContext} from '@tresjs/core';
-  import {usePlayerStore} from '@/stores/playerStore';
   import {useEnemyStore} from '@/stores/enemyStore';
   import {SpiderAnimationEnum} from '../../enum/spider-animation.enum';
-  import {generateUUID} from 'three/src/math/MathUtils';
-  import {LoopOnce, LoopRepeat} from "three/src/constants";
+  import {LoopOnce} from "three/src/constants";
   import gsap from 'gsap';
   import {useEventBus} from "@vueuse/core";
   import type {Enemy} from "@/components/BattleManager.vue";
   import useCharacter from "@/composable/useCharacter";
   import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
   import {useResources} from "@/composable/useResources";
+  import {usePlayer} from "@/composable/usePlayer";
 
   const emit = defineEmits(['die'])
   const {config} = defineProps({
@@ -58,7 +57,7 @@
   const { onLoop } = useRenderLoop();
   const { scene } = useTresContext();
   const enemyRef = shallowRef<Mesh>();
-  const playerStore = usePlayerStore();
+  const playerState = usePlayer();
   const enemyStore = useEnemyStore();
   const enemyEventBus = useEventBus('enemyEventBus');
   const { attack, stopWalk, walk, die, idle, isDead } = useCharacter(
@@ -166,7 +165,7 @@
     const enemyPos = enemyRef.value.position;
     const enemyQuaternion = enemyRef.value.quaternion;
 
-    const playerPos = new Vector3().copy(playerStore.playerPosition);
+    const playerPos = new Vector3().copy(playerState.playerPosition.value);
 
     const distance = enemyPos.distanceTo(playerPos);
     const attackRange = 2; // Adjust as needed
@@ -185,16 +184,16 @@
     if (dot > attackAngle) {
       // Player is within 45 degrees in front of enemy
       // Attack hits
-      playerStore.takeDamage(10); // or any function to apply damage
+      playerState.takeDamage(10); // or any function to apply damage
     }
   };
 
   const checkProjectileHit = (projectilePosition: Vector3) => {
-    const playerPos = new Vector3().copy(playerStore.playerPosition);
+    const playerPos = new Vector3().copy(playerState.playerPosition.value);
     const distance = projectilePosition.distanceTo(playerPos);
 
     if (distance <= 1) {
-      playerStore.takeDamage(10);
+      playerState.takeDamage(10);
     } else {
       const bloodSplatInstance = resources.get('bloodSplate').scene;
       bloodSplatInstance.position.set(projectilePosition.x, 0, projectilePosition.z);
@@ -229,7 +228,7 @@
       const spiderPosition = enemyRef.value.position.clone();
       spiderBallMesh.position.set(spiderPosition.x, 1, spiderPosition.z - 1.5);
 
-      const playerPosition = playerStore.playerPosition;
+      const playerPosition = playerState.playerPosition.value;
       const duration = 0.8;
 
       const tl = gsap.timeline({
@@ -273,10 +272,10 @@
 
     if (isDead.value) return;
 
-    if (enemyRef.value && playerStore.playerPosition) {
+    if (enemyRef.value && playerState.playerPosition.value) {
 
       const enemyPos = enemyRef.value.position;
-      const playerPos = new Vector3().copy(playerStore.playerPosition);
+      const playerPos = new Vector3().copy(playerState.playerPosition.value);
       playerPos.y = 0;
 
       const directionToPlayer = new Vector3().subVectors(playerPos, enemyPos);

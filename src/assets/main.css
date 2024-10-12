@@ -1,14 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Coda:wght@400;800&family=Metal+Mania&display=swap');
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Coda', system-ui;
-}
-
 body {
   background: #000;
+}
+
+#app {
+  position: relative;
+}
+
+h1, h2, p, a, button {
+  font-family: "Coda", sans-serif;
 }
 
 img {

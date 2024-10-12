@@ -20,10 +20,9 @@
 
 <script setup lang="ts">
 import {computed, onMounted, onUnmounted, shallowRef} from 'vue';
-import {Html, useAnimations, useGLTF} from '@tresjs/cientos';
+import {Html, useAnimations} from '@tresjs/cientos';
 import {Mesh, Quaternion, Vector3} from 'three';
 import {useRenderLoop} from '@tresjs/core';
-import {usePlayerStore} from '@/stores/playerStore';
 import {useEnemyStore} from '@/stores/enemyStore';
 import {SkeletonAnimationEnum} from '../../enum/skeleton-animation.enum';
 import {useEventBus} from "@vueuse/core";
@@ -31,8 +30,9 @@ import type {Enemy} from "@/components/BattleManager.vue";
 import useCharacter from "@/composable/useCharacter";
 import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
 import {useResources} from "@/composable/useResources";
+import {usePlayer} from "@/composable/usePlayer";
 
-const emit = defineEmits(['die'])
+  const emit = defineEmits(['die'])
   const {config} = defineProps({
     config: {
       type: Object as Enemy,
@@ -47,7 +47,7 @@ const emit = defineEmits(['die'])
 
   const enemyRef = shallowRef<Mesh>();
 
-  const playerStore = usePlayerStore();
+  const playerState = usePlayer();
   const enemyStore = useEnemyStore();
   const enemyEventBus = useEventBus('enemyEventBus');
   const { attack, stopWalk, walk, die, receiveHit, isDead } = useCharacter(
@@ -69,9 +69,7 @@ const emit = defineEmits(['die'])
     },
   )
 
-  // TODO this should be dynamic. Remember to pass to useCharacter
   const attackDistance = 2;
-
   const enemyStoreInstance = computed(() => {
     return enemyStore.enemies.find(e => e.id === config.enemyId);
   })
@@ -142,7 +140,7 @@ const emit = defineEmits(['die'])
     const enemyPos = enemyRef.value.position;
     const enemyQuaternion = enemyRef.value.quaternion;
 
-    const playerPos = new Vector3().copy(playerStore.playerPosition);
+    const playerPos = new Vector3().copy(playerState.playerPosition.value);
 
     const distance = enemyPos.distanceTo(playerPos);
     const attackRange = 2; // Adjust as needed
@@ -161,7 +159,7 @@ const emit = defineEmits(['die'])
     if (dot > attackAngle) {
       // Player is within 45 degrees in front of enemy
       // Attack hits
-      playerStore.takeDamage(10); // or any function to apply damage
+      playerState.takeDamage(10); // or any function to apply damage
     }
   };
 
@@ -169,10 +167,10 @@ const emit = defineEmits(['die'])
 
     if (isDead.value) return;
 
-    if (enemyRef.value && playerStore.playerPosition) {
+    if (enemyRef.value && playerState.playerPosition.value) {
 
       const enemyPos = enemyRef.value.position;
-      const playerPos = new Vector3().copy(playerStore.playerPosition);
+      const playerPos = new Vector3().copy(playerState.playerPosition.value);
       playerPos.y = 0;
 
       const directionToPlayer = new Vector3().subVectors(playerPos, enemyPos);

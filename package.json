@@ -15,6 +15,7 @@
     "@tresjs/core": "^4.3.0",
     "@vueuse/core": "^11.1.0",
     "gsap": "^3.12.5",
+    "modern-normalize": "^3.0.1",
     "nipplejs": "^0.10.2",
     "pinia": "^2.1.7",
     "postprocessing": "^6.36.3",

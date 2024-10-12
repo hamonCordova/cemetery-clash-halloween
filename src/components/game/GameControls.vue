@@ -1,5 +1,19 @@
 <template>
-  <div class="nipple-container" v-if="isMobile" ref="nippleContainer"></div>
+  <div class="mobile-controls" v-if="isMobile">
+    <div class="nipple-container" @click="$event.stopPropagation()" ref="nippleContainer"></div>
+    <div class="buttons-container">
+      <button class="button button--jump"
+              @touchstart="activeMovements.jump = true; $event.preventDefault(); $event.stopPropagation()"
+              @touchend="activeMovements.jump = false; $event.stopPropagation()">
+        <img src="../../../static/img/arrow_n.svg" alt="Jump icon" />
+      </button>
+      <button class="button button--attack"
+              @touchstart="attack(); $event.preventDefault(); $event.stopPropagation()"
+              @touchend="$event.preventDefault(); $event.stopPropagation()">
+        <img src="../../../static/img/tool_sword_b.svg" alt="Attack icon" />
+      </button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -10,7 +24,7 @@
   import { Vector3 } from 'three';
 
   const isMobile = DocumentUtils.isMobile();
-  const { activeMovements } = usePlayer();
+  const { activeMovements, attack } = usePlayer();
   const nippleInstance = ref(null);
   const nippleContainer = ref(null);
 
@@ -52,6 +66,10 @@
         handleKeyEvent('keyup', event);
       });
     }
+
+    window.addEventListener('click', (event) => {
+      attack();
+    });
   };
 
   const handleKeyEvent = (type: 'keyup' | 'keydown', event: KeyboardEvent) => {
@@ -90,8 +108,8 @@
 
     const radianAngle = angle.radian - Math.PI / 2;
 
-    const movementX = -Math.sin(radianAngle) * (distance / 50);
-    const movementZ = -Math.cos(radianAngle) * (distance / 50);
+    const movementX = -Math.sin(radianAngle) * (distance / 100);
+    const movementZ = -Math.cos(radianAngle) * (distance / 100);
 
     activeMovements.run = true;
     activeMovements.joystickMovement = new Vector3(movementX, 0, movementZ);
@@ -101,14 +119,65 @@
     activeMovements.run = false;
     activeMovements.joystickMovement = new Vector3(0, 0, 0);
   };
+
 </script>
 
-<style scoped>
-  .nipple-container {
-    height: 150px;
-    width: 150px;
+<style>
+
+  .mobile-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
     position: fixed;
     bottom: 0;
     left: 0;
+    width: 100%;
   }
+
+  .nipple-container {
+    height: 150px;
+    width: 150px;
+    position: relative;
+  }
+
+  .nipple .back {
+    background-color: rgba(255, 255, 255, 1) !important;
+  }
+
+  .nipple .front {
+    background-color: #020202 !important;
+  }
+
+  .buttons-container {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 30px 30px 30px;
+  }
+
+  .button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    outline: none;
+    border: 1px solid #ccc;
+    background: rgba(255, 255, 255, 0.22);
+    transition: box-shadow linear 80ms;
+  }
+
+  .button:active {
+    box-shadow: inset 2px 0 4px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .button--attack {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+  }
+
+
 </style>

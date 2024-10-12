@@ -1,10 +1,11 @@
 <template>
 
   <!-- Moon -->
-  <primitive :object="resources.get('moon').scene" :scale="[0.02, 0.02, 0.02]" :position="[-30, 15, -30]"></primitive>
-  <TresPointLight :args="['#ffffff', 30, 20, 0.9]" :power="900" :position="[-23, 15, -20]" ></TresPointLight>
   <TresDirectionalLight :args="['#ffffc1', 2]" :position="[-23, 15, -20]" />
-  <TresDirectionalLight :args="['#fff', 2]" :position="[-27, 10, -27]" cast-shadow :shadow-mapSize-height="512" :shadow-mapSize-width="512" />
+  <TresDirectionalLight :args="['#fff', 2]" :position="[-27, 10, -27]" cast-shadow :mapSize="[256, 256]" />
+  <TresDirectionalLight v-if="isMobile" :args="['#f65a00', 2]" :position="[-20, 3, 6]" :rotation="[0, 0.09, 0]" cast-shadow :mapSize="[256, 256]" />
+  <TresHemisphereLight v-if="isMobile" :args="['#6f0eff', '#d67a26', 3]" :position="[0, 60, 0]" />
+  <TresAmbientLight v-if="isMobile" :intensity="1.3" />
 
   <!-- Tree -->
   <primitive :object="resources.get('deadTree').scene" :scale="[1.9, 1.9, 1.9]" :position="[24, 0, -21]"></primitive>
@@ -41,11 +42,8 @@
   <primitive :object="resources.get('deadTree', 0.2).scene" :scale="[1.4, 1.4, 1.4]" :position="[-1, 0, -39]"></primitive>
   <primitive :object="resources.get('deadTree', 0.2).scene" :scale="[1.4, 1.4, 1.4]" :position="[7, 0, -39]"></primitive>
 
-
-
-
   <!--PumpKin-->
-  <Pumpkin :position="[22, 0.7, -20]" />
+  <Pumpkin :render-light="!isMobile" :position="[22, 0.7, -20]" />
 
   <!-- Crypt -->
   <primitive :object="resources.get('crypt').scene" :scale="[1.3, 1.3, 1.3]" :position="[-5, 0, -22]"></primitive>
@@ -53,8 +51,8 @@
   <primitive :object="resources.get('skull').scene" :position="[-7, 0.01, -16]" :rotation="[0, 0.6, 0]"></primitive>
   <primitive :object="resources.get('bone').scene" :position="[-10, 0.01, -18]"></primitive>
   <primitive :object="resources.get('bone').scene" :position="[-9.5, 0.01, -18.2]" :rotation="[0, 2.3, 0]"></primitive>
-  <Candles :position="[-8, 0.01, -16]" />
-  <Candles :position="[-9, 0.01, -16.5]" />
+  <Candles :render-light="!isMobile" :position="[-8, 0.01, -16]" />
+  <Candles :render-light="!isMobile" :position="[-9, 0.01, -16.5]" />
 
   <!--Path-->
   <primitive :object="resources.get('path').scene" :scale="[1.3, 1.3, 1.3]" :position="[-9, 0.01, -14.2]"></primitive>
@@ -72,9 +70,8 @@
   <primitive :object="resources.get('path', 0.2).scene" :scale="[1.3, 1.3, 1.3]" :position="[1.4, 0.01, -34.5]"></primitive>
   <primitive :object="resources.get('path', 0.1).scene" :scale="[1.3, 1.3, 1.3]" :position="[1.4, 0.01, -37]"></primitive>
 
-
   <!--Sepultura-->
-  <Candles :position="[3.5, 0.01, -25.5]" />
+  <Candles :render-light="!isMobile" :position="[3.5, 0.01, -25.5]" />
   <primitive :object="resources.get('shovel').scene" :scale="[0.8, 0.8, 0.8]" :position="[9, 1.2, -17.8]" :rotation="[-0.2, -0.5, 0.1]"></primitive>
   <primitive :object="resources.get('graveUnder').scene" :scale="[1.3, 1.3, 1.3]" :position="[6, 0.3, -21.8]"></primitive>
   <primitive :object="resources.get('coffin').scene" :scale="[1.1, 1.1, 1.1]" :position="[10, 0.01, -21.8]"></primitive>
@@ -84,29 +81,29 @@
   <primitive :object="resources.get('bone').scene" :scale="[0.7, 0.7, 0.7]" :position="[8, 0, -17.8]" :rotation="[0, 1.3, 0]"></primitive>
   <primitive :object="resources.get('grave').scene" :scale="[1.2, 1.2, 1.2]" :position="[5.9, 0, -25.8]"></primitive>
   <primitive :object="resources.get('ribcage').scene" :scale="[1.2, 1.2, 1.2]" :position="[5.9, 0.3, -16.8]" :rotation="[1, 2.5, 1]"></primitive>
-  <Lantern :position="[4.5, 0.3, -14.8]" />
-  <Lantern :position="[14, 0.01, -18.5]" />
+  <Lantern :render-light="!isMobile" :position="[4.5, 0.3, -14.8]" />
+  <Lantern :render-light="!isMobile" :position="[14, 0.01, -18.5]" />
 
   <!-- Tree -->
   <primitive :object="resources.get('deadTree2').scene" :scale="[1, 1, 1]" :position="[13, 0, -15]"></primitive>
   <primitive :object="resources.get('deadTree').scene" :scale="[1.2, 1.2, 1.2]" :position="[17, 0, -16]"></primitive>
-  <Pumpkin :position="[10, 0.7, -15]" />
-  <Pumpkin :position="[14, 0.7, 8]" />
+  <Pumpkin :render-light="!isMobile" :position="[10, 0.7, -15]" />
+  <Pumpkin :render-light="!isMobile" :position="[14, 0.7, 8]" />
 
   <!-- Left side -->
   <primitive :object="resources.get('cemetary').scene" :scale="[4, 4, 4]" :position="[-19, 1, -12]"></primitive>
   <primitive :object="resources.get('cobweb').scene" :scale="[2.6, 2.6, 2.6]" :position="[-19.5, 1, -12.5]"></primitive>
-  <Candles :position="[-15.5, 1, -10.5]" />
-  <Pumpkin :position="[-14.5, 0.65, -4]" :rotation="[0, -2, 0]" />
+  <Candles :render-light="!isMobile" :position="[-15.5, 1, -10.5]" />
+  <Pumpkin :render-light="!isMobile" :position="[-14.5, 0.65, -4]" :rotation="[0, -2, 0]" />
 
   <template v-for="item in 10" :key="item">
     <primitive :object="resources.get('path').scene" :scale="[1.3, 1.3, 1.3]" :position="[-18.5, 0.01, (-9.5 - (2.5 * -item))]"></primitive>
   </template>
-  <PostLantern :position="[-21.5, 0, -7]" :rotation="[0, 0.7, 0]" />
+  <PostLantern :render-light="!isMobile" :position="[-21.5, 0, -7]" :rotation="[0, 0.7, 0]" />
   <primitive :object="resources.get('crypt').scene" :scale="[1.3, 1.3, 1.3]" :position="[-26, 0, -2]" :rotation="[0, 1.3, 0]"></primitive>
   <primitive :object="resources.get('crypt').scene" :scale="[1.3, 1.3, 1.3]" :position="[-26, 0, 9]" :rotation="[0, 1.6, 0]"></primitive>
-  <PostLantern :position="[-21, 0, 3.5]" :rotation="[0, 1, 0]" />
-  <Pumpkin :position="[-21.5, 0.65, 13]" :rotation="[0, -2.5, 0]" />
+  <PostLantern :render-light="!isMobile" :position="[-21, 0, 3.5]" :rotation="[0, 1, 0]" />
+  <Pumpkin :render-light="!isMobile" :position="[-21.5, 0.65, 13]" :rotation="[0, -2.5, 0]" />
   <primitive :object="resources.get('coffin2').scene" :scale="[1, 1, 1]" :position="[-21, 1.5, 6]" :rotation="[Math.PI / 2, 0.2, -1.2]"></primitive>
   <primitive :object="resources.get('graveMarker').scene" :scale="[1, 1, 1]" :position="[-15, 0, 6]" :rotation="[0, 0.5, 0]"></primitive>
   <primitive :object="resources.get('graveMarker').scene" :scale="[1, 1, 1]" :position="[-15, 0, 9]" :rotation="[0, 0.2, 0]"></primitive>
@@ -128,12 +125,15 @@
   import gsap from 'gsap';
   import {Euler, Vector3} from "three";
   import {useGameState} from "@/composable/useGameState";
+  import {DocumentUtils} from "@/utils/document-utils";
+  import { vLightHelper } from '@tresjs/core'
 
   const emit = defineEmits(['start'])
 
   const resources = useResources();
   const { renderer, scene, camera } = useTresContext();
   const gameState = useGameState();
+  const isMobile = DocumentUtils.isMobile()
 
   onMounted(() => {
     setTimeout(() => {

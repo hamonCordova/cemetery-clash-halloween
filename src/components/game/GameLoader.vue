@@ -1,11 +1,13 @@
 <template>
   <div class="container">
-    <div class="logo-container">
-      <img src="../../../static/img/cemetery-clash-halloween-logo.webp" alt="Cemetery Clash: Halloween game logo" class="logo-img" >
-    </div>
-    <h1 class="font-metal">{{ isWaitingRender ? 'Preparing your game...' : 'Loading...' }}</h1>
-    <div class="loading-progress-container">
-      <div class="loading-progress__bar" :style="{width: loadingCounter + '%'}"></div>
+    <div class="content">
+      <div class="logo-container">
+        <img src="../../../static/img/cemetery-clash-halloween-logo.webp" alt="Cemetery Clash: Halloween game logo" class="logo-img" width="1024" height="828" >
+      </div>
+      <h1 class="font-metal">{{ isWaitingRender ? 'Preparing your game...' : 'Loading...' }}</h1>
+      <div class="loading-progress-container">
+        <div class="loading-progress__bar" :style="{width: loadingCounter + '%'}"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -26,37 +28,39 @@
   const loadingCounter = ref(0);
 
   onMounted(() => {
-
-      resources.load(() => {
-        isWaitingRender.value = true;
-        setTimeout(() => {
-          emit('loaded');
-        }, gameState.mode.value === GameStateModeEnum.PRODUCTION ? 5000 : 500)
-      }, (total: number) => {
-        loadingCounter.value = total;
-      });
+    resources.load(() => {
+      isWaitingRender.value = true;
+      setTimeout(() => {
+        emit('loaded');
+      }, gameState.mode.value === GameStateModeEnum.PRODUCTION ? 5000 : 500)
+    }, (total: number) => {
+      loadingCounter.value = total;
+    });
   })
 </script>
 
 <style scoped>
 
   .container {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-color: black;
+    z-index: 9;
+  }
+
+  .content {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: #000;
-    width: 100vw;
-    max-width: 100%;
-    height: 100vh;
-    user-select: none;
-    position: fixed;
-    z-index: 9;
+    transform: translateY(25%);
   }
 
   .logo-container {
     width: 600px;
     max-width: 95vw;
+    aspect-ratio: 1024 / 828;
   }
 
   .logo-img {

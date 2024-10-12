@@ -1,4 +1,5 @@
 <template>
+  <GameLoader v-if="isLoading" @loaded="showIntro()" />
   <template v-if="resources.isLoaded.value">
     <TresCanvas window-size v-bind="rendererProps">
       <StatsGl v-if="!isProductionGameMode" />
@@ -14,10 +15,8 @@
         <BattleFloor />
       </Suspense>
     </TresCanvas>
+    <GameControls />
   </template>
-
-  <GameControls />
-  <GameLoader v-if="isLoading" @loaded="showIntro()" />
 </template>
 
 <script lang="ts" setup>
@@ -46,8 +45,7 @@
   const rendererProps = {
     shadows: true,
     alpha: false,
-    shadowHeight: 64,
-    shadowWidth: 64,
+    antialias: !isMobile,
     shadowMapType: PCFSoftShadowMap,
     outputColorSpace: SRGBColorSpace,
     toneMapping: ACESFilmicToneMapping,

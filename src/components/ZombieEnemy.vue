@@ -23,7 +23,6 @@ import {computed, onMounted, onUnmounted, shallowRef, toValue} from 'vue';
 import {Html, useAnimations, useGLTF} from '@tresjs/cientos';
 import {Mesh, Quaternion, Vector3} from 'three';
 import {useRenderLoop} from '@tresjs/core';
-import {usePlayerStore} from '@/stores/playerStore';
 import {useEnemyStore} from '@/stores/enemyStore';
 import {ZombieAnimationEnum} from '../../enum/zombie-animation.enum';
 import {useEventBus} from "@vueuse/core";
@@ -32,6 +31,7 @@ import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
 import {LoopRepeat} from "three/src/constants";
 import gsap from "gsap";
 import {useResources} from "@/composable/useResources";
+import {usePlayer} from "@/composable/usePlayer";
 
 const emit = defineEmits(['die'])
   const {config} = defineProps({
@@ -46,7 +46,7 @@ const emit = defineEmits(['die'])
   const { actions } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
 
-  const playerStore = usePlayerStore();
+  const playerState = usePlayer();
   const enemyStore = useEnemyStore();
   const enemyEventBus = useEventBus('enemyEventBus');
 
@@ -99,7 +99,7 @@ const emit = defineEmits(['die'])
   const die = () => {
 
     isDead = true;
-    playerStore.unfreeze(config.enemyId);
+    playerState.unfreeze(config.enemyId);
 
     gsap.to(
         enemyRef.value.position,
@@ -156,7 +156,7 @@ const emit = defineEmits(['die'])
     const enemyPos = enemyRef.value.position;
     const enemyQuaternion = enemyRef.value.quaternion;
 
-    const playerPos = new Vector3().copy(playerStore.playerPosition);
+    const playerPos = new Vector3().copy(playerState.playerPosition.value);
 
     const distance = enemyPos.distanceTo(playerPos);
     if (distance > freezeDistance) {
@@ -172,7 +172,7 @@ const emit = defineEmits(['die'])
 
     if (dot > attackAngle) {
       isFreezing = true;
-      playerStore.freeze(config.enemyId);
+      playerState.freeze(config.enemyId);
     }
   };
 
@@ -180,10 +180,10 @@ const emit = defineEmits(['die'])
 
     if (isDead) return;
 
-    if (enemyRef.value && playerStore.playerPosition) {
+    if (enemyRef.value && playerState.playerPosition.value) {
 
       const enemyPos = enemyRef.value.position;
-      const playerPos = new Vector3().copy(playerStore.playerPosition);
+      const playerPos = new Vector3().copy(playerState.playerPosition.value);
       playerPos.y = 0;
 
       const directionToPlayer = new Vector3().subVectors(playerPos, enemyPos);

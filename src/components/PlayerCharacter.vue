@@ -9,24 +9,23 @@
   import {SkeletonAnimationEnum} from "../../enum/skeleton-animation.enum";
   import {AnimationAction, MathUtils, Mesh, Quaternion, Vector3} from "three";
   import {useRenderLoop, useTresContext} from "@tresjs/core";
-  import {usePlayerStore} from "@/stores/playerStore";
   import {useEnemyStore} from "@/stores/enemyStore";
   import {EnemyTypeDamageRangeEnum} from "../../enum/enemy-type-damage-range.enum";
   import {useResources} from "@/composable/useResources";
   import {useGameState} from "@/composable/useGameState";
-  import {LoopOnce} from "three/src/constants";
   import {usePlayer} from "@/composable/usePlayer";
+  import {useEventBus} from "@vueuse/core";
 
   const resources = useResources();
   const {scene: model, animations} = resources.get('skeleton');
-  const { actions, mixer } = useAnimations(animations, model)
+  const { actions } = useAnimations(animations, model)
   const { scene, camera } = useTresContext()
   const skeletonRef = shallowRef<Mesh>();
   const { onLoop } = useRenderLoop()
-  const { activeMovements } = usePlayer();
-  const playerStore = usePlayerStore();
   const enemyStore = useEnemyStore();
   const gameState = useGameState();
+  const playerState = usePlayer();
+  const playerEventBus = useEventBus('playerEventBus');
 
   let currentAnimation: AnimationAction | undefined;
 
@@ -36,6 +35,12 @@
 
   onMounted(() => {
     animate(SkeletonAnimationEnum.Idle);
+
+    playerEventBus.on((event) => {
+      if (event === 'attack') {
+        attack();
+      }
+    })
   })
 
   onLoop(({delta, elapsed, clock}) => {
@@ -83,9 +88,10 @@
 
   const move = (delta) => {
     const direction = new Vector3(0, 0, 0);
+    const activeMovements = playerState.activeMovements;
 
     let isMoving = false;
-    const isFreezed = playerStore.isFreezed();
+    const isFreezed = playerState.isFreezed();
     const isJumping = activeMovements.jump;
     const isRunning = activeMovements.run;
 
@@ -200,7 +206,7 @@
         skeletonRef.value.position.x = MathUtils.clamp(skeletonRef.value.position.x, -battleArenaHalfSize, battleArenaHalfSize);
         skeletonRef.value.position.z = MathUtils.clamp(skeletonRef.value.position.z, -battleArenaHalfSize, battleArenaHalfSize);
 
-        playerStore.updatePlayerPosition(skeletonRef.value.position);
+        playerState.updatePlayerPosition(skeletonRef.value.position);
       }
 
       // Atualiza a rotação do personagem
@@ -209,6 +215,7 @@
       const targetQuaternion = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), targetRotationY);
       currentQuaternion.rotateTowards(targetQuaternion, delta * 10);
       skeletonRef.value.quaternion.copy(currentQuaternion);
+
 
     } else {
       if (isAttacking) return;
@@ -277,6 +284,7 @@
         animate(SkeletonAnimationEnum.Jump_Land, 0.1);
       },
       onComplete: () => {
+        playerState.activeMovements.jump = false;
         isJumping = false;
       }
     });
