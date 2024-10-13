@@ -19,8 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, onUnmounted, shallowRef, toValue} from 'vue';
-import {Html, useAnimations, useGLTF} from '@tresjs/cientos';
+import {computed, onMounted, onUnmounted, shallowRef} from 'vue';
+import {Html, useAnimations} from '@tresjs/cientos';
 import {Mesh, Quaternion, Vector3} from 'three';
 import {useRenderLoop} from '@tresjs/core';
 import {useEnemyStore} from '@/stores/enemyStore';
@@ -32,6 +32,7 @@ import {LoopRepeat} from "three/src/constants";
 import gsap from "gsap";
 import {useResources} from "@/composable/useResources";
 import {usePlayer} from "@/composable/usePlayer";
+import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
 
 const emit = defineEmits(['die'])
   const {config} = defineProps({
@@ -47,7 +48,7 @@ const emit = defineEmits(['die'])
   const { onLoop } = useRenderLoop();
 
   const playerState = usePlayer();
-  const enemyStore = useEnemyStore();
+  const enemiesState = useEnemiesSpawned();
   const enemyEventBus = useEventBus('enemyEventBus');
 
   const enemyRef = shallowRef<Mesh>();
@@ -57,7 +58,7 @@ const emit = defineEmits(['die'])
   let isDead = false;
 
   const enemyStoreInstance = computed(() => {
-    return enemyStore.enemies.find(e => e.id === config.enemyId);
+    return enemiesState.enemies.value.find(e => e.id === config.enemyId);
   })
 
   onMounted(() => {
@@ -66,7 +67,7 @@ const emit = defineEmits(['die'])
   });
 
   onUnmounted(() => {
-    enemyStore.removeEnemy(config.enemyId);
+    enemiesState.removeEnemy(config.enemyId);
   });
 
   onLoop(({ delta }) => {
@@ -82,7 +83,7 @@ const emit = defineEmits(['die'])
   }
 
   const spawnEnemy = () => {
-    enemyStore.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.ZOMBIE);
+    enemiesState.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.ZOMBIE);
     enemyRef.value.position.set(
         config.spawnPosition.x,
         config.spawnPosition.y,
@@ -203,7 +204,7 @@ const emit = defineEmits(['die'])
 
       // Implement separation behavior to avoid overlapping with other enemies
       const separationForce = new Vector3(0, 0, 0);
-      const neighbors = enemyStore.enemies.filter((e) => e.id !== config.enemyId);
+      const neighbors = enemiesState.enemies.value.filter((e) => e.id !== config.enemyId);
       const separationDistance = 2; // Adjust as needed
 
       for (const neighbor of neighbors) {
@@ -234,7 +235,7 @@ const emit = defineEmits(['die'])
       crawl()
 
       // Update enemy position in the store
-      enemyStore.updateEnemyPosition(config.enemyId, enemyPos);
+      enemiesState.updateEnemyPosition(config.enemyId, enemyPos);
     }
   };
 

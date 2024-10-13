@@ -5,16 +5,16 @@
 <script setup lang="ts">
   import gsap from 'gsap'
   import {onMounted, shallowRef} from "vue";
-  import {useAnimations, useGLTF} from "@tresjs/cientos";
+  import {useAnimations} from "@tresjs/cientos";
   import {SkeletonAnimationEnum} from "../../enum/skeleton-animation.enum";
   import {AnimationAction, MathUtils, Mesh, Quaternion, Vector3} from "three";
   import {useRenderLoop, useTresContext} from "@tresjs/core";
-  import {useEnemyStore} from "@/stores/enemyStore";
   import {EnemyTypeDamageRangeEnum} from "../../enum/enemy-type-damage-range.enum";
   import {useResources} from "@/composable/useResources";
   import {useGameState} from "@/composable/useGameState";
   import {usePlayer} from "@/composable/usePlayer";
   import {useEventBus} from "@vueuse/core";
+  import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
 
   const resources = useResources();
   const {scene: model, animations} = resources.get('skeleton');
@@ -22,7 +22,7 @@
   const { scene, camera } = useTresContext()
   const skeletonRef = shallowRef<Mesh>();
   const { onLoop } = useRenderLoop()
-  const enemyStore = useEnemyStore();
+  const enemiesState = useEnemiesSpawned();
   const gameState = useGameState();
   const playerState = usePlayer();
   const playerEventBus = useEventBus('playerEventBus');
@@ -158,7 +158,7 @@
       // Variável para acumular as normais de colisão
       let collisionNormal = new Vector3(0, 0, 0);
 
-      enemyStore.enemies.forEach(enemy => {
+      enemiesState.enemies.value.forEach(enemy => {
         // Clonar a posição do inimigo antes de usá-la
         const enemyPos = enemy.position.clone();
         enemyPos.y = 0;
@@ -245,7 +245,7 @@
     const playerPos = skeletonRef.value.position;
     const playerQuaternion = skeletonRef.value.quaternion;
 
-    const enemies = enemyStore.enemies;
+    const enemies = enemiesState.enemies.value;
 
     const attackAngle = Math.cos(45 * (Math.PI / 180)); // 45 degrees
 
@@ -270,7 +270,7 @@
         // Enemy is within 45 degrees in front of player
         // Attack hits
         console.warn('enemy hit')
-        enemyStore.damageEnemy(enemy.id, 30);
+        enemiesState.damageEnemy(enemy.id, 30);
       }
     });
   };

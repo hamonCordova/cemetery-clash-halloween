@@ -37,7 +37,6 @@ import SlimeEnemyModel from '@/components/SlimeEnemyModel.vue';
 import ZombieEnemy from '@/components/ZombieEnemy.vue';
 import PlayerCharacter from '@/components/PlayerCharacter.vue';
 import { EnemyTypeEnum } from '../../enum/enemy-type.enum';
-import { useEnemyStore } from '@/stores/enemyStore';
 
 export interface Round {
   num: number;
@@ -78,7 +77,6 @@ import { ref, onMounted } from 'vue';
 import { Vector3 } from 'three';
 import { generateUUID } from 'three/src/math/MathUtils';
 import { EnemyTypeEnum } from '../../enum/enemy-type.enum';
-import { useEnemyStore } from '@/stores/enemyStore';
 
 const rounds = ref<Round[]>([]);
 const currentRoundNum = ref<number>(1);

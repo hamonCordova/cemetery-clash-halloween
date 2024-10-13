@@ -43,6 +43,7 @@
   import { EnemyTypeEnum } from '../../enum/enemy-type.enum';
   import { useResources } from '@/composable/useResources';
   import {usePlayer} from "@/composable/usePlayer";
+  import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
 
   const emit = defineEmits(['die']);
   const { config } = defineProps({
@@ -59,7 +60,7 @@
   const { scene } = useTresContext();
   const enemyRef = shallowRef<Mesh>();
   const playerState = usePlayer();
-  const enemyStore = useEnemyStore();
+  const enemiesState = useEnemiesSpawned();
   const enemyEventBus = useEventBus('enemyEventBus');
   const { attack, die, idle, isDead } = useCharacter(
       enemyRef,
@@ -85,7 +86,7 @@
   const longRangeDelay = config.attackDelayLongRange || 4000;
 
   const enemyStoreInstance = computed(() => {
-    return enemyStore.enemies.find((e) => e.id === config.enemyId);
+    return enemiesState.enemies.value.find((e) => e.id === config.enemyId);
   });
 
   onMounted(() => {
@@ -94,7 +95,7 @@
   });
 
   onUnmounted(() => {
-    enemyStore.removeEnemy(config.enemyId);
+    enemiesState.removeEnemy(config.enemyId);
   });
 
   onLoop(({ delta }) => {
@@ -110,7 +111,7 @@
   };
 
   const spawnEnemy = () => {
-    enemyStore.registerEnemy(
+    enemiesState.registerEnemy(
         config.enemyId,
         config.spawnPosition,
         EnemyTypeEnum.SPIDER
@@ -352,7 +353,7 @@
       }
 
       // Update enemy position in the store
-      enemyStore.updateEnemyPosition(config.enemyId, enemyPos);
+      enemiesState.updateEnemyPosition(config.enemyId, enemyPos);
     }
   };
 </script>

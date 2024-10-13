@@ -1,18 +1,9 @@
-import { ref } from 'vue';
-import { defineStore } from 'pinia';
-import { Vector3 } from 'three';
-import {useEventBus} from "@vueuse/core";
+import {createGlobalState, useEventBus} from "@vueuse/core";
+import {ref} from "vue";
+import {Vector3} from "three";
 import type {EnemyTypeEnum} from "../../enum/enemy-type.enum";
 
-interface EnemyAlive {
-    id: string;
-    position: Vector3;
-    health: number,
-    isDead: boolean,
-    type: EnemyTypeEnum
-}
-
-export const useEnemyStore = defineStore('enemyStore', () => {
+export const useEnemiesSpawned = createGlobalState(() => {
 
     const enemies = ref<Array<EnemyAlive>>([]);
     const enemyEventBus = useEventBus('enemyEventBus');
@@ -55,4 +46,5 @@ export const useEnemyStore = defineStore('enemyStore', () => {
         removeEnemy,
         damageEnemy,
     };
-});
+
+})
