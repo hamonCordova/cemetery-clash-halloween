@@ -46,7 +46,6 @@ export const usePlayer = createGlobalState(() => {
     };
 
     const attack = () => {
-        console.warn('call attack')
         playerEventBus.emit('attack', '');
     }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="mobile-controls" v-if="isMobile">
+  <div v-if="isMobile" :class="['mobile-controls', {'mobile-controls--enabled': gameState.isPlaying.value}]">
     <div class="nipple-container" @click="$event.stopPropagation()" ref="nippleContainer"></div>
     <div class="buttons-container">
       <button class="button button--jump"
@@ -22,11 +22,13 @@
   import { DocumentUtils } from '@/utils/document-utils';
   import { usePlayer } from '@/composable/usePlayer';
   import { Vector3 } from 'three';
+  import {useGameState} from "@/composable/useGameState";
 
   const isMobile = DocumentUtils.isMobile();
   const { activeMovements, attack } = usePlayer();
   const nippleInstance = ref(null);
   const nippleContainer = ref(null);
+  const gameState = useGameState();
 
   onMounted(() => {
     if (isMobile && nippleContainer.value) {
@@ -68,11 +70,15 @@
     }
 
     window.addEventListener('click', (event) => {
+      if (!gameState.isPlaying.value) return;
       attack();
     });
   };
 
   const handleKeyEvent = (type: 'keyup' | 'keydown', event: KeyboardEvent) => {
+
+    if (!gameState.isPlaying.value) return;
+
     const active = type === 'keydown';
     switch (event.code) {
       case 'ArrowUp':
@@ -102,9 +108,10 @@
   };
 
   const handleNippleMove = (event: any, data: any) => {
+
     const { angle, distance } = data;
 
-    if (!angle) return;
+    if (!angle || !gameState.isPlaying.value) return;
 
     const radianAngle = angle.radian - Math.PI / 2;
 
@@ -116,6 +123,8 @@
   };
 
   const handleNippleMoveEnd = () => {
+    if (!gameState.isPlaying) return;
+
     activeMovements.run = false;
     activeMovements.joystickMovement = new Vector3(0, 0, 0);
   };
@@ -132,6 +141,11 @@
     bottom: 0;
     left: 0;
     width: 100%;
+    opacity: 0;
+  }
+
+  .mobile-controls--enabled {
+    opacity: 1;
   }
 
   .nipple-container {

@@ -1,6 +1,5 @@
 <template>
 
-  <!-- Moon -->
   <TresDirectionalLight :args="['#ffffc1', 2]" :position="[-23, 15, -20]" />
   <TresDirectionalLight :args="['#fff', 2]" :position="[-27, 10, -27]" cast-shadow :mapSize="[256, 256]" />
   <TresDirectionalLight v-if="isMobile" :args="['#f65a00', 2]" :position="[-20, 3, 6]" :rotation="[0, 0.09, 0]" cast-shadow :mapSize="[256, 256]" />
@@ -24,6 +23,7 @@
   <primitive :object="resources.get('deadTree2').scene" :scale="[0.9, 0.9, 0.9]" :position="[-20, 0, -23]"></primitive>
   <primitive :object="resources.get('deadTree').scene" :scale="[1.4, 1.4, 1.4]" :position="[-5, 0, -30]"></primitive>
   <primitive :object="resources.get('deadTree2').scene" :scale="[0.65, 0.65, 0.65]" :position="[-9, 0, -30]"></primitive>
+  <primitive :object="resources.get('deadTree').scene" :scale="[1.6, 1.6, 1.6]" :position="[-15, 0, -24]"></primitive>
   <primitive :object="resources.get('deadTree').scene" :scale="[1.6, 1.6, 1.6]" :position="[-15, 0, -24]"></primitive>
   <primitive :object="resources.get('deadTree').scene" :scale="[1.9, 1.9, 1.9]" :position="[-10, 0, -27]"></primitive>
   <primitive :object="resources.get('deadTree').scene" :scale="[1.7, 1.7, 1.7]" :position="[-32, 0, -17]"></primitive>
@@ -52,7 +52,6 @@
   <primitive :object="resources.get('bone').scene" :position="[-10, 0.01, -18]"></primitive>
   <primitive :object="resources.get('bone').scene" :position="[-9.5, 0.01, -18.2]" :rotation="[0, 2.3, 0]"></primitive>
   <Candles :render-light="!isMobile" :position="[-8, 0.01, -16]" />
-  <Candles :render-light="!isMobile" :position="[-9, 0.01, -16.5]" />
 
   <!--Path-->
   <primitive :object="resources.get('path').scene" :scale="[1.3, 1.3, 1.3]" :position="[-9, 0.01, -14.2]"></primitive>
@@ -82,7 +81,6 @@
   <primitive :object="resources.get('grave').scene" :scale="[1.2, 1.2, 1.2]" :position="[5.9, 0, -25.8]"></primitive>
   <primitive :object="resources.get('ribcage').scene" :scale="[1.2, 1.2, 1.2]" :position="[5.9, 0.3, -16.8]" :rotation="[1, 2.5, 1]"></primitive>
   <Lantern :render-light="!isMobile" :position="[4.5, 0.3, -14.8]" />
-  <Lantern :render-light="!isMobile" :position="[14, 0.01, -18.5]" />
 
   <!-- Tree -->
   <primitive :object="resources.get('deadTree2').scene" :scale="[1, 1, 1]" :position="[13, 0, -15]"></primitive>
@@ -122,40 +120,34 @@
   import Candles from "@/components/objects/Candles.vue";
   import Lantern from "@/components/objects/Lantern.vue";
   import PostLantern from "@/components/objects/PostLantern.vue";
-  import gsap from 'gsap';
-  import {Euler, Vector3} from "three";
-  import {useGameState} from "@/composable/useGameState";
   import {DocumentUtils} from "@/utils/document-utils";
   import { vLightHelper } from '@tresjs/core'
+  import gsap from 'gsap';
+  import {Euler, Vector3} from "three";
 
-  const emit = defineEmits(['start'])
+
+  const emit = defineEmits(['finishIntro'])
 
   const resources = useResources();
   const { renderer, scene, camera } = useTresContext();
-  const gameState = useGameState();
   const isMobile = DocumentUtils.isMobile()
 
   onMounted(() => {
     setTimeout(() => {
       renderer.value.shadowMap.autoUpdate = false;
     }, 1000)
+  });
 
-  })
-
-  const startIntro = () => {
+  const startIntro = (duration = 3000) => {
     camera.value.position.set(-40, 20, 50);
     camera.value.rotation.set(0, -Math.PI / 4, 0);
 
-    const finalPosition = new Vector3(0, 2, 10);
-    const finalRotation = new Euler(0, 0, 0);
+    const finalPosition = new Vector3(0, 4, 12);
+    const finalRotation = new Euler(-0.2, 0, 0);
 
     const timeline = gsap.timeline({
       onComplete() {
-        gameState.isPlaying.value = true;
-        // TODO remove this after implement play screen
-        setTimeout(() => {
-          emit('start');
-        }, 1000)
+        emit('finishIntro');
       }
     });
 
@@ -163,7 +155,7 @@
       x: finalPosition.x,
       y: finalPosition.y,
       z: finalPosition.z,
-      duration: 3,
+      duration: duration / 1000,
       ease: 'power2.out',
     });
 
@@ -171,7 +163,7 @@
       x: finalRotation.x,
       y: finalRotation.y,
       z: finalRotation.z,
-      duration: 3,
+      duration: duration / 1000,
       ease: 'power2.out',
     }, '<');
   };

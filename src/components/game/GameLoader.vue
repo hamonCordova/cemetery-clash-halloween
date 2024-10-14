@@ -34,6 +34,7 @@
         emit('loaded');
       }, gameState.mode.value === GameStateModeEnum.PRODUCTION ? 5000 : 500)
     }, (total: number) => {
+      console.warn(total)
       loadingCounter.value = total;
     });
   })

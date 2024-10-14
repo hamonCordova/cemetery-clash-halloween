@@ -2,10 +2,10 @@
   <GameLoader v-if="isLoading" @loaded="showIntro()" />
   <template v-if="resources.isLoaded.value">
     <TresCanvas window-size v-bind="rendererProps">
-      <StatsGl v-if="!isProductionGameMode" />
+      <StatsGl  v-if="!isProductionGameMode" />
       <Stars />
       <Suspense>
-        <BattleScene ref="battleSceneRef" @start="startBattle()" />
+        <BattleScene ref="battleSceneRef" />
       </Suspense>
       <TresPerspectiveCamera :args="[50, 1, 0.1, 10000]" :position="[0, 10, 10]" />
       <OrbitControls v-if="isDevScenarioMode" />
@@ -15,6 +15,9 @@
         <BattleFloor />
       </Suspense>
     </TresCanvas>
+    <transition name="fade" :duration="1000" mode="out-in">
+      <GameMenu v-if="isShowingMenu" ref="gameMenuRef" @startGame="startGame()" />
+    </transition>
     <GameControls />
   </template>
 </template>
@@ -34,11 +37,14 @@
   import {GameStateModeEnum} from "../../enum/game-mode.enum";
   import GameControls from "@/components/game/GameControls.vue";
   import {DocumentUtils} from "@/utils/document-utils";
+  import GameMenu from "@/components/game/GameMenu.vue";
 
   const gameState = useGameState();
   const resources = useResources();
   const isLoading = ref(true);
+  const isShowingMenu = ref(false);
   const battleSceneRef = ref();
+  const gameMenuRef = ref();
   const battleManagerRef = ref();
   const isMobile = DocumentUtils.isMobile();
 
@@ -60,20 +66,44 @@
     return gameState.mode.value === GameStateModeEnum.DEV_SCENARIO
   })
 
-  const startBattle = () => {
-    battleManagerRef.value.startRound();
-  }
-
   const showIntro = () => {
     isLoading.value = false;
 
     if (isProductionGameMode.value) {
-      battleSceneRef.value.startIntro();
+      const introDuration = 3000;
+      battleSceneRef.value.startIntro(introDuration);
+
+      setTimeout(() => {
+        isShowingMenu.value = true;
+      }, isMobile ? introDuration / 1.2 : introDuration / 1.7)
+
       return;
     }
 
-    gameState.isPlaying.value = true;
-    startBattle();
+    startGame(false);
+  }
+
+  const startGame = (withTimeout = true) => {
+
+    isShowingMenu.value = false;
+    setTimeout(() => {
+      gameState.isPlaying.value = true;
+    }, 1000)
+
+    setTimeout(() => {
+      battleManagerRef.value.startRound();
+    }, withTimeout ? 3000 : 0)
   }
 
 </script>
+<style>
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.5s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
+</style>
