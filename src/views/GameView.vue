@@ -18,6 +18,9 @@
     <transition name="fade" :duration="1000" mode="out-in">
       <GameMenu v-if="isShowingMenu" ref="gameMenuRef" @startGame="startGame()" />
     </transition>
+    <transition name="fade" :duration="500" mode="out-in">
+      <GamePlayerStats v-if="gameState.isPlaying.value" />
+    </transition>
     <GameControls />
   </template>
 </template>
@@ -38,6 +41,7 @@
   import GameControls from "@/components/game/GameControls.vue";
   import {DocumentUtils} from "@/utils/document-utils";
   import GameMenu from "@/components/game/GameMenu.vue";
+  import GamePlayerStats from "@/components/game/GamePlayerStats.vue";
 
   const gameState = useGameState();
   const resources = useResources();

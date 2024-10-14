@@ -80,7 +80,7 @@
   <primitive :object="resources.get('bone').scene" :scale="[0.7, 0.7, 0.7]" :position="[8, 0, -17.8]" :rotation="[0, 1.3, 0]"></primitive>
   <primitive :object="resources.get('grave').scene" :scale="[1.2, 1.2, 1.2]" :position="[5.9, 0, -25.8]"></primitive>
   <primitive :object="resources.get('ribcage').scene" :scale="[1.2, 1.2, 1.2]" :position="[5.9, 0.3, -16.8]" :rotation="[1, 2.5, 1]"></primitive>
-  <Lantern :render-light="!isMobile" :position="[4.5, 0.3, -14.8]" />
+  <Lantern :render-light="!isMobile" :position="[4.5, 0, -14.8]" />
 
   <!-- Tree -->
   <primitive :object="resources.get('deadTree2').scene" :scale="[1, 1, 1]" :position="[13, 0, -15]"></primitive>
