@@ -2,9 +2,13 @@
 
   <TresDirectionalLight :args="['#ffffc1', 2]" :position="[-23, 15, -20]" />
   <TresDirectionalLight :args="['#fff', 2]" :position="[-27, 10, -27]" cast-shadow :mapSize="[256, 256]" />
-  <TresDirectionalLight v-if="isMobile" :args="['#f65a00', 2]" :position="[-20, 3, 6]" :rotation="[0, 0.09, 0]" cast-shadow :mapSize="[256, 256]" />
-  <TresHemisphereLight v-if="isMobile" :args="['#6f0eff', '#d67a26', 3]" :position="[0, 60, 0]" />
-  <TresAmbientLight v-if="isMobile" :intensity="1.3" />
+<!--  <TresDirectionalLight v-if="isMobile" :args="['#f65a00', 2]" :position="[-20, 3, 6]" :rotation="[0, 0.09, 0]" cast-shadow :mapSize="[256, 256]" />-->
+  <TresPointLight v-if="isMobile" :color="'#d67a26'" :intensity="20" :distance="20" :decay="0.3" :power="300" :position="[-19, 3, 3]" v-light-helper cast-shadow :mapSize="[256, 256]" />
+  <TresPointLight v-if="isMobile" :color="'#c74902'" :intensity="20" :distance="20" :decay="0.3" :power="300" :position="[5, 1, -16]" v-light-helper cast-shadow :mapSize="[256, 256]" />
+  <TresPointLight v-if="isMobile" :color="'#6f0eff'" :intensity="2" :distance="5" :decay="0.3" :power="50" :position="[-9, 2, -16]" v-light-helper cast-shadow :mapSize="[256, 256]" />
+  <TresPointLight v-if="isMobile" :color="'#d67a26'" :intensity="20" :distance="13" :decay="0.3" :power="300" :position="[-19, 2, -18]" v-light-helper cast-shadow :mapSize="[256, 256]" />
+<!--  <TresHemisphereLight v-if="isMobile" :args="['#6f0eff', '#d67a26', 3]" :position="[0, 60, 0]" />-->
+  <TresAmbientLight v-if="isMobile" :intensity="0.4" />
 
   <!-- Tree -->
   <primitive :object="resources.get('deadTree').scene" :scale="[1.9, 1.9, 1.9]" :position="[24, 0, -21]"></primitive>
@@ -130,7 +134,7 @@
 
   const resources = useResources();
   const { renderer, scene, camera } = useTresContext();
-  const isMobile = DocumentUtils.isMobile()
+  const isMobile = true; //DocumentUtils.isMobile()
 
   onMounted(() => {
     setTimeout(() => {

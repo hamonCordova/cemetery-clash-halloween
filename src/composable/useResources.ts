@@ -1,5 +1,5 @@
 import {createGlobalState, useEventBus} from "@vueuse/core";
-import {LoadingManager, MeshBasicMaterial} from "three";
+import {Audio, AudioListener, AudioLoader, LoadingManager, MeshBasicMaterial} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {ref} from "vue";
 import {useAnimations} from "@tresjs/cientos";
@@ -230,6 +230,12 @@ export const useResources = createGlobalState(() => {
             path: '../static/models/BloodSplat.glb',
             type: 'GLTFLoader'
         },
+        //Audios
+        {
+            name: 'swordSwing1',
+            path: '../static/sounds/sword-swing/sword_swing_1.wav',
+            type: 'AudioLoader'
+        },
     ];
 
     const load = (onLoad: () => void, onProgress: (total: number) => void) => {
@@ -247,6 +253,7 @@ export const useResources = createGlobalState(() => {
         })
 
         const gltfLoader = new GLTFLoader(loadingManager);
+        const audioLoader = new AudioLoader(loadingManager);
 
         sources.forEach(source => {
             if (source.type === 'GLTFLoader') {
@@ -262,6 +269,12 @@ export const useResources = createGlobalState(() => {
                     }
 
                     resources[source.name] = gltf;
+                })
+            }
+
+            if (source.type === 'AudioLoader') {
+                audioLoader.load(source.path, (buffer) => {
+                    resources[source.name] = buffer;
                 })
             }
         })
@@ -290,6 +303,18 @@ export const useResources = createGlobalState(() => {
         }
 
         return resource;
+    }
+
+    const getAudio = (name: string, listener: AudioListener) => {
+        const resource = resources[resourceName];
+        const resourceType = sources.find(s => s.name === resourceName)?.type
+
+        if (resourceType !== 'AudioLoader') return;
+
+        const audio = new Audio(listener);
+        audio.setBuffer(resource);
+
+        return audio;
     }
 
     return {
