@@ -33,7 +33,6 @@
     MeshBasicMaterial,
   } from 'three';
   import { useRenderLoop, useTresContext } from '@tresjs/core';
-  import { useEnemyStore } from '@/stores/enemyStore';
   import { SlimeAnimationEnum } from '../../enum/slime-animation.enum';
   import { LoopOnce } from 'three/src/constants';
   import gsap from 'gsap';
@@ -55,7 +54,7 @@
   });
 
   const resources = useResources();
-  const { scene: model, animations } = resources.get('slime');
+  const { model, animations } = config;
   const { actions, mixer } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
   const { scene } = useTresContext();

@@ -36,9 +36,9 @@
   let isAttacking = false;
 
   const actionSounds = {
-    attack: sounds.createAudioPlayer(['swordSwing1', 'swordSwing2', 'swordSwing3', 'swordSwing4']),
-    steps: sounds.createAudioPlayer(['skeletonSteps1', 'skeletonSteps2', 'skeletonSteps3', 'skeletonSteps4', 'skeletonSteps5', 'skeletonSteps6']),
-    jump: sounds.createAudioPlayer(['skeletonJump'])
+    attack: sounds.createAudioPlayer(['swordSwing1', 'swordSwing2', 'swordSwing3', 'swordSwing4'], model),
+    steps: sounds.createAudioPlayer(['skeletonSteps1', 'skeletonSteps2', 'skeletonSteps3', 'skeletonSteps4', 'skeletonSteps5', 'skeletonSteps6'], model),
+    jump: sounds.createAudioPlayer(['skeletonJump'], model)
   }
 
   onMounted(() => {

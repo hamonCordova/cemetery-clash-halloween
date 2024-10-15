@@ -23,7 +23,6 @@ import {computed, onMounted, onUnmounted, shallowRef} from 'vue';
 import {Html, useAnimations} from '@tresjs/cientos';
 import {Mesh, Quaternion, Vector3} from 'three';
 import {useRenderLoop} from '@tresjs/core';
-import {useEnemyStore} from '@/stores/enemyStore';
 import {ZombieAnimationEnum} from '../../enum/zombie-animation.enum';
 import {useEventBus} from "@vueuse/core";
 import type {Enemy} from "@/components/BattleManager.vue";
@@ -43,7 +42,7 @@ const emit = defineEmits(['die'])
   })
 
   const resources = useResources();
-  const { scene: model, animations } = resources.get('zombie');
+  const { model, animations } = config;
   const { actions } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
 

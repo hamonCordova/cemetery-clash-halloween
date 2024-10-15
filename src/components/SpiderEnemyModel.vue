@@ -48,7 +48,7 @@
   })
 
   const resources = useResources();
-  const { scene: model, animations } = resources.get('spider');
+  const { model, animations } = config;
   const { actions } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
   const { scene } = useTresContext();

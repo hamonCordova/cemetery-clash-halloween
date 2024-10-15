@@ -3,39 +3,42 @@
 
   <template v-if="currentRound">
     <template v-for="enemy in currentStage.enemies" :key="enemy.enemyId">
-      <EnemyModel
-          v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.SKELETON"
-          :config="enemy"
-          @die="enemyDied"
-      />
-      <SpiderEnemyModel
-          v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.SPIDER"
-          :config="enemy"
-          @die="enemyDied"
-      />
-      <SlimeEnemyModel
-          v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.SLIME"
-          :config="enemy"
-          @die="enemyDied"
-      />
-      <ZombieEnemy
-          v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.ZOMBIE"
-          :config="enemy"
-          @die="enemyDied"
-      />
+      <Suspense>
+        <SkeletonEnemyModel
+            v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.SKELETON"
+            :config="enemy"
+            @die="enemyDied"
+        />
+      </Suspense>
+      <Suspense>
+        <SpiderEnemyModel
+            v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.SPIDER"
+            :config="enemy"
+            @die="enemyDied"
+        />
+      </Suspense>
+      <Suspense>
+        <SlimeEnemyModel
+            v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.SLIME"
+            :config="enemy"
+            @die="enemyDied"
+        />
+      </Suspense>
+      <Suspense>
+        <ZombieEnemy
+            v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.ZOMBIE"
+            :config="enemy"
+            @die="enemyDied"
+        />
+      </Suspense>
     </template>
   </template>
 </template>
 
 <script lang="ts">
 import { ref, onMounted } from 'vue';
-import { Vector3 } from 'three';
+import {AnimationClip, Object3D, Vector3} from 'three';
 import { generateUUID } from 'three/src/math/MathUtils';
-import EnemyModel from '@/components/EnemyModel.vue';
-import SpiderEnemyModel from '@/components/SpiderEnemyModel.vue';
-import SlimeEnemyModel from '@/components/SlimeEnemyModel.vue';
-import ZombieEnemy from '@/components/ZombieEnemy.vue';
-import PlayerCharacter from '@/components/PlayerCharacter.vue';
 import { EnemyTypeEnum } from '../../enum/enemy-type.enum';
 
 export interface Round {
@@ -59,24 +62,25 @@ export interface Enemy {
   scale: number; // Para slimes mínimo de 0.3. Spider mínimo de 0.3. Skeleton mínimo de 0.5 (quanto menor, mais move speed precisa ter)
   isDead: boolean;
   type: EnemyTypeEnum;
+  model: Object3D;
+  animation: AnimationClip[]
 }
 
-export default {
-  components: {
-    EnemyModel,
-    SpiderEnemyModel,
-    SlimeEnemyModel,
-    ZombieEnemy,
-    PlayerCharacter,
-  },
-};
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import {ref, onMounted, markRaw} from 'vue';
 import { Vector3 } from 'three';
 import { generateUUID } from 'three/src/math/MathUtils';
 import { EnemyTypeEnum } from '../../enum/enemy-type.enum';
+import {useResources} from "@/composable/useResources";
+import SkeletonEnemyModel from '@/components/SkeletonEnemyModel.vue';
+import SpiderEnemyModel from '@/components/SpiderEnemyModel.vue';
+import SlimeEnemyModel from '@/components/SlimeEnemyModel.vue';
+import ZombieEnemy from '@/components/ZombieEnemy.vue';
+import PlayerCharacter from '@/components/PlayerCharacter.vue';
+
+const resources = useResources();
 
 const rounds = ref<Round[]>([]);
 const currentRoundNum = ref<number>(1);
@@ -315,7 +319,10 @@ const createSlimeEnemy = (
     attackDelayLongRange: number,
     isBoss = false
 ): Enemy => {
+
   const spawnPosition = getStrategicPosition();
+  const {scene, animations} = resources.get('slime');
+
   return {
     enemyId: generateUUID(),
     spawnPosition,
@@ -328,6 +335,8 @@ const createSlimeEnemy = (
     scale,
     isDead: false,
     type: EnemyTypeEnum.SLIME,
+    model: markRaw(scene),
+    animations
   };
 };
 
@@ -337,7 +346,10 @@ const createSpiderEnemy = (
     attackDelay: number,
     isBoss = false
 ): Enemy => {
+
   const spawnPosition = getStrategicPosition();
+  const {scene, animations} = resources.get('spider');
+
   return {
     enemyId: generateUUID(),
     spawnPosition,
@@ -350,6 +362,8 @@ const createSpiderEnemy = (
     scale,
     isDead: false,
     type: EnemyTypeEnum.SPIDER,
+    model: markRaw(scene),
+    animations
   };
 };
 
@@ -359,14 +373,16 @@ const createSkeletonEnemy = (
     attackDelay: number,
     isBoss = false
 ): Enemy => {
-  const adjustedScale = Math.max(scale, 0.5); // Garantir escala mínima de 0.5
+  const adjustedScale = Math.max(scale, 0.5);
   let adjustedMoveSpeed = moveSpeed;
 
   if (adjustedScale < 1) {
-    adjustedMoveSpeed = moveSpeed * (1 / adjustedScale); // Skeletons menores são mais rápidos
+    adjustedMoveSpeed = moveSpeed * (1 / adjustedScale);
   }
 
   const spawnPosition = getStrategicPosition();
+  const {scene, animations} = resources.get('skeleton');
+
   return {
     enemyId: generateUUID(),
     spawnPosition,
@@ -378,14 +394,19 @@ const createSkeletonEnemy = (
     scale: adjustedScale,
     isDead: false,
     type: EnemyTypeEnum.SKELETON,
-  };
+    model: markRaw(scene),
+    animations
+  } as Enemy;
 };
 
 const createZombieEnemy = (
     scale: number,
     moveSpeed: number
 ): Enemy => {
+
   const spawnPosition = getStrategicPosition();
+  const {scene, animations} = resources.get('zombie');
+
   return {
     enemyId: generateUUID(),
     spawnPosition,
@@ -397,6 +418,8 @@ const createZombieEnemy = (
     scale,
     isDead: false,
     type: EnemyTypeEnum.ZOMBIE,
+    model: markRaw(scene),
+    animations
   };
 };
 
