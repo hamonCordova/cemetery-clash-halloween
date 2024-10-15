@@ -42,9 +42,11 @@
   import {DocumentUtils} from "@/utils/document-utils";
   import GameMenu from "@/components/game/GameMenu.vue";
   import GamePlayerStats from "@/components/game/GamePlayerStats.vue";
+  import {useSounds} from "@/composable/useSounds";
 
   const gameState = useGameState();
   const resources = useResources();
+  const sounds = useSounds();
   const isLoading = ref(true);
   const isShowingMenu = ref(false);
   const battleSceneRef = ref();
@@ -90,6 +92,8 @@
   const startGame = (withTimeout = true) => {
 
     isShowingMenu.value = false;
+    sounds.playAudio('themeMusic', true, 0.3);
+
     setTimeout(() => {
       gameState.isPlaying.value = true;
     }, 1000)

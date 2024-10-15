@@ -232,8 +232,98 @@ export const useResources = createGlobalState(() => {
         },
         //Audios
         {
+            name: 'themeMusic',
+            path: '../static/sounds/music/halloween_music.mp3',
+            type: 'AudioLoader'
+        },
+        {
             name: 'swordSwing1',
             path: '../static/sounds/sword-swing/sword_swing_1.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'swordSwing2',
+            path: '../static/sounds/sword-swing/sword_swing_2.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'swordSwing3',
+            path: '../static/sounds/sword-swing/sword_swing_3.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'swordSwing4',
+            path: '../static/sounds/sword-swing/sword_swing_4.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'slimeDeath',
+            path: '../static/sounds/slime/slime_death.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'slimeSlide',
+            path: '../static/sounds/slime/slime_slide.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'slimeHitReceived1',
+            path: '../static/sounds/slime/slime_hitreceived_1.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'slimeHitReceived2',
+            path: '../static/sounds/slime/slime_hitreceived_2.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'slimeHitReceived3',
+            path: '../static/sounds/slime/slime_hitreceived_3.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'slimeHit',
+            path: '../static/sounds/slime/slime_hit.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'slimeAttack',
+            path: '../static/sounds/slime/slime_attack.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonSteps1',
+            path: '../static/sounds/skeleton/skeleton_steps_1.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonSteps2',
+            path: '../static/sounds/skeleton/skeleton_steps_2.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonSteps3',
+            path: '../static/sounds/skeleton/skeleton_steps_3.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonSteps4',
+            path: '../static/sounds/skeleton/skeleton_steps_4.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonSteps5',
+            path: '../static/sounds/skeleton/skeleton_steps_5.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonSteps6',
+            path: '../static/sounds/skeleton/skeleton_steps_6.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonJump',
+            path: '../static/sounds/skeleton/skeleton_jump.wav',
             type: 'AudioLoader'
         },
     ];
@@ -306,10 +396,14 @@ export const useResources = createGlobalState(() => {
     }
 
     const getAudio = (name: string, listener: AudioListener) => {
-        const resource = resources[resourceName];
-        const resourceType = sources.find(s => s.name === resourceName)?.type
+        const resource = resources[name];
+        const resourceType = sources.find(s => s.name === name)?.type
 
         if (resourceType !== 'AudioLoader') return;
+
+        if (!listener) {
+            return resource;
+        }
 
         const audio = new Audio(listener);
         audio.setBuffer(resource);
@@ -320,6 +414,7 @@ export const useResources = createGlobalState(() => {
     return {
         load,
         get,
+        getAudio,
         isLoaded,
         resources,
     }

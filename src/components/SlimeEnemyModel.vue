@@ -44,6 +44,7 @@
   import { useResources } from '@/composable/useResources';
   import {usePlayer} from "@/composable/usePlayer";
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
+  import {useSounds} from "@/composable/useSounds";
 
   const emit = defineEmits(['die']);
   const { config } = defineProps({
@@ -58,11 +59,12 @@
   const { actions, mixer } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
   const { scene } = useTresContext();
+  const sounds = useSounds();
   const enemyRef = shallowRef<Mesh>();
   const playerState = usePlayer();
   const enemiesState = useEnemiesSpawned();
   const enemyEventBus = useEventBus('enemyEventBus');
-  const { attack, die, idle, isDead } = useCharacter(
+  const { attack, die, idle, isDead, isAttacking } = useCharacter(
       enemyRef,
       actions,
       {
@@ -76,9 +78,19 @@
       },
       {
         finishAttack: () => checkAttackHit(),
-        onDie: () => emit('die', config.enemyId),
+        onDie: () => {
+          emit('die', config.enemyId)
+        }
       }
   );
+
+  const actionSounds = {
+    slide: sounds.createAudioPlayer(['slimeSlide'], model),
+    death: sounds.createAudioPlayer(['slimeDeath'], model),
+    attack: sounds.createAudioPlayer(['slimeAttack'], model),
+    hit: sounds.createAudioPlayer(['slimeHit'], model),
+    hitReceived: sounds.createAudioPlayer(['slimeHitReceived1', 'slimeHitReceived2', 'slimeHitReceived3'], model),
+  }
 
   const attackDistance = 2;
 
@@ -105,7 +117,12 @@
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
       if (event === 'die' && config.enemyId === payload) {
+        actionSounds.death?.playRandom();
         die();
+      }
+
+      if (event === 'damageReceived' && config.enemyId === payload) {
+        actionSounds.hitReceived?.playRandom();
       }
     });
   };
@@ -176,6 +193,7 @@
     if (dot > attackAngle) {
       // Player is within 45 degrees in front of enemy
       // Attack hits
+      actionSounds.hit?.playRandom();
       playerState.takeDamage(10); // or any function to apply damage
     }
   };
@@ -227,6 +245,7 @@
     attackAction.setLoop(LoopOnce);
     attackAction.reset();
     attackAction.play();
+    actionSounds.attack?.playRandom();
 
     const attackDuration =
         (attackAction.getClip().duration / attackAction.timeScale) * 0.7;
@@ -275,11 +294,14 @@
               verticalDistance <= 1 && // Adjust vertical tolerance as needed
               !hasDealtDamage
           ) {
+            actionSounds.hit?.playRandom();
+            actionSounds.attack?.playRandom();
             playerState.takeDamage(10);
             hasDealtDamage = true; // Prevent further damage during this attack
           }
 
           // Trail effect
+          actionSounds.slide?.playRandom();
           createTrailEffect(enemyPos.clone());
         },
         onComplete: () => {
@@ -341,7 +363,8 @@
 
       followPlayerRotation(playerPos, delta);
 
-      if (distanceToPlayer <= attackDistance) {
+      if (distanceToPlayer <= attackDistance && !isAttacking.value && !isDead.value) {
+        actionSounds.attack?.playRandom();
         attack();
         followPlayerRotation(playerPos, delta);
       }

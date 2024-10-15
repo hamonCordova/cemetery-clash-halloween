@@ -15,6 +15,7 @@
   import {usePlayer} from "@/composable/usePlayer";
   import {useEventBus} from "@vueuse/core";
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
+  import {useSounds} from "@/composable/useSounds";
 
   const resources = useResources();
   const {scene: model, animations} = resources.get('skeleton');
@@ -25,13 +26,20 @@
   const enemiesState = useEnemiesSpawned();
   const gameState = useGameState();
   const playerState = usePlayer();
+  const sounds = useSounds();
   const playerEventBus = useEventBus('playerEventBus');
 
   let currentAnimation: AnimationAction | undefined;
 
   const jumpDuration = 0.8;
-  let isJumping = false;
+  let _isJumping = false;
   let isAttacking = false;
+
+  const actionSounds = {
+    attack: sounds.createAudioPlayer(['swordSwing1', 'swordSwing2', 'swordSwing3', 'swordSwing4']),
+    steps: sounds.createAudioPlayer(['skeletonSteps1', 'skeletonSteps2', 'skeletonSteps3', 'skeletonSteps4', 'skeletonSteps5', 'skeletonSteps6']),
+    jump: sounds.createAudioPlayer(['skeletonJump'])
+  }
 
   onMounted(() => {
     animate(SkeletonAnimationEnum.Idle);
@@ -138,7 +146,21 @@
     if (isMoving) {
 
       if (!isAttacking && !isJumping) {
-        animate(isRunning ? SkeletonAnimationEnum.Run : SkeletonAnimationEnum.Walk, 0.5);
+
+        if (isRunning) {
+          if (!_isJumping) {
+            actionSounds.steps?.setCooldown(300);
+            actionSounds.steps?.playRandom()
+          }
+          animate(SkeletonAnimationEnum.Run, 0.5);
+        } else {
+          if (!_isJumping) {
+            actionSounds.steps?.setCooldown(500);
+            actionSounds.steps?.playRandom()
+          }
+          animate(SkeletonAnimationEnum.Walk, 0.5);
+        }
+
       }
 
       const speed = isRunning ? 8 : 5;
@@ -233,6 +255,7 @@
     animate(currentAttackAnimationEnum, 0.1);
 
     setTimeout(() => {
+      actionSounds.attack?.playRandom();
       checkAttackHit();
     }, (animationDuration * 1000) * 0.4);
 
@@ -276,16 +299,17 @@
   };
 
   const jump = () => {
-    if (isJumping) return;
+    if (_isJumping) return;
 
     const timeline = gsap.timeline({
       onStart: () => {
-        isJumping = true;
+        _isJumping = true;
+        actionSounds.jump?.playRandom();
         animate(SkeletonAnimationEnum.Jump_Land, 0.1);
       },
       onComplete: () => {
         playerState.activeMovements.jump = false;
-        isJumping = false;
+        _isJumping = false;
       }
     });
 

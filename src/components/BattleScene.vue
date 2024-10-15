@@ -127,16 +127,20 @@
   import {DocumentUtils} from "@/utils/document-utils";
   import { vLightHelper } from '@tresjs/core'
   import gsap from 'gsap';
-  import {Euler, Vector3} from "three";
+  import {AudioListener, Euler, Vector3} from "three";
+  import {useSounds} from "@/composable/useSounds";
 
 
   const emit = defineEmits(['finishIntro'])
 
   const resources = useResources();
+  const sounds = useSounds();
   const { renderer, scene, camera } = useTresContext();
   const isMobile = true; //DocumentUtils.isMobile()
 
   onMounted(() => {
+    camera.value.add(sounds.listener);
+
     setTimeout(() => {
       renderer.value.shadowMap.autoUpdate = false;
     }, 1000)
@@ -173,7 +177,7 @@
   };
 
   defineExpose({
-    startIntro
+    startIntro,
   })
 
 </script>
