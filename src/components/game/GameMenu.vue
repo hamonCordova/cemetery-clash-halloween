@@ -9,7 +9,7 @@
           <button @click="emit('startGame')">Start game</button>
         </li>
         <li>
-          <button @click="toggleSoundState">{{gameState.isSoundsEnabled.value ? 'Disable' : 'Enable'}} sounds</button>
+          <button @click="gameState.toggleSoundState()">{{gameState.isSoundsEnabled.value ? 'Disable' : 'Enable'}} sounds</button>
         </li>
       </ul>
       <footer>
@@ -28,10 +28,6 @@
   const emit = defineEmits(['startGame'])
 
   const gameState = useGameState();
-
-  const toggleSoundState = () => {
-    gameState.isSoundsEnabled.value = !gameState.isSoundsEnabled.value;
-  }
 
 </script>
 

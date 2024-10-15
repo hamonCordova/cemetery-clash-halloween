@@ -31,6 +31,7 @@ import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
 import {useResources} from "@/composable/useResources";
 import {usePlayer} from "@/composable/usePlayer";
 import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
+import {useSounds} from "@/composable/useSounds";
 
   const emit = defineEmits(['die'])
   const {config} = defineProps({
@@ -49,8 +50,9 @@ import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
 
   const playerState = usePlayer();
   const enemiesState = useEnemiesSpawned();
+  const sounds = useSounds();
   const enemyEventBus = useEventBus('enemyEventBus');
-  const { attack, stopWalk, walk, die, receiveHit, isDead } = useCharacter(
+  const { attack, stopWalk, walk, die, receiveHit, isDead, isAttacking } = useCharacter(
     enemyRef,
     actions,
     {
@@ -68,6 +70,12 @@ import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
       onDie: () => emit('die', config.enemyId)
     },
   )
+
+  const soundActions = {
+    attack: sounds.createAudioPlayer(['skeletonEnemySwordSwing1', 'skeletonEnemySwordSwing2'], model),
+    death: sounds.createAudioPlayer(['skeletonDeath'], model, 1),
+    hitReceived: sounds.createAudioPlayer(['skeletonEnemyHit1', 'skeletonEnemyHit2', 'skeletonEnemyHit3'], model),
+  }
 
   const attackDistance = 2;
   const enemyStoreInstance = computed(() => {
@@ -90,15 +98,16 @@ import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
       if (event === 'die' && config.enemyId === payload) {
+        soundActions.death?.playRandom();
         die()
       }
-    });
 
-    enemyEventBus.on((event, payload) => {
       if (event === 'damageReceived' && config.enemyId === payload) {
+        soundActions.hitReceived?.playRandom();
         receiveHit()
       }
     });
+
   }
 
   const spawnEnemy = () => {
@@ -177,6 +186,11 @@ import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
       const distanceToPlayer = enemyPos.distanceTo(playerPos);
 
       if (distanceToPlayer <= attackDistance) {
+
+        if (!isAttacking.value) {
+          soundActions.attack?.playRandom();
+        }
+
         attack()
         stopWalk();
         followPlayerRotation(playerPos, delta);

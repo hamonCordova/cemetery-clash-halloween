@@ -9,7 +9,7 @@ export const useSounds = createGlobalState(() => {
     const listener: AudioListener = new AudioListener();
     const resources = useResources();
 
-    const playAudio = (audioName: string, loop = false, volume = 0.5) => {
+    const getAudio = (audioName: string, loop = false, volume = 0.5) => {
         if (!listener) return;
 
         const audio = resources.getAudio(audioName, listener);
@@ -17,16 +17,17 @@ export const useSounds = createGlobalState(() => {
 
         audio.setLoop(loop);
         audio.setVolume(volume);
-        audio.play();
+
+        return audio;
     }
 
-    const createPositionalAudio = (audioName: string, mesh?: Mesh) => {
+    const createPositionalAudio = (audioName: string, volume = 0.7, mesh?: Mesh) => {
         const audioBuffer = resources.getAudio(audioName);
         if (!audioBuffer) return;
 
         const positionalAudio = new PositionalAudio(listener);
         positionalAudio.setBuffer(audioBuffer);
-        positionalAudio.setVolume(1);
+        positionalAudio.setVolume(volume);
         positionalAudio.setRefDistance(15);
 
         if (mesh) {
@@ -55,13 +56,13 @@ export const useSounds = createGlobalState(() => {
         return players;
     }
 
-    const createAudioPlayer = (audiosName: string[], mesh: Mesh) => {
+    const createAudioPlayer = (audiosName: string[], mesh: Mesh, volume: 0.7) => {
         if (!audiosName) return;
 
         const positionalAudios = [];
 
         audiosName.forEach(audioName => {
-            const positionalAudio = createPositionalAudio(audioName, mesh);
+            const positionalAudio = createPositionalAudio(audioName, volume, mesh);
             positionalAudios.push(positionalAudio);
         })
 
@@ -71,7 +72,7 @@ export const useSounds = createGlobalState(() => {
 
     return {
         listener,
-        playAudio,
+        getAudio,
         createPositionalAudio,
         createMeshActionsAudioPlayers,
         createAudioPlayer

@@ -88,7 +88,7 @@
     death: sounds.createAudioPlayer(['slimeDeath'], model),
     attack: sounds.createAudioPlayer(['slimeAttack'], model),
     hit: sounds.createAudioPlayer(['slimeHit'], model),
-    hitReceived: sounds.createAudioPlayer(['slimeHitReceived1', 'slimeHitReceived2', 'slimeHitReceived3'], model),
+    hitReceived: sounds.createAudioPlayer(['slimeHitReceived1', 'slimeHitReceived2', 'slimeHitReceived3'], model, 1),
   }
 
   const attackDistance = 2;

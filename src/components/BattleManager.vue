@@ -413,7 +413,7 @@ const createZombieEnemy = (
     moveSpeed,
     rotationSpeed: 1,
     damage: 0, // Zombies não causam dano
-    health: 60,
+    health: 100,
     attackDelay: 0,
     scale,
     isDead: false,

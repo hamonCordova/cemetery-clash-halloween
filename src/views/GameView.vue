@@ -15,6 +15,7 @@
         <BattleFloor />
       </Suspense>
     </TresCanvas>
+    <GameSoundStats />
     <transition name="fade" :duration="1000" mode="out-in">
       <GameMenu v-if="isShowingMenu" ref="gameMenuRef" @startGame="startGame()" />
     </transition>
@@ -32,7 +33,7 @@
   import {StatsGl, Stars, OrbitControls, Smoke} from "@tresjs/cientos";
   import BattleScene from "@/components/BattleScene.vue";
   import BattleManager from "@/components/BattleManager.vue";
-  import {computed, onMounted, ref} from "vue";
+  import {computed, onMounted, ref, watch} from "vue";
   import {useResources} from "@/composable/useResources";
   import router from "@/router";
   import GameLoader from "@/components/game/GameLoader.vue";
@@ -43,6 +44,7 @@
   import GameMenu from "@/components/game/GameMenu.vue";
   import GamePlayerStats from "@/components/game/GamePlayerStats.vue";
   import {useSounds} from "@/composable/useSounds";
+  import GameSoundStats from "@/components/game/GameSoundStats.vue";
 
   const gameState = useGameState();
   const resources = useResources();
@@ -53,6 +55,7 @@
   const gameMenuRef = ref();
   const battleManagerRef = ref();
   const isMobile = DocumentUtils.isMobile();
+  let themeMusic;
 
   const rendererProps = {
     shadows: true,
@@ -91,8 +94,12 @@
 
   const startGame = (withTimeout = true) => {
 
+    themeMusic = sounds.getAudio('themeMusic', true, 0.3);
+    if (gameState.isSoundsEnabled.value && isProductionGameMode.value) {
+      themeMusic.play();
+    }
+
     isShowingMenu.value = false;
-    sounds.playAudio('themeMusic', true, 0.3);
 
     setTimeout(() => {
       gameState.isPlaying.value = true;
@@ -102,6 +109,13 @@
       battleManagerRef.value.startRound();
     }, withTimeout ? 3000 : 0)
   }
+
+  watch(() => gameState.isSoundsEnabled.value, () => {
+    console.warn('change audio state')
+    if (!themeMusic) return
+
+    gameState.isSoundsEnabled.value ? themeMusic.play() : themeMusic.stop();
+  })
 
 </script>
 <style>

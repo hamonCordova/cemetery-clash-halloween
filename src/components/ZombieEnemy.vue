@@ -19,21 +19,22 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, onUnmounted, shallowRef} from 'vue';
-import {Html, useAnimations} from '@tresjs/cientos';
-import {Mesh, Quaternion, Vector3} from 'three';
-import {useRenderLoop} from '@tresjs/core';
-import {ZombieAnimationEnum} from '../../enum/zombie-animation.enum';
-import {useEventBus} from "@vueuse/core";
-import type {Enemy} from "@/components/BattleManager.vue";
-import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
-import {LoopRepeat} from "three/src/constants";
-import gsap from "gsap";
-import {useResources} from "@/composable/useResources";
-import {usePlayer} from "@/composable/usePlayer";
-import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
+  import {computed, onMounted, onUnmounted, shallowRef} from 'vue';
+  import {Html, useAnimations} from '@tresjs/cientos';
+  import {Mesh, Quaternion, Vector3} from 'three';
+  import {useRenderLoop} from '@tresjs/core';
+  import {ZombieAnimationEnum} from '../../enum/zombie-animation.enum';
+  import {useEventBus} from "@vueuse/core";
+  import type {Enemy} from "@/components/BattleManager.vue";
+  import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
+  import {LoopRepeat} from "three/src/constants";
+  import gsap from "gsap";
+  import {useResources} from "@/composable/useResources";
+  import {usePlayer} from "@/composable/usePlayer";
+  import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
+  import {useSounds} from "@/composable/useSounds";
 
-const emit = defineEmits(['die'])
+  const emit = defineEmits(['die'])
   const {config} = defineProps({
     config: {
       type: Object as Enemy,
@@ -45,7 +46,7 @@ const emit = defineEmits(['die'])
   const { model, animations } = config;
   const { actions } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
-
+  const sounds = useSounds();
   const playerState = usePlayer();
   const enemiesState = useEnemiesSpawned();
   const enemyEventBus = useEventBus('enemyEventBus');
@@ -55,6 +56,12 @@ const emit = defineEmits(['die'])
   let isCrawling = false;
   let isFreezing= false;
   let isDead = false;
+
+  const soundActions = {
+    hitReceived: sounds.createAudioPlayer(['zombieHitReceived1', 'zombieHitReceived2', 'zombieHitReceived3'], model, 1),
+    death: sounds.createAudioPlayer(['zombieDeath'], model),
+    crawl: sounds.createAudioPlayer(['zombieGurgle1', 'zombieGurgle2'], model),
+  }
 
   const enemyStoreInstance = computed(() => {
     return enemiesState.enemies.value.find(e => e.id === config.enemyId);
@@ -76,7 +83,12 @@ const emit = defineEmits(['die'])
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
       if (event === 'die' && config.enemyId === payload) {
+        soundActions.death?.playRandom();
         die()
+      }
+
+      if (event === 'damageReceived' && config.enemyId === payload) {
+        soundActions.hitReceived?.playRandom();
       }
     });
   }
@@ -188,6 +200,9 @@ const emit = defineEmits(['die'])
 
       const directionToPlayer = new Vector3().subVectors(playerPos, enemyPos);
       const distanceToPlayer = enemyPos.distanceTo(playerPos);
+
+      soundActions.crawl?.setCooldown(5000);
+      soundActions.crawl?.playRandom();
 
       if (isFreezing) {
         followPlayerRotation(playerPos, delta);

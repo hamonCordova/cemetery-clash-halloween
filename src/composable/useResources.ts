@@ -326,6 +326,91 @@ export const useResources = createGlobalState(() => {
             path: '../static/sounds/skeleton/skeleton_jump.wav',
             type: 'AudioLoader'
         },
+        {
+            name: 'skeletonJump',
+            path: '../static/sounds/skeleton/skeleton_jump.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonHitReceived1',
+            path: '../static/sounds/skeleton/skeleton_hit_received_1.ogg',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonHitReceived2',
+            path: '../static/sounds/skeleton/skeleton_hit_received_2.ogg',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonHitReceived3',
+            path: '../static/sounds/skeleton/skeleton_hit_received_3.ogg',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonHitReceived4',
+            path: '../static/sounds/skeleton/skeleton_hit_received_4.ogg',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonEnemyHit1',
+            path: '../static/sounds/skeleton/skeleton_enemy_hit_1.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonEnemyHit2',
+            path: '../static/sounds/skeleton/skeleton_enemy_hit_2.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonEnemyHit3',
+            path: '../static/sounds/skeleton/skeleton_enemy_hit_3.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonDeath',
+            path: '../static/sounds/skeleton/skeleton_death.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonEnemySwordSwing1',
+            path: '../static/sounds/skeleton/skeleton_enemy_sword_swing_1.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonEnemySwordSwing2',
+            path: '../static/sounds/skeleton/skeleton_enemy_sword_swing_2.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'zombieDeath',
+            path: '../static/sounds/zombie/zombie_death.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'zombieGurgle1',
+            path: '../static/sounds/zombie/zombie_gurgle_1.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'zombieGurgle2',
+            path: '../static/sounds/zombie/zombie_gurgle_2.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'zombieHitReceived1',
+            path: '../static/sounds/zombie/zombie_hit_received_1.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'zombieHitReceived2',
+            path: '../static/sounds/zombie/zombie_hit_received_2.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'zombieHitReceived3',
+            path: '../static/sounds/zombie/zombie_hit_received_3.wav',
+            type: 'AudioLoader'
+        },
     ];
 
     const load = (onLoad: () => void, onProgress: (total: number) => void) => {

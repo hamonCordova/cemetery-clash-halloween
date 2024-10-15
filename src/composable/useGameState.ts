@@ -17,10 +17,15 @@ export const useGameState = createGlobalState(() => {
         }
     })
 
+    const toggleSoundState = () => {
+        isSoundsEnabled.value = !isSoundsEnabled.value;
+    }
+
     return {
         isPlaying,
         mode,
-        isSoundsEnabled
+        isSoundsEnabled,
+        toggleSoundState
     }
 
 })

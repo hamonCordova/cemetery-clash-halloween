@@ -35,8 +35,8 @@
     gap: 10px;
     width: 280px;
     position: fixed;
-    top: 5px;
-    left: 5px;
+    top: 10px;
+    left: 10px;
     border-radius: 5px;
     border: 2px solid #ee5e0a;
     background: rgba(0, 0, 0, 0.1);
