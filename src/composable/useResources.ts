@@ -1,5 +1,5 @@
 import {createGlobalState, useEventBus} from "@vueuse/core";
-import {Audio, AudioListener, AudioLoader, LoadingManager, MeshBasicMaterial} from "three";
+import {Audio, AudioListener, AudioLoader, ImageLoader, LoadingManager, MeshBasicMaterial, TextureLoader} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {ref} from "vue";
 import {useAnimations} from "@tresjs/cientos";
@@ -11,6 +11,11 @@ export const useResources = createGlobalState(() => {
     let resources = {};
 
     const sources = [
+        {
+            name: 'blackSmoke',
+            path: '../static/img/blackSmoke00.png',
+            type: 'TextureLoader'
+        },
         {
             name: 'moon',
             path: '../static/models/scene/Moon.glb',
@@ -464,6 +469,7 @@ export const useResources = createGlobalState(() => {
 
         const gltfLoader = new GLTFLoader(loadingManager);
         const audioLoader = new AudioLoader(loadingManager);
+        const textureLoader = new TextureLoader(loadingManager);
 
         sources.forEach(source => {
             if (source.type === 'GLTFLoader') {
@@ -487,6 +493,14 @@ export const useResources = createGlobalState(() => {
                     resources[source.name] = buffer;
                 })
             }
+
+            if (source.type === 'TextureLoader') {
+                textureLoader.load(source.path, (img) => {
+                    resources[source.name] = img;
+                })
+            }
+
+
         })
     }
 

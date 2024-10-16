@@ -151,7 +151,10 @@ const enemyDied = (enemyId: string) => {
   );
   if (enemy) {
     enemy.isDead = true;
-    checkStageProgress();
+
+    setTimeout(() => {
+      checkStageProgress();
+    }, 1)
   }
 };
 

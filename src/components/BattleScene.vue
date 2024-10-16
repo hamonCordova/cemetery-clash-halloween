@@ -153,6 +153,7 @@ import {useRenderLoop, useTresContext} from "@tresjs/core";
     // Criar as partículas usando Three.js puro
     const particlesCount = 1000; // Número de partículas
     const positionsArray = new Float32Array(particlesCount * 3);
+    const particleMap = resources.get('blackSmoke');
 
     for (let i = 0; i < particlesCount; i++) {
       positionsArray[i * 3] = (Math.random() - 0.5) * 70; // X entre -35 e 35
@@ -167,9 +168,10 @@ import {useRenderLoop, useTresContext} from "@tresjs/core";
     // Criar o material para as partículas
     const particlesMaterial = new PointsMaterial({
       color: new Color('#88ccff'), // Cor azul fantasmagórica
-      size: 0.08,                   // Tamanho das partículas
+      size: 0.1,                   // Tamanho das partículas
       transparent: true,
       opacity: 0.3,
+      map: particleMap
     });
 
     // Criar o objeto de partículas (Points)
