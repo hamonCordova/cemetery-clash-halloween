@@ -38,6 +38,7 @@
   import {useResources} from "@/composable/useResources";
   import {usePlayer} from "@/composable/usePlayer";
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
+  import {useSounds} from "@/composable/useSounds";
 
   const emit = defineEmits(['die'])
   const {config} = defineProps({
@@ -53,10 +54,11 @@
   const { onLoop } = useRenderLoop();
   const { scene } = useTresContext();
   const enemyRef = shallowRef<Mesh>();
+  const sounds = useSounds();
   const playerState = usePlayer();
   const enemiesState = useEnemiesSpawned();
   const enemyEventBus = useEventBus('enemyEventBus');
-  const { attack, stopWalk, walk, die, idle, isDead } = useCharacter(
+  const { attack, stopWalk, walk, die, idle, isDead, isAttacking } = useCharacter(
     enemyRef,
     actions,
     {
@@ -73,6 +75,13 @@
       onDie: () => emit('die', config.enemyId)
     },
   )
+
+  const actionSounds = {
+    attack: sounds.createAudioPlayer(['spiderAttack'], model),
+    ballSplash: sounds.createAudioPlayer(['spiderBallSplash'], model, 2),
+    death: sounds.createAudioPlayer(['spiderDeath'], model, 1),
+    hitReceived: sounds.createAudioPlayer(['spiderHitReceived1', 'spiderHitReceived2', 'spiderHitReceived3', 'spiderHitReceived4'], model),
+  }
 
   // TODO this should be dynamic. Remember passing to useCharacter
   const attackDistance = 3;
@@ -117,7 +126,12 @@
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
       if (event === 'die' && config.enemyId === payload) {
+        actionSounds.death?.playRandom();
         die()
+      }
+
+      if (event === 'damageReceived' && config.enemyId === payload) {
+        actionSounds.hitReceived?.playRandom();
       }
     });
   }
@@ -180,7 +194,7 @@
     if (dot > attackAngle) {
       // Player is within 45 degrees in front of enemy
       // Attack hits
-      playerState.takeDamage(10); // or any function to apply damage
+      playerState.takeDamage(config.damage); // or any function to apply damage
     }
   };
 
@@ -188,12 +202,16 @@
     const playerPos = new Vector3().copy(playerState.playerPosition.value);
     const distance = projectilePosition.distanceTo(playerPos);
 
-    if (distance <= 1) {
-      playerState.takeDamage(10);
+    if (distance <= 1.2) {
+      actionSounds.ballSplash?.playRandom();
+      playerState.takeDamage(config.damage);
     } else {
+
       const bloodSplatInstance = resources.get('bloodSplate').scene;
       bloodSplatInstance.position.set(projectilePosition.x, 0, projectilePosition.z);
+
       scene.value.add(bloodSplatInstance);
+      actionSounds.ballSplash?.playRandom();
 
       setTimeout(() => {
         scene.value.remove(bloodSplatInstance);
@@ -201,6 +219,7 @@
         bloodSplatInstance.material?.dispose();
       }, 5000);
     }
+
   };
 
   const longRangeAttack = () => {
@@ -211,11 +230,14 @@
     stopWalk();
 
     const attackAction = actions[SpiderAnimationEnum.Attack];
+    const attackDuration = (attackAction.getClip().duration / attackAction.timeScale) * 0.7;
+
     attackAction.setLoop(LoopOnce);
     attackAction.reset();
     attackAction.play();
 
-    const attackDuration = (attackAction.getClip().duration / attackAction.timeScale) * 0.7;
+    actionSounds.attack?.playRandom();
+
 
     setTimeout(() => {
 
@@ -285,7 +307,11 @@
       }
 
       if (distanceToPlayer <= attackDistance) {
-        attack()
+        if (!isAttacking.value) {
+          actionSounds.attack?.playRandom();
+          attack()
+        }
+
         stopWalk();
         followPlayerRotation(playerPos, delta);
         return;

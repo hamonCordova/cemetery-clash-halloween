@@ -7,7 +7,7 @@
       <Suspense>
         <BattleScene ref="battleSceneRef" />
       </Suspense>
-      <TresPerspectiveCamera :args="[50, 1, 0.1, 10000]" :position="[0, 10, 10]" />
+      <TresPerspectiveCamera :args="[50, 1, 0.5, 10000]" :position="[0, 10, 10]" />
       <OrbitControls v-if="isDevScenarioMode" />
       <TresAmbientLight :intensity="0.5" />
       <BattleManager v-if="!isDevScenarioMode" ref="battleManagerRef" />
@@ -94,7 +94,7 @@
 
   const startGame = (withTimeout = true) => {
 
-    themeMusic = sounds.getAudio('themeMusic', true, 0.3);
+    themeMusic = sounds.getAudio('themeMusic', true, 0.2);
     if (gameState.isSoundsEnabled.value && isProductionGameMode.value) {
       themeMusic.play();
     }

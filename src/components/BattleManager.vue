@@ -201,8 +201,10 @@ const getRound1 = (): Round => {
   // Estágio 1: Slimes pequenas com delays diferentes
   stages.push({
     enemies: [
-      createSkeletonEnemy(1.5, 2.5, 1000),
-      createSlimeEnemy(0.5, 3.5, 2000),
+      /*createSkeletonEnemy(1.5, 2.5, 1000),
+      createSlimeEnemy(0.5, 3.5, 2000),*/
+      createSpiderEnemy(1, 2.5, 1000),
+
     ],
   });
   // Estágio 2: Skeletons com escala padrão

@@ -85,7 +85,7 @@
 
   const actionSounds = {
     slide: sounds.createAudioPlayer(['slimeSlide'], model),
-    death: sounds.createAudioPlayer(['slimeDeath'], model),
+    death: sounds.createAudioPlayer(['slimeDeath'], model, 1),
     attack: sounds.createAudioPlayer(['slimeAttack'], model),
     hit: sounds.createAudioPlayer(['slimeHit'], model),
     hitReceived: sounds.createAudioPlayer(['slimeHitReceived1', 'slimeHitReceived2', 'slimeHitReceived3'], model, 1),
@@ -193,7 +193,7 @@
       // Player is within 45 degrees in front of enemy
       // Attack hits
       actionSounds.hit?.playRandom();
-      playerState.takeDamage(10); // or any function to apply damage
+      playerState.takeDamage(config.damage); // or any function to apply damage
     }
   };
 
@@ -295,7 +295,7 @@
           ) {
             actionSounds.hit?.playRandom();
             actionSounds.attack?.playRandom();
-            playerState.takeDamage(10);
+            playerState.takeDamage(config.damage);
             hasDealtDamage = true; // Prevent further damage during this attack
           }
 

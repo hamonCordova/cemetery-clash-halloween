@@ -39,7 +39,7 @@
     attack: sounds.createAudioPlayer(['swordSwing1', 'swordSwing2', 'swordSwing3', 'swordSwing4'], model),
     steps: sounds.createAudioPlayer(['skeletonSteps1', 'skeletonSteps2', 'skeletonSteps3', 'skeletonSteps4', 'skeletonSteps5', 'skeletonSteps6'], model),
     jump: sounds.createAudioPlayer(['skeletonJump'], model),
-    hitReceived: sounds.createAudioPlayer(['skeletonHitReceived2', 'skeletonHitReceived3', 'skeletonHitReceived4'], model, 1.5)
+    hitReceived: sounds.createAudioPlayer(['skeletonHitReceived2', 'skeletonHitReceived3', 'skeletonHitReceived4'], model, 1.2)
   }
 
   onMounted(() => {

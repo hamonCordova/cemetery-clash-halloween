@@ -116,7 +116,7 @@
 </template>
 
 <script setup lang="ts">
-  import {useTresContext} from "@tresjs/core";
+import {useRenderLoop, useTresContext} from "@tresjs/core";
   import {onMounted} from "vue";
   import {useResources} from "@/composable/useResources";
   import Pumpkin from "@/components/objects/Pumpkin.vue";
@@ -127,7 +127,7 @@
   import {DocumentUtils} from "@/utils/document-utils";
   import { vLightHelper } from '@tresjs/core'
   import gsap from 'gsap';
-  import {AudioListener, Euler, Vector3} from "three";
+  import {BufferAttribute, BufferGeometry, Color, Euler, Points, PointsMaterial, Vector3} from "three";
   import {useSounds} from "@/composable/useSounds";
 
 
@@ -136,15 +136,55 @@
   const resources = useResources();
   const sounds = useSounds();
   const { renderer, scene, camera } = useTresContext();
+  const { onLoop } = useRenderLoop();
   const isMobile = true; //DocumentUtils.isMobile()
+  let particles: Points;
 
   onMounted(() => {
+    createParticles();
     camera.value.add(sounds.listener);
 
     setTimeout(() => {
       renderer.value.shadowMap.autoUpdate = false;
     }, 1000)
   });
+
+  const createParticles = () => {
+    // Criar as partículas usando Three.js puro
+    const particlesCount = 1000; // Número de partículas
+    const positionsArray = new Float32Array(particlesCount * 3);
+
+    for (let i = 0; i < particlesCount; i++) {
+      positionsArray[i * 3] = (Math.random() - 0.5) * 70; // X entre -35 e 35
+      positionsArray[i * 3 + 1] = Math.random() * 5;      // Y entre 0 e 10
+      positionsArray[i * 3 + 2] = (Math.random() - 0.5) * 70; // Z entre -35 e 35
+    }
+
+    // Criar a geometria e adicionar o atributo de posição
+    const particlesGeometry = new BufferGeometry();
+    particlesGeometry.setAttribute('position', new BufferAttribute(positionsArray, 3));
+
+    // Criar o material para as partículas
+    const particlesMaterial = new PointsMaterial({
+      color: new Color('#88ccff'), // Cor azul fantasmagórica
+      size: 0.08,                   // Tamanho das partículas
+      transparent: true,
+      opacity: 0.3,
+    });
+
+    // Criar o objeto de partículas (Points)
+    particles = new Points(particlesGeometry, particlesMaterial);
+
+    // Adicionar as partículas à cena
+    scene.value.add(particles);
+  }
+
+  onLoop(({delta, elapsed}) => {
+    if (!particles) return;
+    particles.rotation.y = Math.cos(elapsed) * 0.01;
+    particles.position.y = Math.cos(elapsed) * 0.01;
+    particles.position.x = Math.sin(elapsed) * 0.01;
+  })
 
   const startIntro = (duration = 3000) => {
     camera.value.position.set(-40, 20, 50);

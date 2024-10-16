@@ -40,7 +40,7 @@ export const usePlayer = createGlobalState(() => {
     const takeDamage = (damage: number) => {
         console.warn('player hit')
         playerEventBus.emit('damageReceived')
-        health.value -= damage;
+        health.value -= damage * 0.5;
         if (health.value <= 0) {
             playerEventBus.emit('die');
         }

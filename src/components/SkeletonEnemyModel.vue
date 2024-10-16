@@ -168,7 +168,7 @@ import {useSounds} from "@/composable/useSounds";
     if (dot > attackAngle) {
       // Player is within 45 degrees in front of enemy
       // Attack hits
-      playerState.takeDamage(10); // or any function to apply damage
+      playerState.takeDamage(config.damage); // or any function to apply damage
     }
   };
 

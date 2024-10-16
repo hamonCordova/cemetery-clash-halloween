@@ -411,6 +411,41 @@ export const useResources = createGlobalState(() => {
             path: '../static/sounds/zombie/zombie_hit_received_3.wav',
             type: 'AudioLoader'
         },
+        {
+            name: 'spiderAttack',
+            path: '../static/sounds/spider/spider_attack.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'spiderBallSplash',
+            path: '../static/sounds/spider/spider_ball_splash.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'spiderDeath',
+            path: '../static/sounds/spider/spider_death.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'spiderHitReceived1',
+            path: '../static/sounds/spider/spider_hit_received_1.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'spiderHitReceived2',
+            path: '../static/sounds/spider/spider_hit_received_2.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'spiderHitReceived3',
+            path: '../static/sounds/spider/spider_hit_received_3.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'spiderHitReceived4',
+            path: '../static/sounds/spider/spider_hit_received_4.wav',
+            type: 'AudioLoader'
+        }
     ];
 
     const load = (onLoad: () => void, onProgress: (total: number) => void) => {
