@@ -4,7 +4,7 @@
       <div class="logo-container">
         <img src="/img/cemetery-clash-halloween-logo.webp" alt="Cemetery Clash: Halloween game logo" class="logo-img" width="1024" height="828" >
       </div>
-      <h1 class="font-metal">{{ isWaitingRender ? 'Preparing your game...' : 'Loading...' }}</h1>
+      <h1 class="font-metal">{{ isWaitingRender ? 'Preparing your game...' : `Loading... ${Math.floor(loadingCounter)}%` }}</h1>
       <div class="loading-progress-container">
         <div class="loading-progress__bar" :style="{width: loadingCounter + '%'}"></div>
       </div>
@@ -34,8 +34,7 @@
         emit('loaded');
       }, gameState.mode.value === GameStateModeEnum.PRODUCTION ? 5000 : 500)
     }, (total: number) => {
-      console.warn(total)
-      loadingCounter.value = total;
+      loadingCounter.value = total > 95 ? 100 : total;
     });
   })
 </script>
@@ -59,7 +58,7 @@
   }
 
   .logo-container {
-    width: 600px;
+    width: 445px;
     max-width: 95vw;
     aspect-ratio: 1024 / 828;
   }
@@ -76,13 +75,12 @@
   }
 
   .loading-progress-container {
-    width: 300px;
+    width: 350px;
     height: 20px;
     padding: 3px;
     background-color: #111623;
     border: 1px solid #2c2c2c;
     border-radius: 15px;
-    margin-top: 15px;
   }
 
   .loading-progress__bar {
@@ -91,6 +89,16 @@
     transition: width ease-out 60ms;
     background: #fff;
     border-radius: inherit;
+  }
+
+  @media only screen and (min-width: 1500px) {
+    .logo-container {
+      width: 500px;
+    }
+
+    .content {
+      transform: translateY(35%);
+    }
   }
 
 </style>

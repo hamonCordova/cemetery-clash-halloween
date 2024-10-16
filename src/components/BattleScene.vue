@@ -4,10 +4,10 @@
   <TresDirectionalLight :args="['#fff', 2]" :position="[-27, 10, -27]" cast-shadow :mapSize="[256, 256]" />
 <!--  <TresDirectionalLight v-if="isMobile" :args="['#f65a00', 2]" :position="[-20, 3, 6]" :rotation="[0, 0.09, 0]" cast-shadow :mapSize="[256, 256]" />-->
   <TresPointLight v-if="isMobile" :color="'#d67a26'" :intensity="20" :distance="20" :decay="0.3" :power="300" :position="[-19, 3, 3]" v-light-helper cast-shadow :mapSize="[256, 256]" />
-  <TresPointLight v-if="isMobile" :color="'#c74902'" :intensity="20" :distance="20" :decay="0.3" :power="300" :position="[5, 1, -16]" v-light-helper cast-shadow :mapSize="[256, 256]" />
-  <TresPointLight v-if="isMobile" :color="'#6f0eff'" :intensity="2" :distance="5" :decay="0.3" :power="50" :position="[-9, 2, -16]" v-light-helper cast-shadow :mapSize="[256, 256]" />
-  <TresPointLight v-if="isMobile" :color="'#d67a26'" :intensity="20" :distance="13" :decay="0.3" :power="300" :position="[-19, 2, -18]" v-light-helper cast-shadow :mapSize="[256, 256]" />
-<!--  <TresHemisphereLight v-if="isMobile" :args="['#6f0eff', '#d67a26', 3]" :position="[0, 60, 0]" />-->
+  <TresPointLight v-if="isMobile" :color="'#c74902'" :intensity="20" :distance="20" :decay="0.3" :power="300" :position="[12, 2, -16]" v-light-helper cast-shadow :mapSize="[256, 256]" />
+  <TresPointLight v-if="isMobile" :color="'#6f0eff'" :intensity="2" :distance="5" :decay="0.3" :power="100" :position="[-8, 2, -16]" v-light-helper cast-shadow :mapSize="[256, 256]" />
+  <TresPointLight v-if="isMobile" :color="'#d67a26'" :intensity="20" :distance="20" :decay="0.3" :power="300" :position="[-19, 2, -18]" v-light-helper cast-shadow :mapSize="[256, 256]" />
+  <TresHemisphereLight v-if="isMobile" :args="['#6f0eff', '#d67a26', 1]" />
   <TresAmbientLight v-if="isMobile" :intensity="0.4" />
 
   <!-- Tree -->
@@ -165,10 +165,10 @@ import {useRenderLoop, useTresContext} from "@tresjs/core";
     particlesGeometry.setAttribute('position', new BufferAttribute(positionsArray, 3));
 
     const particlesMaterial = new PointsMaterial({
-      color: new Color('#88ccff'),
+      color: new Color('#d67a26'),
       size: 0.15,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.7,
       map: particleMap
     });
 
@@ -178,9 +178,9 @@ import {useRenderLoop, useTresContext} from "@tresjs/core";
 
   onLoop(({delta, elapsed}) => {
     if (!particles) return;
-    particles.rotation.y = Math.cos(elapsed) * 0.01;
-    particles.position.y = Math.cos(elapsed) * 0.01;
-    particles.position.x = Math.sin(elapsed) * 0.01;
+    particles.rotation.y = Math.cos(elapsed) * 0.02;
+    particles.position.y = Math.cos(elapsed) * 0.02;
+    particles.position.x = Math.sin(elapsed) * 0.02;
   })
 
   const startIntro = (duration = 3000) => {

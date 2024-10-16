@@ -28,7 +28,14 @@
 
 <script lang="ts" setup>
   import {TresCanvas, vLightHelper} from '@tresjs/core'
-  import {ACESFilmicToneMapping, NoToneMapping, PCFSoftShadowMap, SRGBColorSpace} from "three";
+  import {
+    ACESFilmicToneMapping, CineonToneMapping,
+    LinearToneMapping, NeutralToneMapping,
+    NoToneMapping,
+    PCFSoftShadowMap,
+    ReinhardToneMapping,
+    SRGBColorSpace
+  } from "three";
   import BattleFloor from "@/components/BattleFloor.vue";
   import {StatsGl, Stars, OrbitControls, Smoke} from "@tresjs/cientos";
   import BattleScene from "@/components/BattleScene.vue";
@@ -63,7 +70,7 @@
     antialias: !isMobile,
     shadowMapType: PCFSoftShadowMap,
     outputColorSpace: SRGBColorSpace,
-    toneMapping: ACESFilmicToneMapping,
+    toneMapping: NeutralToneMapping,
     powerPreference: 'high-performance',
   }
 
