@@ -1,9 +1,7 @@
 <template>
   <primitive
-      v-if="config"
       ref="enemyRef"
       :object="model"
-      cast-shadow
   >
     <Html
       center
@@ -32,6 +30,7 @@ import {useResources} from "@/composable/useResources";
 import {usePlayer} from "@/composable/usePlayer";
 import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
 import {useSounds} from "@/composable/useSounds";
+import gsap from "gsap";
 
   const emit = defineEmits(['die'])
   const {config} = defineProps({
@@ -41,13 +40,12 @@ import {useSounds} from "@/composable/useSounds";
     }
   })
 
+  let isSpawned = false;
   const resources = useResources();
   const { model, animations } = config;
   const { actions } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
-
   const enemyRef = shallowRef<Mesh>();
-
   const playerState = usePlayer();
   const enemiesState = useEnemiesSpawned();
   const sounds = useSounds();
@@ -77,7 +75,7 @@ import {useSounds} from "@/composable/useSounds";
   const soundActions = {
     attack: sounds.createAudioPlayer(['skeletonEnemySwordSwing1', 'skeletonEnemySwordSwing2'], model),
     death: sounds.createAudioPlayer(['skeletonDeath'], model, 1),
-    hitReceived: sounds.createAudioPlayer(['skeletonEnemyHit1', 'skeletonEnemyHit2', 'skeletonEnemyHit3'], model),
+    hitReceived: sounds.createAudioPlayer(['skeletonEnemyHit1', 'skeletonEnemyHit2', 'skeletonEnemyHit3'], model, 1),
   }
 
   const attackDistance = 2;
@@ -95,6 +93,11 @@ import {useSounds} from "@/composable/useSounds";
   });
 
   onLoop(({ delta }) => {
+    if (!isSpawned) {
+      followPlayerRotation(playerState.playerPosition.value, delta);
+      return
+    }
+
     moveTowardsPlayer(delta);
   });
 
@@ -115,17 +118,21 @@ import {useSounds} from "@/composable/useSounds";
 
   const spawnEnemy = () => {
     enemiesState.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.SKELETON);
+    enemyRef.value.scale.set(0, 0, 0);
     enemyRef.value.position.set(
         config.spawnPosition.x,
         config.spawnPosition.y,
         config.spawnPosition.z,
     )
 
-    enemyRef.value.scale.set(
-        config.scale || 1.5,
-        config.scale || 1.5,
-        config.scale || 1.5,
-    )
+    gsap.to(enemyRef.value.scale, {
+      x: config.scale || 1.5,
+      y: config.scale || 1.5,
+      z: config.scale || 1.5,
+      duration: 1,
+      ease: "elastic.out",
+      onComplete: () => isSpawned = true
+    });
   }
 
   const followPlayerRotation = (targetPosition: Vector3, delta: number) => {

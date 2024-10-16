@@ -5,8 +5,8 @@ import {GameStateModeEnum} from "../../enum/game-mode.enum";
 export const useGameState = createGlobalState(() => {
 
     const _isPlaying = ref(false);
-    const mode = ref<GameStateModeEnum>(GameStateModeEnum.PRODUCTION);
-    const isSoundsEnabled = ref(true);
+    const mode = ref<GameStateModeEnum>(GameStateModeEnum.DEV);
+    const isSoundsEnabled = ref(mode.value === 'PRODUCTION');
 
     const isPlaying = computed({
         get() {

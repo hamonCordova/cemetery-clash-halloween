@@ -1,9 +1,7 @@
 <template>
   <primitive
-      v-if="config"
       ref="enemyRef"
       :object="model"
-      cast-shadow
   >
     <Html
       center
@@ -27,7 +25,7 @@
   import {useEventBus} from "@vueuse/core";
   import type {Enemy} from "@/components/BattleManager.vue";
   import {EnemyTypeEnum} from "../../enum/enemy-type.enum";
-  import {LoopRepeat} from "three/src/constants";
+  import {LoopOnce, LoopRepeat} from "three/src/constants";
   import gsap from "gsap";
   import {useResources} from "@/composable/useResources";
   import {usePlayer} from "@/composable/usePlayer";
@@ -50,9 +48,9 @@
   const playerState = usePlayer();
   const enemiesState = useEnemiesSpawned();
   const enemyEventBus = useEventBus('enemyEventBus');
-
   const enemyRef = shallowRef<Mesh>();
   const freezeDistance = 2;
+  let isSpawned = false;
   let isCrawling = false;
   let isFreezing= false;
   let isDead = false;
@@ -77,6 +75,14 @@
   });
 
   onLoop(({ delta }) => {
+    if (!isSpawned) {
+      followPlayerRotation(playerState.playerPosition.value, delta);
+      const crawlAction = actions[ZombieAnimationEnum.Crawl].setLoop(LoopOnce);
+      crawlAction.reset();
+      crawlAction.play();
+      return
+    }
+
     moveTowardsPlayer(delta);
   });
 
@@ -94,18 +100,23 @@
   }
 
   const spawnEnemy = () => {
+
     enemiesState.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.ZOMBIE);
+    enemyRef.value.scale.set(0, 0, 0);
     enemyRef.value.position.set(
         config.spawnPosition.x,
         config.spawnPosition.y,
         config.spawnPosition.z,
     )
 
-    enemyRef.value.scale.set(
-        config.scale || 1.5,
-        config.scale || 1.5,
-        config.scale || 1.5,
-    )
+    gsap.to(enemyRef.value.scale, {
+      x: config.scale || 1.5,
+      y: config.scale || 1.5,
+      z: config.scale || 1.5,
+      duration: 1,
+      ease: "elastic.out",
+      onComplete: () => isSpawned = true
+    });
   }
 
   const die = () => {

@@ -510,15 +510,15 @@ export const useResources = createGlobalState(() => {
         if (resourceType === 'GLTFLoader') {
 
             const scene = clone(resource.scene);
-            if (opacity) {
-                scene.traverse((obj) => {
-                    if (obj.isMesh) {
-                        obj.material = obj.material.clone();
-                        obj.material.transparent = true;
+            scene.traverse((obj) => {
+                if (obj.isMesh) {
+                    obj.material = obj.material.clone();
+                    obj.material.transparent = true;
+                    if (opacity) {
                         obj.material.opacity = opacity;
                     }
-                })
-            }
+                }
+            })
 
             return {
                 scene,

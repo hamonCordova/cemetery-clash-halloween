@@ -1,6 +1,5 @@
 <template>
   <primitive
-      v-if="config"
       ref="enemyRef"
       :object="model"
       cast-shadow
@@ -53,6 +52,7 @@
     },
   });
 
+  let isSpawned = false;
   const resources = useResources();
   const { model, animations } = config;
   const { actions } = useAnimations(animations, model);
@@ -111,6 +111,11 @@
   });
 
   onLoop(({ delta }) => {
+    if (!isSpawned) {
+      followPlayerRotation(playerState.playerPosition.value, delta);
+      return
+    }
+
     moveTowardsPlayer(delta);
   });
 
@@ -128,24 +133,22 @@
   };
 
   const spawnEnemy = () => {
-    enemiesState.registerEnemy(
-        config.enemyId,
-        config.spawnPosition,
-        EnemyTypeEnum.SPIDER
-    );
+    enemiesState.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.SLIME);
+    enemyRef.value.scale.set(0, 0, 0);
     enemyRef.value.position.set(
         config.spawnPosition.x,
         config.spawnPosition.y,
-        config.spawnPosition.z
-    );
+        config.spawnPosition.z,
+    )
 
-    enemyRef.value.scale.set(
-        config.scale || 1.5,
-        config.scale || 1.5,
-        config.scale || 1.5
-    );
-
-    // No rotation adjustment needed due to compensated rotation logic
+    gsap.to(enemyRef.value.scale, {
+      x: config.scale || 1.5,
+      y: config.scale || 1.5,
+      z: config.scale || 1.5,
+      duration: 1,
+      ease: "elastic.out",
+      onComplete: () => isSpawned = true
+    });
   };
 
   const followPlayerRotation = (targetPosition: Vector3, delta: number) => {

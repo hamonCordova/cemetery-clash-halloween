@@ -1,9 +1,7 @@
 <template>
   <primitive
-      v-if="config"
       ref="enemyRef"
       :object="model"
-      cast-shadow
   >
     <Html
       center
@@ -48,6 +46,7 @@ import {computed, markRaw, onMounted, onUnmounted, ref, shallowRef} from 'vue';
     }
   })
 
+  let isSpawned = false;
   const resources = useResources();
   const { model, animations } = config;
   const { actions } = useAnimations(animations, model);
@@ -58,6 +57,14 @@ import {computed, markRaw, onMounted, onUnmounted, ref, shallowRef} from 'vue';
   const playerState = usePlayer();
   const enemiesState = useEnemiesSpawned();
   const enemyEventBus = useEventBus('enemyEventBus');
+
+  // TODO this should be dynamic. Remember passing to useCharacter
+  const attackDistance = 3;
+  const distantAttackDistance = 9;
+  const isAttackingByDistance = ref(false);
+  const longRangeDelay = 4000;
+  let spiderBallMesh: Mesh | undefined;
+
   const { attack, stopWalk, walk, die, idle, isDead, isAttacking } = useCharacter(
     enemyRef,
     actions,
@@ -78,22 +85,12 @@ import {computed, markRaw, onMounted, onUnmounted, ref, shallowRef} from 'vue';
       }
     },
   )
-
   const actionSounds = {
     attack: sounds.createAudioPlayer(['spiderAttack'], model),
     ballSplash: sounds.createAudioPlayer(['spiderBallSplash'], model, 2),
     death: sounds.createAudioPlayer(['spiderDeath'], model, 1),
     hitReceived: sounds.createAudioPlayer(['spiderHitReceived1', 'spiderHitReceived2', 'spiderHitReceived3', 'spiderHitReceived4'], model),
   }
-
-  // TODO this should be dynamic. Remember passing to useCharacter
-  const attackDistance = 3;
-  const distantAttackDistance = 9;
-
-  const isAttackingByDistance = ref(false);
-  const longRangeDelay = 4000;
-
-  let spiderBallMesh: Mesh | undefined;
 
   const enemyStoreInstance = computed(() => {
     return enemiesState.enemies.value.find(e => e.id === config.enemyId);
@@ -110,6 +107,11 @@ import {computed, markRaw, onMounted, onUnmounted, ref, shallowRef} from 'vue';
   });
 
   onLoop(({ delta }) => {
+    if (!isSpawned) {
+      followPlayerRotation(playerState.playerPosition.value, delta);
+      return
+    }
+
     moveTowardsPlayer(delta);
   });
 
@@ -140,18 +142,23 @@ import {computed, markRaw, onMounted, onUnmounted, ref, shallowRef} from 'vue';
   }
 
   const spawnEnemy = () => {
+
     enemiesState.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.SPIDER);
+    enemyRef.value.scale.set(0, 0, 0);
     enemyRef.value.position.set(
         config.spawnPosition.x,
         config.spawnPosition.y,
         config.spawnPosition.z,
     )
 
-    enemyRef.value.scale.set(
-        config.scale || 1.5,
-        config.scale || 1.5,
-        config.scale || 1.5,
-    )
+    gsap.to(enemyRef.value.scale, {
+      x: config.scale || 1.5,
+      y: config.scale || 1.5,
+      z: config.scale || 1.5,
+      duration: 1,
+      ease: "elastic.out",
+      onComplete: () => isSpawned = true
+    });
   }
 
   const followPlayerRotation = (targetPosition: Vector3, delta: number) => {
