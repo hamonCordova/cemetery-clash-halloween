@@ -1,7 +1,13 @@
 <template>
   <PlayerCharacter />
 
-  <template v-if="currentRound">
+    <SpiderEnemyModel
+        v-for="spiderId in spiderEnemiesIdPool"
+        :key="spiderId"
+        :config="currentStage?.enemies?.find(e => e.enemyId === spiderId)"
+        @die="enemyDied"
+    />
+<!--
     <template v-for="enemy in currentStage.enemies" :key="enemy.enemyId">
       <Suspense>
         <SkeletonEnemyModel
@@ -31,15 +37,14 @@
             @die="enemyDied"
         />
       </Suspense>
-    </template>
-  </template>
+    </template>-->
 </template>
 
 <script lang="ts">
-import { ref, onMounted } from 'vue';
+import {onMounted, ref} from 'vue';
 import {AnimationClip, Object3D, Vector3} from 'three';
-import { generateUUID } from 'three/src/math/MathUtils';
-import { EnemyTypeEnum } from '../../enum/enemy-type.enum';
+import {generateUUID} from 'three/src/math/MathUtils';
+import {EnemyTypeEnum} from '../../enum/enemy-type.enum';
 
 export interface Round {
   num: number;
@@ -92,8 +97,8 @@ export interface Enemy {
   const currentRoundNum = ref<number>(1);
   const currentStageNum = ref<number>(1);
 
-  const currentRound = ref<Round | null>(null);
-  const currentStage = ref<RoundStage | null>(null);
+  const currentRound = ref<Round>();
+  const currentStage = ref<RoundStage>();
 
   const arenaSize = 25;
   const minSpawnDistance = 4;
@@ -101,6 +106,12 @@ export interface Enemy {
 
   let usedPositions: Vector3[] = [];
   const activeHealthParticles = [];
+
+  const spiderEnemiesIdPool = [
+      generateUUID(),
+      generateUUID(),
+      generateUUID(),
+  ]
 
   onMounted(() => {
     createRounds();
@@ -169,46 +180,6 @@ export interface Enemy {
     }
   });
 
-  const createRounds = () => {
-    rounds.value = [
-      getRound1(),
-      getRound2(),
-      getRound3(),
-    ];
-  };
-
-  const startRound = () => {
-    if (currentRoundNum.value > rounds.value.length) {
-      allRoundsCompleted();
-      return;
-    }
-
-    currentRound.value = rounds.value[currentRoundNum.value - 1];
-    currentStageNum.value = 1;
-    startStage();
-  };
-
-  const startStage = () => {
-    if (!currentRound.value) return;
-
-    if (currentStageNum.value > currentRound.value.stages.length) {
-      currentRoundNum.value++;
-      startRound();
-      return;
-    }
-
-    usedPositions = [];
-    currentStage.value = currentRound.value.stages[currentStageNum.value - 1];
-
-    currentStage.value.enemies.forEach((enemy) => {
-      enemy.isDead = false;
-    });
-
-    currentStage.value.enemies.forEach((enemy) => {
-      enemy.spawnPosition = getStrategicPosition();
-    });
-  };
-
   const spawnHealthParticles = (startPosition: Vector3) => {
     const particleCount = 70;
     const particlesGeometry = new BufferGeometry();
@@ -248,19 +219,67 @@ export interface Enemy {
     activeHealthParticles.push({ particles, individualOffsets, particlesReached });
   };
 
+  const createRounds = () => {
+    rounds.value = [
+      getRound1(),
+      getRound2(),
+      getRound3(),
+    ];
+  };
+
+  const startRound = () => {
+    if (currentRoundNum.value > rounds.value.length) {
+      allRoundsCompleted();
+      return;
+    }
+
+    currentRound.value = rounds.value[currentRoundNum.value - 1];
+    currentStageNum.value = 1;
+
+    startStage();
+  };
+
+  const startStage = () => {
+
+    if (!currentRound.value) return;
+
+    if (currentStageNum.value > currentRound.value.stages.length) {
+      currentRoundNum.value++;
+      startRound();
+      return;
+    }
+
+    usedPositions = [];
+
+    const stage = currentRound.value.stages[currentStageNum.value - 1];
+    stage.enemies.forEach((enemy: Enemy) => {
+
+      if (enemy.type === EnemyTypeEnum.SPIDER) {
+        enemy.enemyId = spiderEnemiesIdPool.find(id => !stage.enemies.some(e => e.enemyId === id))
+      }
+
+      enemy.isDead = false;
+      enemy.spawnPosition = getStrategicPosition();
+    });
+
+    console.warn(stage)
+
+    currentStage.value = stage;
+  };
+
   const enemyDied = (event: {id: string, position: Vector3}) => {
 
     const {id, position} = event;
-    const enemy = currentStage.value?.enemies.find(
+    const enemyIndex = currentStage.value?.enemies.findIndex(
         (e) => e.enemyId === id
     );
 
-    if (enemy) {
+    if (enemyIndex > -1) {
       if (position) {
         spawnHealthParticles(position);
       }
 
-      enemy.isDead = true;
+      currentStage.value?.enemies.splice(enemyIndex, 1);
 
       setTimeout(() => {
         checkStageProgress();
@@ -269,7 +288,7 @@ export interface Enemy {
   };
 
   const checkStageProgress = () => {
-    if (currentStage.value?.enemies.every((e) => e.isDead)) {
+    if (!currentStage.value?.enemies?.length) {
       currentStageNum.value++;
       startStage();
     }
@@ -286,47 +305,25 @@ export interface Enemy {
     // Você pode adicionar lógica aqui futuramente
   };
 
-  const getRandomSpawnPosition = (
-      existingPositions: Vector3[]
-  ): Vector3 => {
-    let position: Vector3;
-    let attempts = 0;
-    do {
-      const x = Math.random() * arenaSize - arenaSize / 2;
-      const z = Math.random() * arenaSize - arenaSize / 2;
-      position = new Vector3(x, 0, z);
-      attempts++;
-    } while (
-        (position.distanceTo(playerPosition) < minSpawnDistance ||
-            existingPositions.some(
-                (pos) => pos.distanceTo(position) < minSpawnDistance
-            )) &&
-        attempts < 100
-        );
-    return position;
-  };
-
   const getRound1 = (): Round => {
     const stages: RoundStage[] = [];
 
     stages.push({
       enemies: [
-        createZombieEnemy(1.5, 1),
-        createSkeletonEnemy(1.5, 2.5, 1000),
-        createSlimeEnemy(0.5, 3.5, 2000),
-        //createSpiderEnemy(1, 2.5, 1000),
-        //createSpiderEnemy(1, 2.5, 1000),
         createSpiderEnemy(1, 2.5, 1000),
-
       ],
     });
 
     stages.push({
       enemies: [
-        createSkeletonEnemy(1, 2.5, 800),
+        /*createSkeletonEnemy(1, 2.5, 800),
         createSkeletonEnemy(1, 2.5, 1000),
         createSkeletonEnemy(1, 2.5, 1200),
-        createZombieEnemy(1.5, 1),
+        createZombieEnemy(1.5, 1),*/
+        createSpiderEnemy(1, 2.5, 1000),
+        createSpiderEnemy(1, 2.5, 1000),
+        createSpiderEnemy(1, 2.5, 1000),
+        createSpiderEnemy(1, 2.5, 1000),
       ],
     });
 
@@ -457,7 +454,7 @@ export interface Enemy {
     const {scene, animations} = resources.get('spider');
 
     return {
-      enemyId: generateUUID(),
+      enemyId: undefined,
       spawnPosition,
       moveSpeed,
       rotationSpeed: 2,

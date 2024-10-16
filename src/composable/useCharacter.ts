@@ -1,7 +1,7 @@
 import {type Reactive, ref, type ShallowRef, toValue} from "vue";
 import {LoopOnce, LoopRepeat} from "three/src/constants";
 import gsap from "gsap";
-import type {AnimationAction, Mesh} from "three";
+import type {AnimationAction, AnimationClip, Mesh} from "three";
 
 interface CharacterActionsName {
     idle: string;
@@ -35,6 +35,14 @@ export default function useCharacter(
     const isReceivingHit = ref(false);
 
     let nextAttackTimeout;
+
+    const resetActions = () => {
+        isWalking.value = false;
+        isIdle.value = false;
+        isDead.value = false;
+        isAttacking.value = false;
+        isReceivingHit.value = false;
+    }
 
     const attack = () => {
 
@@ -116,24 +124,29 @@ export default function useCharacter(
 
         if (isDead.value) return;
 
-        const dieAction = actions[actionsName.die];
+        const dieAction = actions[actionsName.die] as AnimationAction;
+
         dieAction.reset();
         dieAction.setLoop(LoopOnce);
         dieAction.clampWhenFinished = true;
         dieAction.play();
         isDead.value = true;
+
         stopIdle();
         stopWalk();
         stopAttack();
 
         setTimeout(() => {
+
             gsap.to(
                 toValue(characterRef).position,
                 {
-                    y: -2,
-                    duration: 2,
+                    y: -3,
+                    duration: 2.2,
                     ease: 'power2.in',
                     onComplete: () => {
+                        dieAction.reset();
+                        dieAction.stop();
                         eventsCallbacks.onDie ? eventsCallbacks.onDie() : undefined;
                     }
                 }
@@ -154,6 +167,7 @@ export default function useCharacter(
         idle,
         stopIdle,
         die,
-        receiveHit
+        receiveHit,
+        resetActions
     }
 }
