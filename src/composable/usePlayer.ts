@@ -46,6 +46,10 @@ export const usePlayer = createGlobalState(() => {
         }
     };
 
+    const increaseHealth = (additionalHealth: number) => {
+        health.value = Math.min(100, health.value + additionalHealth);
+    }
+
     const attack = () => {
         playerEventBus.emit('attack');
     }
@@ -54,6 +58,7 @@ export const usePlayer = createGlobalState(() => {
         activeMovements,
         playerPosition,
         health,
+        increaseHealth,
         isFreezed,
         attack,
         updatePlayerPosition,

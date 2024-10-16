@@ -143,6 +143,7 @@ import {useRenderLoop, useTresContext} from "@tresjs/core";
   onMounted(() => {
     createParticles();
     camera.value.add(sounds.listener);
+    camera.value?.layers.enableAll();
 
     setTimeout(() => {
       renderer.value.shadowMap.autoUpdate = false;
@@ -150,34 +151,28 @@ import {useRenderLoop, useTresContext} from "@tresjs/core";
   });
 
   const createParticles = () => {
-    // Criar as partículas usando Three.js puro
-    const particlesCount = 1000; // Número de partículas
+    const particlesCount = 1000;
     const positionsArray = new Float32Array(particlesCount * 3);
     const particleMap = resources.get('blackSmoke');
 
     for (let i = 0; i < particlesCount; i++) {
-      positionsArray[i * 3] = (Math.random() - 0.5) * 70; // X entre -35 e 35
-      positionsArray[i * 3 + 1] = Math.random() * 5;      // Y entre 0 e 10
-      positionsArray[i * 3 + 2] = (Math.random() - 0.5) * 70; // Z entre -35 e 35
+      positionsArray[i * 3] = (Math.random() - 0.5) * 70;
+      positionsArray[i * 3 + 1] = Math.random() * 5;
+      positionsArray[i * 3 + 2] = (Math.random() - 0.5) * 70;
     }
 
-    // Criar a geometria e adicionar o atributo de posição
     const particlesGeometry = new BufferGeometry();
     particlesGeometry.setAttribute('position', new BufferAttribute(positionsArray, 3));
 
-    // Criar o material para as partículas
     const particlesMaterial = new PointsMaterial({
-      color: new Color('#88ccff'), // Cor azul fantasmagórica
-      size: 0.1,                   // Tamanho das partículas
+      color: new Color('#88ccff'),
+      size: 0.15,
       transparent: true,
-      opacity: 0.3,
+      opacity: 0.5,
       map: particleMap
     });
 
-    // Criar o objeto de partículas (Points)
     particles = new Points(particlesGeometry, particlesMaterial);
-
-    // Adicionar as partículas à cena
     scene.value.add(particles);
   }
 

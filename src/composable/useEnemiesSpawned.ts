@@ -5,7 +5,7 @@ import type {EnemyTypeEnum} from "../../enum/enemy-type.enum";
 
 export const useEnemiesSpawned = createGlobalState(() => {
 
-    const enemies = ref<Array<EnemyAlive>>([]);
+    const enemies = ref<Array<{ id: string, position: Vector3, health: number, type: EnemyTypeEnum }>>([]);
     const enemyEventBus = useEventBus('enemyEventBus');
 
     const registerEnemy = (id: string, position: Vector3, type: EnemyTypeEnum) => {
@@ -29,7 +29,6 @@ export const useEnemiesSpawned = createGlobalState(() => {
             enemy.health -= damage;
             enemyEventBus.emit('damageReceived', id);
             if (enemy.health <= 0) {
-                removeEnemy(id);
                 enemyEventBus.emit('die', id)
 
                 enemy.isDead = true;

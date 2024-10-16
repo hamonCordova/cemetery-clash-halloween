@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-  import {computed, onMounted, onUnmounted, ref, shallowRef} from 'vue';
+import {computed, markRaw, onMounted, onUnmounted, ref, shallowRef} from 'vue';
   import {useAnimations, Html} from '@tresjs/cientos';
   import {
     Mesh,
@@ -72,7 +72,10 @@
     },
     {
       finishAttack: () => checkAttackHit(),
-      onDie: () => emit('die', config.enemyId)
+      onDie: () => {
+        emit('die', {id: config.enemyId, position: enemyStoreInstance.value?.position})
+        enemiesState.removeEnemy(config.enemyId);
+      }
     },
   )
 
@@ -178,8 +181,7 @@
     const playerPos = new Vector3().copy(playerState.playerPosition.value);
 
     const distance = enemyPos.distanceTo(playerPos);
-    const attackRange = 2; // Adjust as needed
-    if (distance > attackRange) {
+    if (distance > attackDistance) {
       return; // Player is out of range
     }
 

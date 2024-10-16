@@ -67,7 +67,10 @@ import {useSounds} from "@/composable/useSounds";
     },
     {
       finishAttack: () => checkAttackHit(),
-      onDie: () => emit('die', config.enemyId)
+      onDie: () => {
+        emit('die', {id: config.enemyId, position: enemyStoreInstance.value?.position})
+        enemiesState.removeEnemy(config.enemyId);
+      }
     },
   )
 

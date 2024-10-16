@@ -55,7 +55,7 @@
 
   const resources = useResources();
   const { model, animations } = config;
-  const { actions, mixer } = useAnimations(animations, model);
+  const { actions } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
   const { scene } = useTresContext();
   const sounds = useSounds();
@@ -78,7 +78,8 @@
       {
         finishAttack: () => checkAttackHit(),
         onDie: () => {
-          emit('die', config.enemyId)
+          emit('die', {id: config.enemyId, position: enemyStoreInstance.value?.position})
+          enemiesState.removeEnemy(config.enemyId);
         }
       }
   );

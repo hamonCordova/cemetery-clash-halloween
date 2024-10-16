@@ -120,7 +120,8 @@
           duration: 2,
           ease: 'power2.in',
           onComplete: () => {
-            emit('die', config.enemyId)
+            emit('die', {id: config.enemyId, position: enemyStoreInstance.value?.position})
+            enemiesState.removeEnemy(config.enemyId);
           }
         }
     )
