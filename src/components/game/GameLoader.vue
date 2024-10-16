@@ -2,7 +2,7 @@
   <div class="container">
     <div class="content">
       <div class="logo-container">
-        <img src="../../../static/img/cemetery-clash-halloween-logo.webp" alt="Cemetery Clash: Halloween game logo" class="logo-img" width="1024" height="828" >
+        <img src="/img/cemetery-clash-halloween-logo.webp" alt="Cemetery Clash: Halloween game logo" class="logo-img" width="1024" height="828" >
       </div>
       <h1 class="font-metal">{{ isWaitingRender ? 'Preparing your game...' : 'Loading...' }}</h1>
       <div class="loading-progress-container">

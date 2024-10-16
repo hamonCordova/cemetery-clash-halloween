@@ -2,7 +2,7 @@
   <div class="container">
     <div class="wrapper">
       <div class="logo-container">
-        <img class="logo-img" src="../../../static/img/cemetery-clash-halloween-logo.webp" alt="Cemetery Clash: Halloween logo" width="1024" height="828" />
+        <img class="logo-img" src="/img/cemetery-clash-halloween-logo.webp" alt="Cemetery Clash: Halloween logo" width="1024" height="828" />
       </div>
       <ul>
         <li>

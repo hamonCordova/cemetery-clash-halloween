@@ -10,7 +10,7 @@
       <button class="button button--attack"
               @touchstart="attack(); $event.preventDefault(); $event.stopPropagation()"
               @touchend="$event.preventDefault(); $event.stopPropagation()">
-        <img src="../../../static/img/tool_sword_b.svg" alt="Attack icon" />
+        <img src="/img/tool_sword_b.svg" alt="Attack icon" />
       </button>
     </div>
   </div>

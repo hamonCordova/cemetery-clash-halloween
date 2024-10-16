@@ -15,7 +15,7 @@ import {useTexture} from "@tresjs/core";
 import {DoubleSide, SRGBColorSpace} from "three";
 
 const { alphaMap } = await useTexture({
-    alphaMap: '../static/textures/floor/alpha.webp',
+    alphaMap: '/textures/floor/alpha.webp',
   });
 
 </script>

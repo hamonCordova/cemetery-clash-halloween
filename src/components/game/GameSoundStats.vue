@@ -1,6 +1,6 @@
 <template>
   <div class="container" @click="$event.stopPropagation(); gameState.toggleSoundState()">
-    <img :src="gameState.isSoundsEnabled.value ? '../../../static/img/audioOn.png' : '../../../static/img/audioOff.png'" alt="Mute icon" width="35" height="35">
+    <img :src="gameState.isSoundsEnabled.value ? '/img/audioOn.png' : '/img/audioOff.png'" alt="Mute icon" width="35" height="35">
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="avatar-container">
-      <img class="avatar-img" src="../../../static/img/player-avatar.png" alt="Player avatar">
+      <img class="avatar-img" src="/img/player-avatar.png" alt="Player avatar">
     </div>
     <div class="stats-container">
       <div class="player-name-container">
