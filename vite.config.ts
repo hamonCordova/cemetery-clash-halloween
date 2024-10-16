@@ -6,7 +6,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  publicDir: '../static/', // Path from "root" to static assets (files that are served as they are)
+  publicDir: 'static', // Path from "root" to static assets (files that are served as they are)
   plugins: [
     vue({
       // Other config
