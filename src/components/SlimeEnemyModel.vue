@@ -2,7 +2,7 @@
   <primitive
       ref="enemyRef"
       :object="model"
-      :position="[15, -15, -15]"
+      :position="[0, 1.01, 0]"
   >
     <Html
         center
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, shallowRef, watch } from 'vue';
+import {computed, onMounted, ref, shallowRef, watch} from 'vue';
   import { useAnimations, Html } from '@tresjs/cientos';
   import {
     Mesh,
@@ -43,6 +43,7 @@
   import {usePlayer} from "@/composable/usePlayer";
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
   import {useSounds} from "@/composable/useSounds";
+  import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
   const emit = defineEmits(['die']);
   const props = defineProps({
@@ -98,6 +99,10 @@
     return enemiesState.enemies.value.find((e) => e.id === props.config?.enemyId);
   });
 
+  onMounted(() => {
+    setLayer(BattleLayersEnum.POOL)
+  })
+
   onLoop(({ delta }) => {
     if (!isSpawned.value) {
       if (props.config) {
@@ -108,6 +113,12 @@
     
     moveTowardsPlayer(delta);
   });
+
+  const setLayer = (layer: number) => {
+    model.traverse((mesh) => {
+      mesh.layers.set(layer)
+    })
+  }
 
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
@@ -123,7 +134,8 @@
   };
 
   const spawnEnemy = () => {
-    
+    setLayer(BattleLayersEnum.ACTIVE)
+
     enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, EnemyTypeEnum.SLIME);
     enemyRef.value.scale.set(0, 0, 0);
     enemyRef.value.position.set(
@@ -143,9 +155,11 @@
   };
 
   const reset = () => {
+  setLayer(BattleLayersEnum.POOL)
+
     isSpawned.value = false;
     isAttackingByDistance = false;
-    enemyRef.value.position.set(15, -15, -15);
+    enemyRef.value.position.set(0, 1.01, 0);
     enemyRef.value?.rotation.set(0, 0, 0);
     resetActions();
   }

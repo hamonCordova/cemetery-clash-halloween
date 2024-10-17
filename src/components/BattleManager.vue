@@ -76,10 +76,11 @@ export interface Enemy {
   import {usePlayer} from "@/composable/usePlayer";
   import {useRenderLoop, useTresContext} from "@tresjs/core";
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
+  import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
   const resources = useResources();
   const playerState = usePlayer();
-  const { scene } = useTresContext();
+  const { scene, camera } = useTresContext();
   const { onLoop } = useRenderLoop();
 
   const rounds = ref<Round[]>([]);
@@ -122,6 +123,7 @@ export interface Enemy {
   ]
 
   onMounted(() => {
+    camera.value?.layers.set(0)
     createRounds();
   });
 

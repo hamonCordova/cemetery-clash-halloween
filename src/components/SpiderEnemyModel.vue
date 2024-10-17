@@ -2,7 +2,7 @@
   <primitive
     ref="enemyRef"
     :object="model"
-    :position="[15, -15, -15]"
+    :position="[0, 1.01, 0]"
   >
     <Html
       center
@@ -38,6 +38,7 @@ import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
   import {usePlayer} from "@/composable/usePlayer";
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
   import {useSounds} from "@/composable/useSounds";
+import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
   const emit = defineEmits(['die'])
   const props = defineProps({
@@ -97,6 +98,7 @@ import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
   })
 
   onMounted(() => {
+    setLayer(BattleLayersEnum.POOL)
     createSpiderBall();
   });
 
@@ -111,6 +113,12 @@ import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
     moveTowardsPlayer(delta);
   });
 
+  const setLayer = (layer: number) => {
+    model.traverse((mesh) => {
+      mesh.layers.set(layer)
+    })
+  }
+
   const createSpiderBall = () => {
 
     spiderBallMesh = new Mesh(
@@ -120,6 +128,7 @@ import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
         })
     )
 
+    spiderBallMesh.layers.set(BattleLayersEnum.POOL)
     scene.value.add(spiderBallMesh)
     spiderBallMesh.position.y = -2;
   }
@@ -138,6 +147,8 @@ import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
   }
 
   const spawnEnemy = () => {
+    setLayer(BattleLayersEnum.ACTIVE)
+    spiderBallMesh.layers.set(BattleLayersEnum.ACTIVE)
 
     enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, EnemyTypeEnum.SPIDER);
     enemyRef.value.scale.set(0, 0, 0);
@@ -158,8 +169,11 @@ import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
   }
 
   const reset = () => {
+    setLayer(BattleLayersEnum.POOL)
+    spiderBallMesh.layers.set(BattleLayersEnum.POOL)
+
     isSpawned.value = false;
-    enemyRef.value.position.set(15, -15, -15);
+    enemyRef.value.position.set(0, 1.01, 0);
     enemyRef.value?.rotation.set(0, 0, 0);
     resetActions();
   }

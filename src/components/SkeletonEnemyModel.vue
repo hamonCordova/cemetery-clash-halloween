@@ -2,7 +2,7 @@
   <primitive
       ref="enemyRef"
       :object="model"
-      :position="[15, -15, -15]"
+      :position="[0, 1.01, 0]"
   >
     <Html
       center
@@ -32,6 +32,7 @@ import {usePlayer} from "@/composable/usePlayer";
 import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
 import {useSounds} from "@/composable/useSounds";
 import gsap from "gsap";
+import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
   const emit = defineEmits(['die'])
   const props = defineProps({
@@ -85,6 +86,7 @@ import gsap from "gsap";
   })
 
   onMounted(() => {
+    setLayer(BattleLayersEnum.POOL)
   });
 
   onUnmounted(() => {
@@ -102,6 +104,12 @@ import gsap from "gsap";
     moveTowardsPlayer(delta);
   });
 
+  const setLayer = (layer: number) => {
+    model.traverse((mesh) => {
+      mesh.layers.set(layer)
+    })
+  }
+
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
       if (event === 'die' && props.config?.enemyId === payload) {
@@ -118,6 +126,8 @@ import gsap from "gsap";
   }
 
   const spawnEnemy = () => {
+    setLayer(BattleLayersEnum.ACTIVE)
+
     enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, EnemyTypeEnum.SKELETON);
     enemyRef.value.scale.set(0, 0, 0);
     enemyRef.value.position.set(
@@ -137,8 +147,9 @@ import gsap from "gsap";
   }
 
   const reset = () => {
+    setLayer(BattleLayersEnum.POOL)
     isSpawned.value = false;
-    enemyRef.value.position.set(15, -15, -15);
+    enemyRef.value.position.set(0, 1.01, 0);
     enemyRef.value?.rotation.set(0, 0, 0);
     resetActions();
   }
