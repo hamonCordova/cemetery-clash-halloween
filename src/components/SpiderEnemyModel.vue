@@ -104,6 +104,11 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
   });
 
   onLoop(({ delta }) => {
+
+    if (playerState.isDead.value) {
+      return;
+    }
+
     if (!isSpawned.value) {
       if (props.config) {
         followPlayerRotation(playerState.playerPosition.value, delta);
@@ -143,6 +148,20 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
       if (event === 'damageReceived' && props.config?.enemyId === payload) {
         actionSounds.hitReceived?.playRandom();
+      }
+    });
+  }
+
+  const unspawnEnemy = () => {
+    gsap.to(enemyRef.value.scale, {
+      x: 0,
+      y: 0,
+      z: 0,
+      duration: 2,
+      ease: "elastic.in",
+      onComplete: () => {
+        emit('die', {id: props.config?.enemyId, position: enemyStoreInstance.value?.position})
+        enemiesState.removeEnemy(props.config?.enemyId);
       }
     });
   }
@@ -389,6 +408,12 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
     spawnEnemy();
     listenEvents();
+  })
+
+  watch(() => playerState.isDead.value, (isPlayerDead: boolean) => {
+    if (isPlayerDead) {
+      unspawnEnemy()
+    }
   })
 
 </script>

@@ -28,5 +28,6 @@
     right: 10px;
     top: 10px;
     user-select: none;
+    z-index: 999;
   }
 </style>

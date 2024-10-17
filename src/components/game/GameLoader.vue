@@ -15,8 +15,6 @@
 <script setup lang="ts">
   import {useResources} from "@/composable/useResources";
   import {onMounted, ref} from "vue";
-  import router from "@/router";
-  import {useEventBus} from "@vueuse/core";
   import {useGameState} from "@/composable/useGameState";
   import {GameStateModeEnum} from "../../../enum/game-mode.enum";
 

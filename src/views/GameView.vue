@@ -10,30 +10,36 @@
       <TresPerspectiveCamera :args="[50, 1, 0.5, 100]" :position="[0, 10, 10]" />
       <OrbitControls v-if="isDevScenarioMode" />
       <TresAmbientLight :intensity="0.5" />
-      <BattleManager v-if="!isDevScenarioMode" ref="battleManagerRef" />
+      <BattleManager v-if="!isDevScenarioMode" ref="battleManagerRef" @playerDied="onPlayerDied()" />
       <Suspense>
         <BattleFloor />
       </Suspense>
     </TresCanvas>
+
     <GameSoundStats />
+
     <transition name="fade" :duration="1000" mode="out-in">
       <GameMenu v-if="isShowingMenu" ref="gameMenuRef" @startGame="startGame()" />
     </transition>
+
     <transition name="fade" :duration="500" mode="out-in">
-      <GamePlayerStats v-if="gameState.isPlaying.value" />
+      <GamePlayerStats v-if="gameState.isPlaying.value && !showingDeadPlayerScore" />
     </transition>
+
     <GameControls />
+
+    <transition name="fade" :duration="500" mode="out-in">
+      <GamePlayerDiedScore v-if="showingDeadPlayerScore" />
+    </transition>
+
   </template>
 </template>
 
 <script lang="ts" setup>
   import {TresCanvas, vLightHelper} from '@tresjs/core'
   import {
-    ACESFilmicToneMapping, CineonToneMapping,
-    LinearToneMapping, NeutralToneMapping,
-    NoToneMapping,
+    NeutralToneMapping,
     PCFSoftShadowMap,
-    ReinhardToneMapping,
     SRGBColorSpace
   } from "three";
   import BattleFloor from "@/components/BattleFloor.vue";
@@ -52,6 +58,7 @@
   import GamePlayerStats from "@/components/game/GamePlayerStats.vue";
   import {useSounds} from "@/composable/useSounds";
   import GameSoundStats from "@/components/game/GameSoundStats.vue";
+  import GamePlayerDiedScore from "@/components/game/GamePlayerDiedScore.vue";
 
   const gameState = useGameState();
   const resources = useResources();
@@ -61,6 +68,7 @@
   const battleSceneRef = ref();
   const gameMenuRef = ref();
   const battleManagerRef = ref();
+  const showingDeadPlayerScore = ref(false);
   const isMobile = DocumentUtils.isMobile();
   let themeMusic;
 
@@ -115,6 +123,10 @@
     setTimeout(() => {
       battleManagerRef.value.startRound();
     }, withTimeout ? 3000 : 0)
+  }
+
+  const onPlayerDied = () => {
+    showingDeadPlayerScore.value = true;
   }
 
   watch(() => gameState.isSoundsEnabled.value, () => {

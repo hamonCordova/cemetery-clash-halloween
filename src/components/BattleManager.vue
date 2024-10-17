@@ -29,6 +29,7 @@
       :config="currentStage?.enemies?.find(e => e.enemyId === slimeId)"
       @die="enemyDied"
   />
+
 </template>
 
 <script lang="ts">
@@ -63,7 +64,7 @@ export interface Enemy {
 </script>
 
 <script setup lang="ts">
-  import {ref, onMounted, markRaw} from 'vue';
+import {ref, onMounted, markRaw, watch} from 'vue';
   import {AdditiveBlending, BufferGeometry, Float32BufferAttribute, Points, PointsMaterial, Vector3} from 'three';
   import { generateUUID } from 'three/src/math/MathUtils';
   import { EnemyTypeEnum } from '../../enum/enemy-type.enum';
@@ -75,13 +76,16 @@ export interface Enemy {
   import PlayerCharacter from '@/components/PlayerCharacter.vue';
   import {usePlayer} from "@/composable/usePlayer";
   import {useRenderLoop, useTresContext} from "@tresjs/core";
-  import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
-  import {BattleLayersEnum} from "../../enum/battle-layers.enum";
+  import gsap from "gsap";
+  import {useSounds} from "@/composable/useSounds";
+
+  const emit = defineEmits(['playerDied']);
 
   const resources = useResources();
   const playerState = usePlayer();
   const { scene, camera } = useTresContext();
   const { onLoop } = useRenderLoop();
+  const sounds = useSounds();
 
   const rounds = ref<Round[]>([]);
   const currentRoundNum = ref<number>(1);
@@ -191,6 +195,11 @@ export interface Enemy {
   });
 
   const spawnHealthParticles = (startPosition: Vector3) => {
+
+    if (playerState.isDead.value) {
+      return
+    }
+
     const particleCount = 70;
     const particlesGeometry = new BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
@@ -311,6 +320,9 @@ export interface Enemy {
   };
 
   const checkStageProgress = () => {
+
+    if (playerState.isDead.value) return;
+
     if (!currentStage.value?.enemies?.length) {
       currentStageNum.value++;
       startStage();
@@ -335,8 +347,11 @@ export interface Enemy {
     stages.push({
       enemies: [
       //  createSkeletonEnemy(1, 2.5, 800),
-       // createSpiderEnemy(1, 2.5, 1000),
-        createZombieEnemy(1.5, 1),
+        createSpiderEnemy(1, 2.5, 1000),
+        createSpiderEnemy(1, 2.5, 1000),
+        createSpiderEnemy(1, 2.5, 1000),
+        createSlimeEnemy(0.5, 3.5, 1000),
+        createSlimeEnemy(0.5, 3.5, 1000),
         createSlimeEnemy(0.5, 3.5, 1000),
       ],
     });
@@ -580,6 +595,45 @@ export interface Enemy {
 
     return chosenPosition;
   };
+
+  const handleOnPlayerDie = () => {
+
+    const playerPosition = playerState.playerPosition.value;
+    const enemyDiedSound = sounds.getAudio('evilLaugh', false, 2)
+
+    setTimeout(() => {
+      enemyDiedSound.play();
+    }, 300)
+
+    const timeline = gsap.timeline({
+      onComplete() {
+        emit('playerDied');
+      }
+    });
+
+    timeline.to(camera.value.position, {
+      x: playerPosition.x,
+      y: 15,
+      z: playerPosition.z,
+      duration: 1.5,
+      ease: 'power2.in',
+    });
+
+    timeline.to(camera.value.rotation, {
+      x: -1.5,
+      duration: 1.5,
+      ease: 'power2.in',
+    }, '<');
+
+  }
+
+  watch(() => playerState.isDead.value, (isPlayerDead: boolean) => {
+    if (isPlayerDead) {
+      setTimeout(() => {
+        handleOnPlayerDie()
+      }, 1000)
+    }
+  })
 
   defineExpose({
     startRound,

@@ -107,6 +107,11 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
   })
 
   onLoop(({ delta }) => {
+
+    if (playerState.isDead.value) {
+      return;
+    }
+
     if (!isSpawned.value) {
       if (props.config) {
         followPlayerRotation(playerState.playerPosition.value, delta);
@@ -135,6 +140,20 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
       }
     });
   };
+
+  const unspawnEnemy = () => {
+    gsap.to(enemyRef.value.scale, {
+      x: 0,
+      y: 0,
+      z: 0,
+      duration: 2,
+      ease: "elastic.in",
+      onComplete: () => {
+        emit('die', {id: props.config?.enemyId, position: enemyStoreInstance.value?.position})
+        enemiesState.removeEnemy(props.config?.enemyId);
+      }
+    });
+  }
 
   const spawnEnemy = () => {
     setLayer(BattleLayersEnum.ACTIVE)
@@ -408,6 +427,12 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
 
     spawnEnemy();
     listenEvents();
+  })
+
+  watch(() => playerState.isDead.value, (isPlayerDead: boolean) => {
+    if (isPlayerDead) {
+      unspawnEnemy()
+    }
   })
 </script>
 

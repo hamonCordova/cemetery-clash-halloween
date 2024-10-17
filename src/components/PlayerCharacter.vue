@@ -16,6 +16,7 @@
   import {useEventBus} from "@vueuse/core";
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
   import {useSounds} from "@/composable/useSounds";
+  import {LoopOnce} from "three/src/constants";
 
   const resources = useResources();
   const {scene: model, animations} = resources.get('skeleton');
@@ -39,7 +40,8 @@
     attack: sounds.createAudioPlayer(['swordSwing1', 'swordSwing2', 'swordSwing3', 'swordSwing4'], model, 0.5),
     steps: sounds.createAudioPlayer(['skeletonSteps1', 'skeletonSteps2', 'skeletonSteps3', 'skeletonSteps4', 'skeletonSteps5', 'skeletonSteps6'], model),
     jump: sounds.createAudioPlayer(['skeletonJump'], model),
-    hitReceived: sounds.createAudioPlayer(['skeletonHitReceived2', 'skeletonHitReceived3', 'skeletonHitReceived4'], model, 1.2)
+    hitReceived: sounds.createAudioPlayer(['skeletonHitReceived2', 'skeletonHitReceived3', 'skeletonHitReceived4'], model, 1.2),
+    death: sounds.createAudioPlayer(['skeletonPlayerDeath'], model, 1)
   }
 
   onMounted(() => {
@@ -51,12 +53,20 @@
       }
 
       if (event === 'damageReceived') {
-        actionSounds.hitReceived?.playRandom()
+        actionSounds.hitReceived?.playRandom();
+      }
+
+      if (event === 'die') {
+        actionSounds.death?.playRandom();
+        die();
       }
     })
   })
 
   onLoop(({delta, elapsed, clock}) => {
+
+    if (playerState.isDead.value) return;
+
     move(delta)
     moveCamera();
   })
@@ -86,18 +96,27 @@
 
     currentAnimation = newAnimation;
 
-    newAnimation.reset();
-    newAnimation.play();
-
     if (animationName === SkeletonAnimationEnum.Jump_Land) {
       const animationClipDuration = newAnimation.getClip().duration;
       newAnimation.setEffectiveTimeScale(animationClipDuration / (jumpDuration * 4));
     }
 
+    if (animationName === SkeletonAnimationEnum.Death) {
+      newAnimation.setLoop(LoopOnce);
+      newAnimation.clampWhenFinished = true;
+    }
+
+    newAnimation.reset();
+    newAnimation.play();
+
     if (oldAnimation) {
       newAnimation.crossFadeFrom(oldAnimation, duration, false);
     }
   };
+
+  const die = () => {
+    animate(SkeletonAnimationEnum.Death);
+  }
 
   const move = (delta) => {
     const direction = new Vector3(0, 0, 0);
@@ -251,7 +270,7 @@
   };
 
   const attack = () => {
-    if (isAttacking) return;
+    if (isAttacking || playerState.isDead.value) return;
     isAttacking = true;
 
     const currentAttackAnimationEnum = Math.floor((Math.random() * 10)) % 2 === 0 ? SkeletonAnimationEnum.Sword : SkeletonAnimationEnum.Punch;
@@ -286,7 +305,6 @@
 
 
       const distance = playerPos.distanceTo(enemyPos);
-      console.warn(enemy.position, playerPos, distance)
 
       if (distance > attackRange) {
         console.warn('enemy out of range')
@@ -309,7 +327,7 @@
   };
 
   const jump = () => {
-    if (_isJumping) return;
+    if (_isJumping || playerState.isDead.value) return;
 
     const timeline = gsap.timeline({
       onStart: () => {

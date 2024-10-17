@@ -2,6 +2,7 @@ import {createGlobalState, useEventBus} from "@vueuse/core";
 import type {GameMovements} from "../../interfaces/game-movements";
 import {Vector3} from "three";
 import {ref} from "vue";
+import {DocumentUtils} from "@/utils/document-utils";
 
 
 export const usePlayer = createGlobalState(() => {
@@ -9,7 +10,9 @@ export const usePlayer = createGlobalState(() => {
     const playerEventBus = useEventBus('playerEventBus');
     const playerPosition = ref(new Vector3(0, 0, 0));
     const health = ref(100);
+    const isDead = ref(false);
     const freezedByEnemiesId = ref<Map>(new Map());
+    const isMobile = DocumentUtils.isMobile();
     const activeMovements: GameMovements = {
         up: false,
         left: false,
@@ -38,15 +41,22 @@ export const usePlayer = createGlobalState(() => {
     };
 
     const takeDamage = (damage: number) => {
+
+        if (isDead.value) return;
         console.warn('player hit')
-        playerEventBus.emit('damageReceived')
-        health.value -= damage * 0.5;
+        health.value -= (isMobile ? damage * 0.5 : damage * 5);
+
         if (health.value <= 0) {
             playerEventBus.emit('die');
+            isDead.value = true;
+            return;
         }
+
+        playerEventBus.emit('damageReceived')
     };
 
     const increaseHealth = (additionalHealth: number) => {
+        if (isDead.value) return;
         health.value = Math.min(100, health.value + additionalHealth);
     }
 
@@ -58,6 +68,7 @@ export const usePlayer = createGlobalState(() => {
         activeMovements,
         playerPosition,
         health,
+        isDead,
         increaseHealth,
         isFreezed,
         attack,

@@ -242,6 +242,11 @@ export const useResources = createGlobalState(() => {
             type: 'AudioLoader'
         },
         {
+            name: 'evilLaugh',
+            path: '/sounds/voices/evil_laugh.wav',
+            type: 'AudioLoader'
+        },
+        {
             name: 'swordSwing1',
             path: '/sounds/sword-swing/sword_swing_1.wav',
             type: 'AudioLoader'
@@ -294,6 +299,11 @@ export const useResources = createGlobalState(() => {
         {
             name: 'slimeAttack',
             path: '/sounds/slime/slime_attack.wav',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'skeletonPlayerDeath',
+            path: '/sounds/skeleton/skeleton_player_death.ogg',
             type: 'AudioLoader'
         },
         {

@@ -30,4 +30,19 @@ export default class GameAudioPlayer {
     public setCooldown(cooldown: number) {
         this.cooldown = cooldown;
     }
+
+    public stopAll() {
+        this.audios.forEach(audio => audio.stop());
+    }
+
+    public static stopAllAudioPlayers(players: {[key: string]: GameAudioPlayer}) {
+        if (!players) return;
+
+        Object.keys(players).forEach(key => {
+            const player = players[key];
+            if (typeof player === GameAudioPlayer) {
+                player.audios.forEach(audio => audio.stop());
+            }
+        })
+    }
 }

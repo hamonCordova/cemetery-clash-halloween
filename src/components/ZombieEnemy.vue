@@ -78,6 +78,10 @@
 
   onLoop(({ delta }) => {
 
+    if (playerState.isDead.value) {
+      return;
+    }
+
     if (!isSpawned.value) {
       if (props.config) {
         followPlayerRotation(playerState.playerPosition.value, delta);
@@ -106,6 +110,20 @@
 
       if (event === 'damageReceived' && props.config?.enemyId === payload) {
         soundActions.hitReceived?.playRandom();
+      }
+    });
+  }
+
+  const unspawnEnemy = () => {
+    gsap.to(enemyRef.value.scale, {
+      x: 0,
+      y: 0,
+      z: 0,
+      duration: 2,
+      ease: "elastic.in",
+      onComplete: () => {
+        emit('die', {id: props.config?.enemyId, position: enemyStoreInstance.value?.position})
+        enemiesState.removeEnemy(props.config?.enemyId);
       }
     });
   }
@@ -296,6 +314,12 @@
 
     spawnEnemy();
     listenEvents();
+  })
+
+  watch(() => playerState.isDead.value, (isPlayerDead: boolean) => {
+    if (isPlayerDead) {
+      unspawnEnemy()
+    }
   })
 
 </script>
