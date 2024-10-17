@@ -2,7 +2,7 @@
   <primitive
     ref="enemyRef"
     :object="model"
-    :position="[0, -10, 0]"
+    :position="[15, -15, -15]"
   >
     <Html
       center
@@ -100,10 +100,6 @@ import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
     createSpiderBall();
   });
 
-  onUnmounted(() => {
-    enemiesState.removeEnemy(props.config?.enemyId);
-  });
-
   onLoop(({ delta }) => {
     if (!isSpawned.value) {
       if (props.config) {
@@ -163,7 +159,7 @@ import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
 
   const reset = () => {
     isSpawned.value = false;
-    enemyRef.value.position.set(0, -10, 0);
+    enemyRef.value.position.set(15, -15, -15);
     enemyRef.value?.rotation.set(0, 0, 0);
     resetActions();
   }

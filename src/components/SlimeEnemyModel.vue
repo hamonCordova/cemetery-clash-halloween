@@ -2,7 +2,7 @@
   <primitive
       ref="enemyRef"
       :object="model"
-      cast-shadow
+      :position="[15, -15, -15]"
   >
     <Html
         center
@@ -10,7 +10,7 @@
         :distance-factor="4"
         :position="[0, 1.6, -0.1]"
     >
-    <div class="enemy-health" :class="{ 'enemy-health--dead': isDead }">
+    <div class="enemy-health" :class="{ 'enemy-health--dead': isDead || !isSpawned }">
       <div
           class="enemy-health__progress"
           :style="{ width: (enemyStoreInstance?.health || 0) + '%' }"
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, onUnmounted, ref, shallowRef } from 'vue';
+  import { computed, ref, shallowRef, watch } from 'vue';
   import { useAnimations, Html } from '@tresjs/cientos';
   import {
     Mesh,
@@ -45,16 +45,15 @@
   import {useSounds} from "@/composable/useSounds";
 
   const emit = defineEmits(['die']);
-  const { config } = defineProps({
+  const props = defineProps({
     config: {
       type: Object as Enemy,
-      required: true,
     },
   });
 
-  let isSpawned = false;
+  const isSpawned = ref(false);
   const resources = useResources();
-  const { model, animations } = config;
+  const { scene: model, animations } = resources.get('slime');
   const { actions } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
   const { scene } = useTresContext();
@@ -63,7 +62,10 @@
   const playerState = usePlayer();
   const enemiesState = useEnemiesSpawned();
   const enemyEventBus = useEventBus('enemyEventBus');
-  const { attack, die, idle, isDead, isAttacking } = useCharacter(
+  const attackDistance = 2;
+  let isAttackingByDistance = false;
+  const longRangeDelay = props.config?.attackDelayLongRange || 4000;
+  const { attack, die, idle, resetActions, isDead, isAttacking } = useCharacter(
       enemyRef,
       actions,
       {
@@ -73,13 +75,13 @@
         die: SlimeAnimationEnum.Death,
       },
       {
-        nextAttackDelay: config.attackDelay || 1000,
+        nextAttackDelay: props.config?.attackDelay || 1000,
       },
       {
         finishAttack: () => checkAttackHit(),
         onDie: () => {
-          emit('die', {id: config.enemyId, position: enemyStoreInstance.value?.position})
-          enemiesState.removeEnemy(config.enemyId);
+          emit('die', {id: props.config?.enemyId, position: enemyStoreInstance.value?.position})
+          enemiesState.removeEnemy(props.config?.enemyId);
         }
       }
   );
@@ -92,64 +94,61 @@
     hitReceived: sounds.createAudioPlayer(['slimeHitReceived1', 'slimeHitReceived2', 'slimeHitReceived3'], model, 1),
   }
 
-  const attackDistance = 2;
-
-  const isAttackingByDistance = ref(false);
-  const longRangeDelay = config.attackDelayLongRange || 4000;
-
   const enemyStoreInstance = computed(() => {
-    return enemiesState.enemies.value.find((e) => e.id === config.enemyId);
-  });
-
-  onMounted(() => {
-    spawnEnemy();
-    listenEvents();
-  });
-
-  onUnmounted(() => {
-    enemiesState.removeEnemy(config.enemyId);
+    return enemiesState.enemies.value.find((e) => e.id === props.config?.enemyId);
   });
 
   onLoop(({ delta }) => {
-    if (!isSpawned) {
-      followPlayerRotation(playerState.playerPosition.value, delta);
+    if (!isSpawned.value) {
+      if (props.config) {
+        followPlayerRotation(playerState.playerPosition.value, delta);
+      }
       return
     }
-
+    
     moveTowardsPlayer(delta);
   });
 
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
-      if (event === 'die' && config.enemyId === payload) {
+      if (event === 'die' && props.config?.enemyId === payload) {
         actionSounds.death?.playRandom();
         die();
       }
 
-      if (event === 'damageReceived' && config.enemyId === payload) {
+      if (event === 'damageReceived' && props.config?.enemyId === payload) {
         actionSounds.hitReceived?.playRandom();
       }
     });
   };
 
   const spawnEnemy = () => {
-    enemiesState.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.SLIME);
+    
+    enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, EnemyTypeEnum.SLIME);
     enemyRef.value.scale.set(0, 0, 0);
     enemyRef.value.position.set(
-        config.spawnPosition.x,
-        config.spawnPosition.y,
-        config.spawnPosition.z,
+        props.config?.spawnPosition.x,
+        props.config?.spawnPosition.y,
+        props.config?.spawnPosition.z,
     )
 
     gsap.to(enemyRef.value.scale, {
-      x: config.scale || 1.5,
-      y: config.scale || 1.5,
-      z: config.scale || 1.5,
+      x: props.config?.scale || 1.5,
+      y: props.config?.scale || 1.5,
+      z: props.config?.scale || 1.5,
       duration: 1,
       ease: "elastic.out",
-      onComplete: () => isSpawned = true
+      onComplete: () => isSpawned.value = true
     });
   };
+
+  const reset = () => {
+    isSpawned.value = false;
+    isAttackingByDistance = false;
+    enemyRef.value.position.set(15, -15, -15);
+    enemyRef.value?.rotation.set(0, 0, 0);
+    resetActions();
+  }
 
   const followPlayerRotation = (targetPosition: Vector3, delta: number) => {
     const enemyPos = enemyRef.value.position;
@@ -166,7 +165,7 @@
         targetAngle
     );
 
-    const rotationSpeed = config.rotationSpeed || 5;
+    const rotationSpeed = props.config?.rotationSpeed || 5;
     enemyQuaternion.rotateTowards(targetQuaternion, delta * rotationSpeed);
 
     enemyRef.value.quaternion.copy(enemyQuaternion);
@@ -197,7 +196,7 @@
       // Player is within 45 degrees in front of enemy
       // Attack hits
       actionSounds.hit?.playRandom();
-      playerState.takeDamage(config.damage); // or any function to apply damage
+      playerState.takeDamage(props.config?.damage); // or any function to apply damage
     }
   };
 
@@ -240,8 +239,8 @@
   }
 
   const longRangeAttack = () => {
-    if (isAttackingByDistance.value || isDead.value) return;
-    isAttackingByDistance.value = true;
+    if (isAttackingByDistance || isDead.value) return;
+    isAttackingByDistance = true;
     idle();
 
     const attackAction = actions[SlimeAnimationEnum.Attack];
@@ -299,7 +298,7 @@
           ) {
             actionSounds.hit?.playRandom();
             actionSounds.attack?.playRandom();
-            playerState.takeDamage(config.damage);
+            playerState.takeDamage(props.config?.damage);
             hasDealtDamage = true; // Prevent further damage during this attack
           }
 
@@ -310,7 +309,7 @@
         onComplete: () => {
           // Reset enemy position or other logic after attack completes
           setTimeout(() => {
-            isAttackingByDistance.value = false;
+            isAttackingByDistance = false;
           }, longRangeDelay);
         },
       });
@@ -373,15 +372,26 @@
       }
 
       // Check if enemy is already performing a long-range attack
-      if (!isAttackingByDistance.value) {
+      if (!isAttackingByDistance) {
         longRangeAttack();
         idle();
       }
 
       // Update enemy position in the store
-      enemiesState.updateEnemyPosition(config.enemyId, enemyPos);
+      enemiesState.updateEnemyPosition(props.config?.enemyId, enemyPos);
     }
   };
+
+  watch(() => props.config, (config) => {
+
+    if (!config) {
+      reset();
+      return;
+    }
+
+    spawnEnemy();
+    listenEvents();
+  })
 </script>
 
 <style>

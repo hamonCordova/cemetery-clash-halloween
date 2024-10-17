@@ -7,7 +7,7 @@
       <Suspense>
         <BattleScene ref="battleSceneRef" />
       </Suspense>
-      <TresPerspectiveCamera :args="[50, 1, 0.5, 10000]" :position="[0, 10, 10]" />
+      <TresPerspectiveCamera :args="[50, 1, 0.5, 100]" :position="[0, 10, 10]" />
       <OrbitControls v-if="isDevScenarioMode" />
       <TresAmbientLight :intensity="0.5" />
       <BattleManager v-if="!isDevScenarioMode" ref="battleManagerRef" />

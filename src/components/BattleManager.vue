@@ -1,43 +1,34 @@
 <template>
+
   <PlayerCharacter />
 
-    <SpiderEnemyModel
-        v-for="spiderId in spiderEnemiesIdPool"
-        :key="spiderId"
-        :config="currentStage?.enemies?.find(e => e.enemyId === spiderId)"
-        @die="enemyDied"
-    />
-<!--
-    <template v-for="enemy in currentStage.enemies" :key="enemy.enemyId">
-      <Suspense>
-        <SkeletonEnemyModel
-            v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.SKELETON"
-            :config="enemy"
-            @die="enemyDied"
-        />
-      </Suspense>
-      <Suspense>
-        <SpiderEnemyModel
-            v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.SPIDER"
-            :config="enemy"
-            @die="enemyDied"
-        />
-      </Suspense>
-      <Suspense>
-        <SlimeEnemyModel
-            v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.SLIME"
-            :config="enemy"
-            @die="enemyDied"
-        />
-      </Suspense>
-      <Suspense>
-        <ZombieEnemy
-            v-if="!enemy.isDead && enemy.type === EnemyTypeEnum.ZOMBIE"
-            :config="enemy"
-            @die="enemyDied"
-        />
-      </Suspense>
-    </template>-->
+  <SpiderEnemyModel
+      v-for="spiderId in spiderEnemiesIdPool"
+      :key="spiderId"
+      :config="currentStage?.enemies?.find(e => e.enemyId === spiderId)"
+      @die="enemyDied"
+  />
+
+  <SkeletonEnemyModel
+      v-for="skeletonId in skeletonEnemiesIdPool"
+      :key="skeletonId"
+      :config="currentStage?.enemies?.find(e => e.enemyId === skeletonId)"
+      @die="enemyDied"
+  />
+
+  <ZombieEnemy
+      v-for="zombieId in zombieEnemiesIdPool"
+      :key="zombieId"
+      :config="currentStage?.enemies?.find(e => e.enemyId === zombieId)"
+      @die="enemyDied"
+  />
+
+  <SlimeEnemyModel
+      v-for="slimeId in slimeEnemiesIdPool"
+      :key="slimeId"
+      :config="currentStage?.enemies?.find(e => e.enemyId === slimeId)"
+      @die="enemyDied"
+  />
 </template>
 
 <script lang="ts">
@@ -111,6 +102,25 @@ export interface Enemy {
       generateUUID(),
       generateUUID(),
       generateUUID(),
+  ]
+
+  const skeletonEnemiesIdPool = [
+    generateUUID(),
+    generateUUID(),
+    generateUUID(),
+    generateUUID(),
+  ]
+
+  const zombieEnemiesIdPool = [
+    generateUUID(),
+    generateUUID(),
+    generateUUID(),
+  ]
+
+  const slimeEnemiesIdPool = [
+    generateUUID(),
+    generateUUID(),
+    generateUUID(),
   ]
 
   onMounted(() => {
@@ -254,15 +264,28 @@ export interface Enemy {
     const stage = currentRound.value.stages[currentStageNum.value - 1];
     stage.enemies.forEach((enemy: Enemy) => {
 
-      if (enemy.type === EnemyTypeEnum.SPIDER) {
-        enemy.enemyId = spiderEnemiesIdPool.find(id => !stage.enemies.some(e => e.enemyId === id))
+      let enemiesIdPool;
+      switch (enemy.type) {
+        case EnemyTypeEnum.SPIDER:
+          enemiesIdPool = spiderEnemiesIdPool;
+          break;
+        case EnemyTypeEnum.SKELETON:
+          enemiesIdPool = skeletonEnemiesIdPool;
+          break;
+        case EnemyTypeEnum.ZOMBIE:
+          enemiesIdPool = zombieEnemiesIdPool;
+          break;
+        case EnemyTypeEnum.SLIME:
+          enemiesIdPool = slimeEnemiesIdPool;
+          break;
       }
+
+      if (!enemiesIdPool) return;
+      enemy.enemyId = enemiesIdPool.find(id => !stage.enemies.some(e => e.enemyId === id))
 
       enemy.isDead = false;
       enemy.spawnPosition = getStrategicPosition();
     });
-
-    console.warn(stage)
 
     currentStage.value = stage;
   };
@@ -306,11 +329,14 @@ export interface Enemy {
   };
 
   const getRound1 = (): Round => {
+
     const stages: RoundStage[] = [];
 
     stages.push({
       enemies: [
-        createSpiderEnemy(1, 2.5, 1000),
+      //  createSkeletonEnemy(1, 2.5, 800),
+       // createSpiderEnemy(1, 2.5, 1000),
+        createSlimeEnemy(0.5, 3.5, 1000),
       ],
     });
 
@@ -320,10 +346,13 @@ export interface Enemy {
         createSkeletonEnemy(1, 2.5, 1000),
         createSkeletonEnemy(1, 2.5, 1200),
         createZombieEnemy(1.5, 1),*/
-        createSpiderEnemy(1, 2.5, 1000),
-        createSpiderEnemy(1, 2.5, 1000),
-        createSpiderEnemy(1, 2.5, 1000),
-        createSpiderEnemy(1, 2.5, 1000),
+        createSlimeEnemy(0.5, 3.5, 1000),
+
+      //  createSkeletonEnemy(1, 2.5, 800),
+      //  createSpiderEnemy(1, 2.5, 1000),
+      //  createSpiderEnemy(1, 2.5, 1000),
+      //  createSpiderEnemy(1, 2.5, 1000),
+      //  createSpiderEnemy(1, 2.5, 1000),
       ],
     });
 

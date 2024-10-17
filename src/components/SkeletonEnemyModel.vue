@@ -2,6 +2,7 @@
   <primitive
       ref="enemyRef"
       :object="model"
+      :position="[15, -15, -15]"
   >
     <Html
       center
@@ -9,7 +10,7 @@
       :distance-factor="4"
       :position="[0, 1.6, -0.1]"
     >
-    <div class="enemy-health" :class="{'enemy-health--dead': isDead}">
+    <div class="enemy-health" :class="{'enemy-health--dead': isDead || !isSpawned}">
       <div class="enemy-health__progress"  :style="{width: (enemyStoreInstance?.health || 0) + '%'}"></div>
     </div>
     </Html>
@@ -17,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, onUnmounted, shallowRef} from 'vue';
+import {computed, onMounted, onUnmounted, shallowRef, watch, ref} from 'vue';
 import {Html, useAnimations} from '@tresjs/cientos';
 import {Mesh, Quaternion, Vector3} from 'three';
 import {useRenderLoop} from '@tresjs/core';
@@ -33,16 +34,15 @@ import {useSounds} from "@/composable/useSounds";
 import gsap from "gsap";
 
   const emit = defineEmits(['die'])
-  const {config} = defineProps({
+  const props = defineProps({
     config: {
       type: Object as Enemy,
-      required: true
     }
   })
 
-  let isSpawned = false;
+  const isSpawned = ref(false);
   const resources = useResources();
-  const { model, animations } = config;
+  const { scene: model, animations } = resources.get('skeleton');
   const { actions } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
   const enemyRef = shallowRef<Mesh>();
@@ -50,7 +50,9 @@ import gsap from "gsap";
   const enemiesState = useEnemiesSpawned();
   const sounds = useSounds();
   const enemyEventBus = useEventBus('enemyEventBus');
-  const { attack, stopWalk, walk, die, receiveHit, isDead, isAttacking } = useCharacter(
+  const attackDistance = 2;
+
+  const { attack, stopWalk, walk, die, receiveHit, resetActions, isDead, isAttacking } = useCharacter(
     enemyRef,
     actions,
     {
@@ -61,13 +63,13 @@ import gsap from "gsap";
       hitReact: SkeletonAnimationEnum.HitReact
     },
     {
-     nextAttackDelay: config.attackDelay || 1000
+     nextAttackDelay: props.config?.attackDelay || 1000
     },
     {
       finishAttack: () => checkAttackHit(),
       onDie: () => {
-        emit('die', {id: config.enemyId, position: enemyStoreInstance.value?.position})
-        enemiesState.removeEnemy(config.enemyId);
+        emit('die', {id: props.config?.enemyId, position: enemyStoreInstance.value?.position})
+        enemiesState.removeEnemy(props.config?.enemyId);
       }
     },
   )
@@ -78,23 +80,22 @@ import gsap from "gsap";
     hitReceived: sounds.createAudioPlayer(['skeletonEnemyHit1', 'skeletonEnemyHit2', 'skeletonEnemyHit3'], model, 1),
   }
 
-  const attackDistance = 2;
   const enemyStoreInstance = computed(() => {
-    return enemiesState.enemies.value.find(e => e.id === config.enemyId);
+    return enemiesState.enemies.value.find(e => e.id ===props.config?.enemyId);
   })
 
   onMounted(() => {
-    spawnEnemy();
-    listenEvents();
   });
 
   onUnmounted(() => {
-    enemiesState.removeEnemy(config.enemyId);
+    enemiesState.removeEnemy(props.config?.enemyId);
   });
 
   onLoop(({ delta }) => {
-    if (!isSpawned) {
-      followPlayerRotation(playerState.playerPosition.value, delta);
+    if (!isSpawned.value) {
+      if (props.config) {
+        followPlayerRotation(playerState.playerPosition.value, delta);
+      }
       return
     }
 
@@ -103,12 +104,12 @@ import gsap from "gsap";
 
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
-      if (event === 'die' && config.enemyId === payload) {
+      if (event === 'die' && props.config?.enemyId === payload) {
         soundActions.death?.playRandom();
         die()
       }
 
-      if (event === 'damageReceived' && config.enemyId === payload) {
+      if (event === 'damageReceived' && props.config?.enemyId === payload) {
         soundActions.hitReceived?.playRandom();
         receiveHit()
       }
@@ -117,22 +118,29 @@ import gsap from "gsap";
   }
 
   const spawnEnemy = () => {
-    enemiesState.registerEnemy(config.enemyId, config.spawnPosition, EnemyTypeEnum.SKELETON);
+    enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, EnemyTypeEnum.SKELETON);
     enemyRef.value.scale.set(0, 0, 0);
     enemyRef.value.position.set(
-        config.spawnPosition.x,
-        config.spawnPosition.y,
-        config.spawnPosition.z,
+       props.config?.spawnPosition.x,
+       props.config?.spawnPosition.y,
+       props.config?.spawnPosition.z,
     )
 
     gsap.to(enemyRef.value.scale, {
-      x: config.scale || 1.5,
-      y: config.scale || 1.5,
-      z: config.scale || 1.5,
+      x: props.config?.scale || 1.5,
+      y: props.config?.scale || 1.5,
+      z: props.config?.scale || 1.5,
       duration: 1,
       ease: "elastic.out",
-      onComplete: () => isSpawned = true
+      onComplete: () => isSpawned.value = true
     });
+  }
+
+  const reset = () => {
+    isSpawned.value = false;
+    enemyRef.value.position.set(15, -15, -15);
+    enemyRef.value?.rotation.set(0, 0, 0);
+    resetActions();
   }
 
   const followPlayerRotation = (targetPosition: Vector3, delta: number) => {
@@ -148,7 +156,7 @@ import gsap from "gsap";
     const enemyQuaternion = enemyRef.value.quaternion.clone()
     const targetQuaternion = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), targetAngle);
 
-    const rotationSpeed = config.rotationSpeed || 5;
+    const rotationSpeed = props.config?.rotationSpeed || 5;
     enemyQuaternion.rotateTowards(targetQuaternion, delta * rotationSpeed);
 
     // Apply enemy quaternion
@@ -178,7 +186,7 @@ import gsap from "gsap";
     if (dot > attackAngle) {
       // Player is within 45 degrees in front of enemy
       // Attack hits
-      playerState.takeDamage(config.damage); // or any function to apply damage
+      playerState.takeDamage(props.config?.damage); // or any function to apply damage
     }
   };
 
@@ -209,7 +217,7 @@ import gsap from "gsap";
 
       // Implement separation behavior to avoid overlapping with other enemies
       const separationForce = new Vector3(0, 0, 0);
-      const neighbors = enemiesState.enemies.value.filter((e) => e.id !== config.enemyId);
+      const neighbors = enemiesState.enemies.value.filter((e) => e.id !== props.config?.enemyId);
       const separationDistance = 2; // Adjust as needed
 
       for (const neighbor of neighbors) {
@@ -231,7 +239,7 @@ import gsap from "gsap";
 
       // Normalize and move enemy towards player, considering separation
       combinedDirection.normalize();
-      enemyPos.add(combinedDirection.multiplyScalar(config.moveSpeed * delta));
+      enemyPos.add(combinedDirection.multiplyScalar(props.config?.moveSpeed * delta));
 
       // Rotate enemy to face movement direction
       followPlayerRotation(enemyPos.clone().add(combinedDirection), delta);
@@ -240,11 +248,23 @@ import gsap from "gsap";
       walk()
 
       // Update enemy position in the store
-      enemiesState.updateEnemyPosition(config.enemyId, enemyPos);
+      enemiesState.updateEnemyPosition(props.config?.enemyId, enemyPos);
     }
   };
 
+  watch(() => props.config, (config) => {
+
+    if (!config) {
+      reset();
+      return;
+    }
+
+    spawnEnemy();
+    listenEvents();
+  })
+
 </script>
+
 <style>
 .enemy-health {
   background: #ccc;
