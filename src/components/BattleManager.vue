@@ -58,8 +58,6 @@ export interface Enemy {
   scale: number; // Para slimes mínimo de 0.3. Spider mínimo de 0.3. Skeleton mínimo de 0.5 (quanto menor, mais move speed precisa ter)
   isDead: boolean;
   type: EnemyTypeEnum;
-  model: Object3D;
-  animation: AnimationClip[]
 }
 
 </script>
@@ -453,7 +451,6 @@ export interface Enemy {
   ): Enemy => {
 
     const spawnPosition = getStrategicPosition();
-    const {scene, animations} = resources.get('slime');
 
     return {
       enemyId: generateUUID(),
@@ -467,8 +464,6 @@ export interface Enemy {
       scale,
       isDead: false,
       type: EnemyTypeEnum.SLIME,
-      model: markRaw(scene),
-      animations
     };
   };
 
@@ -480,7 +475,6 @@ export interface Enemy {
   ): Enemy => {
 
     const spawnPosition = getStrategicPosition();
-    const {scene, animations} = resources.get('spider');
 
     return {
       enemyId: undefined,
@@ -494,8 +488,6 @@ export interface Enemy {
       scale,
       isDead: false,
       type: EnemyTypeEnum.SPIDER,
-      model: markRaw(scene),
-      animations
     };
   };
 
@@ -513,7 +505,6 @@ export interface Enemy {
     }
 
     const spawnPosition = getStrategicPosition();
-    const {scene, animations} = resources.get('skeleton');
 
     return {
       enemyId: generateUUID(),
@@ -526,8 +517,6 @@ export interface Enemy {
       scale: adjustedScale,
       isDead: false,
       type: EnemyTypeEnum.SKELETON,
-      model: markRaw(scene),
-      animations
     } as Enemy;
   };
 
@@ -537,7 +526,6 @@ export interface Enemy {
   ): Enemy => {
 
     const spawnPosition = getStrategicPosition();
-    const {scene, animations} = resources.get('zombie');
 
     return {
       enemyId: generateUUID(),
@@ -550,8 +538,6 @@ export interface Enemy {
       scale,
       isDead: false,
       type: EnemyTypeEnum.ZOMBIE,
-      model: markRaw(scene),
-      animations
     };
   };
 
