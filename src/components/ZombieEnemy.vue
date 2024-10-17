@@ -9,7 +9,8 @@
       center
       transform
       :distance-factor="4"
-      :position="[0, 1.6, -0.1]"
+      :position="[0, 0.7, 0.4]"
+      :scale="[0.6, 0.6, 0.6]"
     >
     <div class="enemy-health" :class="{'enemy-health--dead': isDead || !isSpawned}">
       <div class="enemy-health__progress" :style="{width: (enemyStoreInstance?.health || 0) + '%'}"></div>

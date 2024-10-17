@@ -9,7 +9,9 @@
       center
       transform
       :distance-factor="4"
-      :position="[0, 1.6, -0.1]"
+      :position="[0, 2.3, -0.1]"
+      :rotation="[0, 1.6, 0]"
+      :scale="[2, 2, 2]"
     >
     <div class="enemy-health" :class="{ 'enemy-health--dead': isDead || !isSpawned }">
       <div

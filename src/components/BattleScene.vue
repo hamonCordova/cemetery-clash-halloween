@@ -127,7 +127,7 @@ import {useRenderLoop, useTresContext} from "@tresjs/core";
   import {DocumentUtils} from "@/utils/document-utils";
   import { vLightHelper } from '@tresjs/core'
   import gsap from 'gsap';
-  import {BufferAttribute, BufferGeometry, Color, Euler, Points, PointsMaterial, Vector3} from "three";
+import {AdditiveBlending, BufferAttribute, BufferGeometry, Color, Euler, Points, PointsMaterial, Vector3} from "three";
   import {useSounds} from "@/composable/useSounds";
 
 
@@ -169,7 +169,10 @@ import {useRenderLoop, useTresContext} from "@tresjs/core";
       size: 0.15,
       transparent: true,
       opacity: 0.7,
-      map: particleMap
+      map: particleMap,
+      blending: AdditiveBlending,
+      depthWrite: false,
+      depthTest: false
     });
 
     particles = new Points(particlesGeometry, particlesMaterial);

@@ -275,14 +275,19 @@
 
     const enemies = enemiesState.enemies.value;
 
-    const attackAngle = Math.cos(45 * (Math.PI / 180)); // 45 degrees
+
+    // TODO old angle = 45
+    const attackAngle = Math.cos(65 * (Math.PI / 180)); // 65 degrees
 
     enemies.forEach((enemy) => {
       const enemyPos = enemy.position;
       const enemyType = enemy.type;
       const attackRange = EnemyTypeDamageRangeEnum[enemyType];
 
+
       const distance = playerPos.distanceTo(enemyPos);
+      console.warn(enemy.position, playerPos, distance)
+
       if (distance > attackRange) {
         console.warn('enemy out of range')
         return; // Enemy is out of range

@@ -336,12 +336,14 @@ export interface Enemy {
       enemies: [
       //  createSkeletonEnemy(1, 2.5, 800),
        // createSpiderEnemy(1, 2.5, 1000),
+        createZombieEnemy(1.5, 1),
         createSlimeEnemy(0.5, 3.5, 1000),
       ],
     });
 
     stages.push({
       enemies: [
+        createZombieEnemy(1.5, 1),
         /*createSkeletonEnemy(1, 2.5, 800),
         createSkeletonEnemy(1, 2.5, 1000),
         createSkeletonEnemy(1, 2.5, 1200),
