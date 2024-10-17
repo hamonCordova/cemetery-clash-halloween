@@ -5,6 +5,7 @@
       :position="[0, 1.01, 0]"
   >
     <Html
+      v-if="isSpawned"
       center
       transform
       :distance-factor="4"

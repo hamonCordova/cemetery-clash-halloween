@@ -5,6 +5,7 @@
     :position="[0, 1.01, 0]"
   >
     <Html
+      v-if="isSpawned"
       center
       transform
       :distance-factor="4"
@@ -381,7 +382,6 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
   };
 
   watch(() => props.config, (config) => {
-
     if (!config) {
       reset();
       return;

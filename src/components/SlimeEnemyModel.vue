@@ -5,10 +5,11 @@
       :position="[0, 1.01, 0]"
   >
     <Html
-        center
-        transform
-        :distance-factor="4"
-        :position="[0, 1.6, -0.1]"
+      v-if="isSpawned"
+      center
+      transform
+      :distance-factor="4"
+      :position="[0, 1.6, -0.1]"
     >
     <div class="enemy-health" :class="{ 'enemy-health--dead': isDead || !isSpawned }">
       <div
