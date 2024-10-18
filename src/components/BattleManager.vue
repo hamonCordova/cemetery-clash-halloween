@@ -373,13 +373,13 @@ import {ref, onMounted, markRaw, watch} from 'vue';
       ],
     });*/
 
-    stages.push({
+  /*  stages.push({
       enemies: [
         createSpiderEnemy(1, 2.5, 2000, 5000, 5),
         createSpiderEnemy(1, 2.5, 2000, 5000, 5),
         createSpiderEnemy(1, 2.5, 2000, 5000, 5),
       ],
-    });
+    });*/
 
     stages.push({
       enemies: [
