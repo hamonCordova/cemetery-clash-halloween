@@ -1,6 +1,6 @@
 <template>
 
-  <PlayerCharacter />
+  <PlayerCharacter ref="playerCharacterRef" />
 
   <SpiderEnemyModel
       v-for="spiderId in spiderEnemiesIdPool"
@@ -78,14 +78,17 @@ import {ref, onMounted, markRaw, watch} from 'vue';
   import {useRenderLoop, useTresContext} from "@tresjs/core";
   import gsap from "gsap";
   import {useSounds} from "@/composable/useSounds";
+import {useGameState} from "@/composable/useGameState";
 
   const emit = defineEmits(['playerDied']);
 
   const resources = useResources();
   const playerState = usePlayer();
+  const gameState = useGameState();
   const { scene, camera } = useTresContext();
   const { onLoop } = useRenderLoop();
   const sounds = useSounds();
+  const playerCharacterRef = ref();
 
   const rounds = ref<Round[]>([]);
   const currentRoundNum = ref<number>(1);
@@ -249,11 +252,14 @@ import {ref, onMounted, markRaw, watch} from 'vue';
   const startRound = () => {
     if (currentRoundNum.value > rounds.value.length) {
       allRoundsCompleted();
+      console.warn('all rounds completed')
       return;
     }
 
     currentRound.value = rounds.value[currentRoundNum.value - 1];
     currentStageNum.value = 1;
+
+    console.warn('currentRound', currentRound.value)
 
     startStage();
   };
@@ -296,6 +302,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
       enemy.spawnPosition = getStrategicPosition();
     });
 
+    console.warn('currentStage', currentStage.value)
     currentStage.value = stage;
   };
 
@@ -327,12 +334,6 @@ import {ref, onMounted, markRaw, watch} from 'vue';
       currentStageNum.value++;
       startStage();
     }
-  };
-
-  const resetGame = () => {
-    currentRoundNum.value = 1;
-    currentStageNum.value = 1;
-    startRound();
   };
 
   const allRoundsCompleted = () => {
@@ -603,7 +604,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
 
     setTimeout(() => {
       enemyDiedSound.play();
-    }, 300)
+    }, 500)
 
     const timeline = gsap.timeline({
       onComplete() {
@@ -627,6 +628,70 @@ import {ref, onMounted, markRaw, watch} from 'vue';
 
   }
 
+  const restart = () => {
+
+    gameState.isPlaying.value = false;
+
+    const timeline = gsap.timeline({});
+
+    const lookAtPlayerTimeline = gsap.timeline({
+      delay: 0.2,
+      onComplete() {
+
+        gameState.isPlaying.value = true;
+
+        setTimeout(() => {
+          createRounds();
+          currentRound.value = undefined;
+          currentStage.value = undefined;
+          currentRoundNum.value = 1;
+          currentStageNum.value = 1;
+
+          startRound();
+        }, 2000)
+      }
+    })
+
+    timeline.to(camera.value?.position, {
+      x: 0,
+      duration: 1.5,
+      ease: 'power2.out',
+      onComplete() {
+        playerCharacterRef.value.restart();
+      }
+    }, '<');
+
+    timeline.to(camera.value.rotation, {
+      x: -0.3,
+      duration: 1.5,
+      ease: 'power2.out',
+      onComplete() {
+        playerCharacterRef.value.restart();
+      }
+    }, '<');
+
+    timeline.add(lookAtPlayerTimeline);
+
+    lookAtPlayerTimeline.to(camera.value.position, {
+      x: 0,
+      y: 7.65,
+      z: 15,
+      duration: 1.5,
+      ease: 'power2.out',
+      onUpdate() {
+      }
+    }, '<');
+
+    lookAtPlayerTimeline.to(camera.value.rotation, {
+      x: -0.42,
+      duration: 1.5,
+      ease: 'power2.out',
+      onUpdate() {
+      }
+    }, '<');
+
+  }
+
   watch(() => playerState.isDead.value, (isPlayerDead: boolean) => {
     if (isPlayerDead) {
       setTimeout(() => {
@@ -637,6 +702,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
 
   defineExpose({
     startRound,
-    resetGame,
+    restart,
   });
+
 </script>

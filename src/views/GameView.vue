@@ -29,7 +29,7 @@
     <GameControls />
 
     <transition name="fade" :duration="500" mode="out-in">
-      <GamePlayerDiedScore v-if="showingDeadPlayerScore" />
+      <GamePlayerDiedScore v-if="showingDeadPlayerScore" @restart="restart" />
     </transition>
 
   </template>
@@ -43,12 +43,11 @@
     SRGBColorSpace
   } from "three";
   import BattleFloor from "@/components/BattleFloor.vue";
-  import {StatsGl, Stars, OrbitControls, Smoke} from "@tresjs/cientos";
+  import {StatsGl, Stars, OrbitControls} from "@tresjs/cientos";
   import BattleScene from "@/components/BattleScene.vue";
   import BattleManager from "@/components/BattleManager.vue";
-  import {computed, onMounted, ref, watch} from "vue";
+  import {computed, ref, watch} from "vue";
   import {useResources} from "@/composable/useResources";
-  import router from "@/router";
   import GameLoader from "@/components/game/GameLoader.vue";
   import {useGameState} from "@/composable/useGameState";
   import {GameStateModeEnum} from "../../enum/game-mode.enum";
@@ -109,7 +108,7 @@
 
   const startGame = (withTimeout = true) => {
 
-    themeMusic = sounds.getAudio('themeMusic', true, 0.2);
+    themeMusic = sounds.getAudio('themeMusic', true, 0.15);
     if (gameState.isSoundsEnabled.value && isProductionGameMode.value) {
       themeMusic.play();
     }
@@ -127,6 +126,11 @@
 
   const onPlayerDied = () => {
     showingDeadPlayerScore.value = true;
+  }
+
+  const restart = () => {
+    showingDeadPlayerScore.value = false;
+    battleManagerRef.value.restart()
   }
 
   watch(() => gameState.isSoundsEnabled.value, () => {

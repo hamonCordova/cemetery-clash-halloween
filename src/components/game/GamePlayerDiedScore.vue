@@ -2,6 +2,7 @@
   <div class="container">
     <h1 class="title" ref="titleRef">You died!</h1>
     <p class="description" ref="descriptionRef">Death called. You answered. Wanna retry?</p>
+    <button ref="buttonRef" @click="emit('restart')">Start new game</button>
   </div>
 </template>
 
@@ -10,8 +11,11 @@
   import {onMounted, ref} from "vue";
   import gsap from "gsap";
 
+  const emit = defineEmits(['restart']);
+
   const titleRef = ref();
   const descriptionRef = ref();
+  const buttonRef = ref();
 
   onMounted(() => {
 
@@ -19,7 +23,7 @@
     timeline.to(titleRef.value, {
       transform: "scale(1)",
       visibility: 'visible',
-      ease: 'bounce.out',
+      ease: 'power4.out',
       duration: 1,
     })
 
@@ -28,6 +32,12 @@
       ease: 'power2.out',
       duration: 0.7,
       delay: 0.6,
+    }, '<')
+
+    timeline.to(buttonRef.value, {
+      opacity: "1",
+      ease: 'power2.out',
+      duration: 0.7,
     }, '<')
   })
 
@@ -67,6 +77,11 @@
     text-align: center;
   }
 
+  button {
+    width: 300px;
+    opacity: 0;
+  }
+
   @media only screen and (min-width: 762px) {
     .title {
       font-size: 150px;
@@ -75,6 +90,10 @@
     .description {
       font-size: 30px;
       margin-top: -110px;
+    }
+
+    button {
+      width: 400px;
     }
   }
 

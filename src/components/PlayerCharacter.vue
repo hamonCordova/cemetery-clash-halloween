@@ -1,5 +1,5 @@
 <template>
-  <primitive v-if="model" ref="skeletonRef" :object="model" :scale="[1.5, 1.5, 1.5]" cast-shadow :position="[0, 0.01, 0]"></primitive>
+  <primitive v-if="model" ref="playerModelRef" :object="model" :scale="[1.5, 1.5, 1.5]" cast-shadow :position="[0, 0.01, 0]"></primitive>
 </template>
 
 <script setup lang="ts">
@@ -22,7 +22,7 @@
   const {scene: model, animations} = resources.get('skeleton');
   const { actions } = useAnimations(animations, model)
   const { scene, camera } = useTresContext()
-  const skeletonRef = shallowRef<Mesh>();
+  const playerModelRef = shallowRef<Mesh>();
   const { onLoop } = useRenderLoop()
   const enemiesState = useEnemiesSpawned();
   const gameState = useGameState();
@@ -33,7 +33,7 @@
   let currentAnimation: AnimationAction | undefined;
 
   const jumpDuration = 0.8;
-  let _isJumping = false;
+  let isJumping = false;
   let isAttacking = false;
 
   const actionSounds = {
@@ -63,23 +63,34 @@
     })
   })
 
-  onLoop(({delta, elapsed, clock}) => {
-
+  onLoop(({delta}) => {
     if (playerState.isDead.value) return;
-
     move(delta)
     moveCamera();
   })
 
+  const restart = () => {
+    const position = new Vector3(0, 0, 0);
+    playerState.reset(position);
+    playerModelRef.value.position.copy(position)
+
+    playerModelRef.value?.quaternion.copy(
+        new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), MathUtils.degToRad(0))
+    )
+
+    isAttacking = false;
+    isJumping = false;
+  }
+
   const moveCamera = () => {
-    if (skeletonRef.value && camera.value && gameState.isPlaying.value) {
+    if (playerModelRef.value && camera.value && gameState.isPlaying.value) {
       const cameraOffset = new Vector3(0, 7, 15);
-      const characterPosition = skeletonRef.value.position.clone();
+      const characterPosition = playerModelRef.value.position.clone();
       const cameraTargetPosition = characterPosition.add(cameraOffset);
 
       camera.value.position.lerp(cameraTargetPosition, 0.1);
 
-      const targetPosition = skeletonRef.value.position.clone();
+      const targetPosition = playerModelRef.value.position.clone();
       targetPosition.y += 1;
 
       camera.value.lookAt(targetPosition);
@@ -124,7 +135,7 @@
 
     let isMoving = false;
     const isFreezed = playerState.isFreezed();
-    const isJumping = activeMovements.jump;
+    const _isJumping = activeMovements.jump;
     const isRunning = activeMovements.run;
 
     const speed = isRunning ? 8 : 5;
@@ -163,13 +174,13 @@
       }
     }
 
-    if (isJumping && !isFreezed) {
+    if (_isJumping && !isFreezed) {
       jump();
     }
 
     if (isMoving) {
 
-      if (!isAttacking && !isJumping) {
+      if (!isAttacking && !_isJumping) {
 
         if (isRunning) {
           if (!_isJumping) {
@@ -198,7 +209,7 @@
 
       let movementDirection = movement.clone().normalize();
 
-      const characterPos = skeletonRef.value.position.clone();
+      const characterPos = playerModelRef.value.position.clone();
       characterPos.y = 0;
 
       // Variável para acumular as normais de colisão
@@ -244,23 +255,23 @@
 
       if (!isFreezed) {
         // Atualiza a posição com o movimento permitido
-        skeletonRef.value.position.add(movement);
+        playerModelRef.value.position.add(movement);
 
         // Clamp the position to stay within the 25x25 area
         const battleArenaOffset = 1;
         const battleArenaHalfSize = (25 - battleArenaOffset) / 2;
-        skeletonRef.value.position.x = MathUtils.clamp(skeletonRef.value.position.x, -battleArenaHalfSize, battleArenaHalfSize);
-        skeletonRef.value.position.z = MathUtils.clamp(skeletonRef.value.position.z, -battleArenaHalfSize, battleArenaHalfSize);
+        playerModelRef.value.position.x = MathUtils.clamp(playerModelRef.value.position.x, -battleArenaHalfSize, battleArenaHalfSize);
+        playerModelRef.value.position.z = MathUtils.clamp(playerModelRef.value.position.z, -battleArenaHalfSize, battleArenaHalfSize);
 
-        playerState.updatePlayerPosition(skeletonRef.value.position);
+        playerState.updatePlayerPosition(playerModelRef.value.position);
       }
 
       // Atualiza a rotação do personagem
       const targetRotationY = Math.atan2(direction.x, direction.z);
-      const currentQuaternion = skeletonRef.value.quaternion.clone();
+      const currentQuaternion = playerModelRef.value.quaternion.clone();
       const targetQuaternion = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), targetRotationY);
       currentQuaternion.rotateTowards(targetQuaternion, delta * 10);
-      skeletonRef.value.quaternion.copy(currentQuaternion);
+      playerModelRef.value.quaternion.copy(currentQuaternion);
 
 
     } else {
@@ -289,8 +300,8 @@
   };
 
   const checkAttackHit = () => {
-    const playerPos = skeletonRef.value.position;
-    const playerQuaternion = skeletonRef.value.quaternion;
+    const playerPos = playerModelRef.value.position;
+    const playerQuaternion = playerModelRef.value.quaternion;
 
     const enemies = enemiesState.enemies.value;
 
@@ -327,31 +338,35 @@
   };
 
   const jump = () => {
-    if (_isJumping || playerState.isDead.value) return;
+    if (isJumping || playerState.isDead.value) return;
 
     const timeline = gsap.timeline({
       onStart: () => {
-        _isJumping = true;
+        isJumping = true;
         actionSounds.jump?.playRandom();
         animate(SkeletonAnimationEnum.Jump_Land, 0.1);
       },
       onComplete: () => {
         playerState.activeMovements.jump = false;
-        _isJumping = false;
+        isJumping = false;
       }
     });
 
-    timeline.to(skeletonRef.value.position, {
+    timeline.to(playerModelRef.value.position, {
       y: 2,
       duration: jumpDuration / 2,
       ease: 'power1.out'
     });
 
-    timeline.to(skeletonRef.value.position, {
+    timeline.to(playerModelRef.value.position, {
       y: 0,
       duration: (jumpDuration / 2) * jumpDuration,
       ease: 'circ.in'
     });
   };
+
+  defineExpose({
+    restart
+  })
 
 </script>

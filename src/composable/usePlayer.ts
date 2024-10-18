@@ -44,7 +44,7 @@ export const usePlayer = createGlobalState(() => {
 
         if (isDead.value) return;
         console.warn('player hit')
-        health.value -= (isMobile ? damage * 0.5 : damage * 5);
+        health.value -= (isMobile ? damage * 0.5 : damage);
 
         if (health.value <= 0) {
             playerEventBus.emit('die');
@@ -64,6 +64,13 @@ export const usePlayer = createGlobalState(() => {
         playerEventBus.emit('attack');
     }
 
+    const reset = (resetPosition: Vector3) => {
+        playerPosition.value.copy(resetPosition);
+        freezedByEnemiesId.value = new Map();
+        health.value = 100;
+        isDead.value = false;
+    }
+
     return {
         activeMovements,
         playerPosition,
@@ -76,5 +83,6 @@ export const usePlayer = createGlobalState(() => {
         takeDamage,
         freeze,
         unfreeze,
+        reset
     };
 })

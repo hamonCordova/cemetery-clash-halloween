@@ -69,25 +69,6 @@
     width: 100%;
   }
 
-  button {
-    background: linear-gradient(360deg, #ee5e0a, #f5b442);
-    box-shadow: inset 0 0 8px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #000;
-    border-radius: 10px;
-    width: 90%;
-    height: 43px;
-    cursor: pointer;
-    font-size: 34px;
-    font-family: "Metal Mania", system-ui;
-    transition: filter 120ms ease-out, box-shadow 120ms ease-out;
-    margin-top: 30px;
-  }
-
-  button:hover {
-    filter: brightness(1.2);
-    box-shadow: inset 0 0 8px 3px rgba(0, 0, 0, 0.4);
-  }
-
   footer {
     display: flex;
     justify-content: center;
