@@ -47,6 +47,7 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
   import {useSounds} from "@/composable/useSounds";
   import {BattleLayersEnum} from "../../enum/battle-layers.enum";
+import GameAudioPlayer from "../../models/game-audio-player";
 
   const emit = defineEmits(['die']);
   const props = defineProps({
@@ -87,7 +88,7 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
       }
   );
 
-  const actionSounds = {
+  const soundActions = {
     slide: sounds.createAudioPlayer(['slimeSlide'], model),
     death: sounds.createAudioPlayer(['slimeDeath'], model, 1),
     attack: sounds.createAudioPlayer(['slimeAttack'], model),
@@ -134,23 +135,25 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
       if (event === 'die' && props.config?.enemyId === payload) {
-        actionSounds.death?.playRandom();
+        soundActions.death?.playRandom();
         die();
       }
 
       if (event === 'damageReceived' && props.config?.enemyId === payload) {
-        actionSounds.hitReceived?.playRandom();
+        soundActions.hitReceived?.playRandom();
       }
     });
   };
 
   const unspawnEnemy = () => {
+
     isDead.value = true;
+
     gsap.to(enemyRef.value.scale, {
       x: 0,
       y: 0,
       z: 0,
-      duration: 2.5,
+      duration: props.config?.moveSpeed || 4,
       ease: "elastic.in",
       onComplete: () => {
         emit('die', {id: props.config?.enemyId, position: enemyStoreInstance.value?.position})
@@ -183,7 +186,7 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
   };
 
   const reset = () => {
-  setLayer(BattleLayersEnum.POOL)
+    setLayer(BattleLayersEnum.POOL)
 
     isSpawned.value = false;
     isAttackingByDistance = false;
@@ -237,7 +240,7 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
     if (dot > attackAngle) {
       // Player is within 45 degrees in front of enemy
       // Attack hits
-      actionSounds.hit?.playRandom();
+      soundActions.hit?.playRandom();
       playerState.takeDamage(props.config?.damage); // or any function to apply damage
     }
   };
@@ -289,7 +292,7 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
     attackAction.setLoop(LoopOnce);
     attackAction.reset();
     attackAction.play();
-    actionSounds.attack?.playRandom();
+    soundActions.attack?.playRandom();
 
     const attackDuration =
         (attackAction.getClip().duration / attackAction.timeScale) * 0.7;
@@ -338,15 +341,18 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
               verticalDistance <= 1 && // Adjust vertical tolerance as needed
               !hasDealtDamage
           ) {
-            actionSounds.hit?.playRandom();
-            actionSounds.attack?.playRandom();
+            soundActions.hit?.playRandom();
+            soundActions.attack?.playRandom();
             playerState.takeDamage(props.config?.damage);
             hasDealtDamage = true; // Prevent further damage during this attack
           }
 
           // Trail effect
-          actionSounds.slide?.playRandom();
-          createTrailEffect(enemyPos.clone());
+          if (!isDead.value) {
+            soundActions.slide?.playRandom();
+            createTrailEffect(enemyPos.clone());
+          }
+
         },
         onComplete: () => {
           // Reset enemy position or other logic after attack completes
@@ -408,7 +414,7 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
       followPlayerRotation(playerPos, delta);
 
       if (distanceToPlayer <= attackDistance && !isAttacking.value && !isDead.value) {
-        actionSounds.attack?.playRandom();
+        soundActions.attack?.playRandom();
         attack();
         followPlayerRotation(playerPos, delta);
       }

@@ -35,6 +35,7 @@
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
   import {useSounds} from "@/composable/useSounds";
   import {BattleLayersEnum} from "../../enum/battle-layers.enum";
+  import GameAudioPlayer from "../../models/game-audio-player";
 
   const emit = defineEmits(['die'])
   const props = defineProps({
@@ -115,7 +116,9 @@
   }
 
   const unspawnEnemy = () => {
+
     isDead = true;
+
     gsap.to(enemyRef.value.scale, {
       x: 0,
       y: 0,

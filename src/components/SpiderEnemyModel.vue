@@ -40,6 +40,7 @@ import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
   import {useSounds} from "@/composable/useSounds";
 import {BattleLayersEnum} from "../../enum/battle-layers.enum";
+import GameAudioPlayer from "../../models/game-audio-player";
 
   const emit = defineEmits(['die'])
   const props = defineProps({
@@ -84,7 +85,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
       }
     },
   )
-  const actionSounds = {
+  const soundActions = {
     attack: sounds.createAudioPlayer(['spiderAttack'], model),
     ballSplash: sounds.createAudioPlayer(['spiderBallSplash'], model, 2),
     death: sounds.createAudioPlayer(['spiderDeath'], model, 1),
@@ -145,12 +146,12 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
       if (event === 'die' && props.config?.enemyId === payload) {
-        actionSounds.death?.playRandom();
+        soundActions.death?.playRandom();
         die()
       }
 
       if (event === 'damageReceived' && props.config?.enemyId === payload) {
-        actionSounds.hitReceived?.playRandom();
+        soundActions.hitReceived?.playRandom();
       }
     });
   }
@@ -158,6 +159,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
   const unspawnEnemy = () => {
 
     isDead.value = true;
+
     gsap.to(enemyRef.value.scale, {
       x: 0,
       y: 0,
@@ -256,7 +258,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
     const distance = projectilePosition.distanceTo(playerPos);
 
     if (distance <= 1.2) {
-      actionSounds.ballSplash?.playRandom();
+      soundActions.ballSplash?.playRandom();
       playerState.takeDamage(props.config?.damage);
     } else {
 
@@ -264,7 +266,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
       bloodSplatInstance.position.set(projectilePosition.x, 0, projectilePosition.z);
 
       scene.value.add(bloodSplatInstance);
-      actionSounds.ballSplash?.playRandom();
+      soundActions.ballSplash?.playRandom();
 
       setTimeout(() => {
         scene.value.remove(bloodSplatInstance);
@@ -289,7 +291,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
     attackAction.reset();
     attackAction.play();
 
-    actionSounds.attack?.playRandom();
+    soundActions.attack?.playRandom();
 
 
     setTimeout(() => {
@@ -361,7 +363,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
       if (distanceToPlayer <= attackDistance) {
         if (!isAttacking.value) {
-          actionSounds.attack?.playRandom();
+          soundActions.attack?.playRandom();
           attack()
         }
 

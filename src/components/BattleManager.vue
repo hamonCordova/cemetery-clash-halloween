@@ -345,18 +345,27 @@ import {ref, onMounted, markRaw, watch} from 'vue';
 
     const stages: RoundStage[] = [];
 
-
-    stages.push({
-      enemies: [
+  /*  stages.push({
+      enemies:[
         createSlimeEnemy(0.5, 3.5, 1000),
         createSlimeEnemy(0.5, 3.5, 1500),
         createSpiderEnemy(0.7, 3, 1000),
         createSkeletonEnemy(1, 2.5, 800),
         createZombieEnemy(1.5, 1),
+      ]
+    })*/
+
+    stages.push({
+      enemies: [
+        createSlimeEnemy(0.5, 3.5, 1000),
       ],
     });
 
-
+    stages.push({
+      enemies: [
+        createSlimeEnemy(0.5, 3.5, 1000),
+      ],
+    });
 
     stages.push({
       enemies: [

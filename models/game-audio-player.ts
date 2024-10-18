@@ -23,18 +23,11 @@ export default class GameAudioPlayer {
         const audio = this.audios[Math.floor(Math.random() * this.audios.length)];
         if (!audio || audio.isPlaying) return;
 
-        if (audio instanceof PositionalAudio) {
-            const { x, y, z } = audio.position;
-
-            if (isFinite(x) && isFinite(y) && isFinite(z)) {
-                audio.play();
-            } else {
-                console.warn('Positional audio has an invalid position', audio.position);
-            }
-        } else {
+        try {
             audio.play();
+        } catch (e) {
+            console.warn('Error playing audio', e);
         }
-
         this.lastPlayedTime = now;
     }
 
@@ -51,7 +44,9 @@ export default class GameAudioPlayer {
 
         Object.keys(players).forEach(key => {
             const player = players[key];
-            player.audios.forEach(audio => audio.stop());
+            player.audios.forEach(audio => {
+                audio.stop();
+            });
         })
     }
 }
