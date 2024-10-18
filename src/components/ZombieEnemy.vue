@@ -119,7 +119,7 @@
       x: 0,
       y: 0,
       z: 0,
-      duration: 2,
+      duration: 3,
       ease: "elastic.in",
       onComplete: () => {
         emit('die', {id: props.config?.enemyId, position: enemyStoreInstance.value?.position})

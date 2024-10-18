@@ -78,7 +78,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
   import {useRenderLoop, useTresContext} from "@tresjs/core";
   import gsap from "gsap";
   import {useSounds} from "@/composable/useSounds";
-import {useGameState} from "@/composable/useGameState";
+  import {useGameState} from "@/composable/useGameState";
 
   const emit = defineEmits(['playerDied']);
 
@@ -347,13 +347,11 @@ import {useGameState} from "@/composable/useGameState";
 
     stages.push({
       enemies: [
-      //  createSkeletonEnemy(1, 2.5, 800),
-        createSpiderEnemy(1, 2.5, 1000),
-        createSpiderEnemy(1, 2.5, 1000),
-        createSpiderEnemy(1, 2.5, 1000),
-        createSlimeEnemy(0.5, 3.5, 1000),
-        createSlimeEnemy(0.5, 3.5, 1000),
-        createSlimeEnemy(0.5, 3.5, 1000),
+        //createZombieEnemy(1.5, 1, 10),
+//        createSpiderEnemy(1, 3.5, 500, 300, 6.5),
+     //   createSlimeEnemy(0.5, 3.5, 1, 1000, 2500),
+        createSkeletonEnemy(1.5, 0.5, 2, 800),
+        createSkeletonEnemy(1.5, 2.5, 5, 2000),
       ],
     });
 
@@ -465,8 +463,10 @@ import {useGameState} from "@/composable/useGameState";
 
   const createSlimeEnemy = (
       scale: number,
-      moveSpeed: number,
-      attackDelayLongRange: number,
+      moveSpeed: number = 2,
+      rotationSpeed: number = 2,
+      attackDelay: number = 2000,
+      attackDelayLongRange: number = 3000,
       isBoss = false
   ): Enemy => {
 
@@ -476,11 +476,11 @@ import {useGameState} from "@/composable/useGameState";
       enemyId: generateUUID(),
       spawnPosition,
       moveSpeed,
-      rotationSpeed: 2,
+      rotationSpeed,
       damage: isBoss ? 15 : 10,
       health: isBoss ? 70 : 30,
-      attackDelay: 1000,
-      attackDelayLongRange,
+      attackDelay: attackDelay || 2000,
+      attackDelayLongRange: attackDelayLongRange || 3000,
       scale,
       isDead: false,
       type: EnemyTypeEnum.SLIME,
@@ -491,6 +491,8 @@ import {useGameState} from "@/composable/useGameState";
       scale: number,
       moveSpeed: number,
       attackDelay: number,
+      attackDelayLongRange: number,
+      rotationSpeed: number,
       isBoss = false
   ): Enemy => {
 
@@ -500,11 +502,11 @@ import {useGameState} from "@/composable/useGameState";
       enemyId: undefined,
       spawnPosition,
       moveSpeed,
-      rotationSpeed: 2,
+      rotationSpeed: rotationSpeed || 2,
       damage: isBoss ? 15 : 10,
       health: isBoss ? 80 : 40,
-      attackDelay,
-      attackDelayLongRange: 2000,
+      attackDelay: attackDelay || 2000,
+      attackDelayLongRange: attackDelayLongRange || 4000,
       scale,
       isDead: false,
       type: EnemyTypeEnum.SPIDER,
@@ -512,29 +514,24 @@ import {useGameState} from "@/composable/useGameState";
   };
 
   const createSkeletonEnemy = (
-      scale: number,
-      moveSpeed: number,
-      attackDelay: number,
+      scale: number = 1.5,
+      moveSpeed = 1.5,
+      rotationSpeed = 3,
+      attackDelay = 2000,
       isBoss = false
   ): Enemy => {
-    const adjustedScale = Math.max(scale, 0.5);
-    let adjustedMoveSpeed = moveSpeed;
-
-    if (adjustedScale < 1) {
-      adjustedMoveSpeed = moveSpeed * (1 / adjustedScale);
-    }
 
     const spawnPosition = getStrategicPosition();
 
     return {
       enemyId: generateUUID(),
       spawnPosition,
-      moveSpeed: adjustedMoveSpeed,
-      rotationSpeed: 2,
+      moveSpeed: moveSpeed,
+      rotationSpeed: rotationSpeed,
       damage: isBoss ? 15 : 10,
       health: isBoss ? 90 : 50,
       attackDelay,
-      scale: adjustedScale,
+      scale,
       isDead: false,
       type: EnemyTypeEnum.SKELETON,
     } as Enemy;
@@ -542,16 +539,15 @@ import {useGameState} from "@/composable/useGameState";
 
   const createZombieEnemy = (
       scale: number,
-      moveSpeed: number
+      moveSpeed: number = 2,
+      rotationSpeed = 5
   ): Enemy => {
-
-    const spawnPosition = getStrategicPosition();
 
     return {
       enemyId: generateUUID(),
-      spawnPosition,
+      spawnPosition: getStrategicPosition(),
       moveSpeed,
-      rotationSpeed: 1,
+      rotationSpeed,
       damage: 0,
       health: 100,
       attackDelay: 0,
@@ -599,12 +595,14 @@ import {useGameState} from "@/composable/useGameState";
 
   const handleOnPlayerDie = () => {
 
-    const playerPosition = playerState.playerPosition.value;
-    const enemyDiedSound = sounds.getAudio('evilLaugh', false, 2)
+    if (gameState.isSoundsEnabled.value) {
+      setTimeout(() => {
+        const enemyDiedSound = sounds.getAudio('evilLaugh', false, 2)
+        enemyDiedSound.play();
+      }, 500)
+    }
 
-    setTimeout(() => {
-      enemyDiedSound.play();
-    }, 500)
+    const playerPosition = playerState.playerPosition.value;
 
     const timeline = gsap.timeline({
       onComplete() {

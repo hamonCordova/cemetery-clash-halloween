@@ -67,7 +67,7 @@ export default function useCharacter(
 
         nextAttackTimeout = setTimeout(() => {
             isAttacking.value = false;
-        }, attackConfig.nextAttackDelay);
+        }, toValue(attackConfig).nextAttackDelay);
     }
 
     const stopAttack = () => {
@@ -101,7 +101,7 @@ export default function useCharacter(
         walkAction.crossFadeFrom(actions[isAttacking.value ? actionsName.attack : actionsName.idle], 0.5);
         isWalking.value = true;
 
-        isAttacking.value = false;
+        //isAttacking.value = false;
     }
 
     const stopWalk = () => {

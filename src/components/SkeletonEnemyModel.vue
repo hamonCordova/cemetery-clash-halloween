@@ -64,9 +64,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
       die: SkeletonAnimationEnum.Death,
       hitReact: SkeletonAnimationEnum.HitReact
     },
-    {
-     nextAttackDelay: props.config?.attackDelay || 1000
-    },
+      () => attackConfig.value,
     {
       finishAttack: () => checkAttackHit(),
       onDie: () => {
@@ -84,6 +82,12 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
   const enemyStoreInstance = computed(() => {
     return enemiesState.enemies.value.find(e => e.id ===props.config?.enemyId);
+  })
+
+  const attackConfig = computed(() => {
+    return {
+      nextAttackDelay: props.config?.attackDelay || 2000,
+    }
   })
 
   onMounted(() => {
@@ -136,7 +140,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
       x: 0,
       y: 0,
       z: 0,
-      duration: 2,
+      duration: 2.5,
       ease: "elastic.in",
       onComplete: () => {
         emit('die', {id: props.config?.enemyId, position: enemyStoreInstance.value?.position})

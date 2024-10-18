@@ -64,7 +64,6 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
   const attackDistance = 3;
   const distantAttackDistance = 9;
   const isAttackingByDistance = ref(false);
-  const longRangeDelay = 4000;
   let spiderBallMesh: Mesh | undefined;
 
   const { attack, stopWalk, walk, die, idle, resetActions, isDead, isAttacking } = useCharacter(
@@ -76,9 +75,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
       attack: SpiderAnimationEnum.Attack,
       die: SpiderAnimationEnum.Death,
     },
-    {
-     nextAttackDelay: props.config?.attackDelay || 1000
-    },
+      () => attackConfig.value,
     {
       finishAttack: () => checkAttackHit(),
       onDie: () => {
@@ -96,6 +93,12 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
   const enemyStoreInstance = computed(() => {
     return enemiesState.enemies.value.find(e => e.id === props.config?.enemyId);
+  })
+
+  const attackConfig = computed(() => {
+    return {
+      nextAttackDelay: props.config?.attackDelay || 2000,
+    }
   })
 
   onMounted(() => {
@@ -135,8 +138,8 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
     )
 
     spiderBallMesh.layers.set(BattleLayersEnum.POOL)
-    scene.value.add(spiderBallMesh)
     spiderBallMesh.position.y = -2;
+    scene.value.add(spiderBallMesh)
   }
 
   const listenEvents = () => {
@@ -157,7 +160,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
       x: 0,
       y: 0,
       z: 0,
-      duration: 2,
+      duration: 2.5,
       ease: "elastic.in",
       onComplete: () => {
         emit('die', {id: props.config?.enemyId, position: enemyStoreInstance.value?.position})
@@ -327,7 +330,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
       setTimeout(() => {
         isAttackingByDistance.value = false;
-      }, longRangeDelay)
+      }, props.config.attackDelayLongRange || 4000)
     }, attackDuration * 1000)
 
   }

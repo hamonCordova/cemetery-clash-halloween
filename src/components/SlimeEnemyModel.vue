@@ -68,7 +68,6 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
   const enemyEventBus = useEventBus('enemyEventBus');
   const attackDistance = 2;
   let isAttackingByDistance = false;
-  const longRangeDelay = props.config?.attackDelayLongRange || 4000;
   const { attack, die, idle, resetActions, isDead, isAttacking } = useCharacter(
       enemyRef,
       actions,
@@ -78,9 +77,7 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
         attack: SlimeAnimationEnum.Attack,
         die: SlimeAnimationEnum.Death,
       },
-      {
-        nextAttackDelay: props.config?.attackDelay || 1000,
-      },
+      () => attackConfig.value,
       {
         finishAttack: () => checkAttackHit(),
         onDie: () => {
@@ -101,6 +98,12 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
   const enemyStoreInstance = computed(() => {
     return enemiesState.enemies.value.find((e) => e.id === props.config?.enemyId);
   });
+
+  const attackConfig = computed(() => {
+    return {
+      nextAttackDelay: props.config?.attackDelay || 2000,
+    }
+  })
 
   onMounted(() => {
     setLayer(BattleLayersEnum.POOL)
@@ -146,7 +149,7 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
       x: 0,
       y: 0,
       z: 0,
-      duration: 2,
+      duration: 2.5,
       ease: "elastic.in",
       onComplete: () => {
         emit('die', {id: props.config?.enemyId, position: enemyStoreInstance.value?.position})
@@ -346,14 +349,14 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
           // Reset enemy position or other logic after attack completes
           setTimeout(() => {
             isAttackingByDistance = false;
-          }, longRangeDelay);
+          }, props.config.attackDelayLongRange || 4000);
         },
       });
 
       tl.to(
           enemyRef.value.position,
           {
-            duration: 2,
+            duration: props.config?.moveSpeed || 2,
             x: targetPosition.x,
             z: targetPosition.z,
             ease: 'power2.out',
