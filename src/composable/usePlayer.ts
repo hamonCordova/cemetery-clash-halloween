@@ -44,7 +44,7 @@ export const usePlayer = createGlobalState(() => {
 
         if (isDead.value) return;
         console.warn('player hit')
-        health.value -= (isMobile ? damage * 0.5 : damage * 2);
+        health.value -= (isMobile ? damage * 0.5 : damage);
 
         if (health.value <= 0) {
             playerEventBus.emit('die');

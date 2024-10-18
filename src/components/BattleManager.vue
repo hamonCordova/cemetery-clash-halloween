@@ -344,8 +344,14 @@ import {ref, onMounted, markRaw, watch} from 'vue';
   const getRound1 = (): Round => {
 
     const stages: RoundStage[] = [];
+/*
+    stages.push({
+      enemies: [
+        createSlimeEnemy(0.5, 3.5, 1000),
+      ],
+    });
 
-  /*  stages.push({
+   stages.push({
       enemies:[
         createSlimeEnemy(0.5, 3.5, 1000),
         createSlimeEnemy(0.5, 3.5, 1500),
@@ -353,7 +359,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
         createSkeletonEnemy(1, 2.5, 800),
         createZombieEnemy(1.5, 1),
       ]
-    })*/
+    })
 
     stages.push({
       enemies: [
@@ -364,6 +370,14 @@ import {ref, onMounted, markRaw, watch} from 'vue';
     stages.push({
       enemies: [
         createSlimeEnemy(0.5, 3.5, 1000),
+      ],
+    });*/
+
+    stages.push({
+      enemies: [
+        createSpiderEnemy(1, 2.5, 2000, 5000, 5),
+        createSpiderEnemy(1, 2.5, 2000, 5000, 5),
+        createSpiderEnemy(1, 2.5, 2000, 5000, 5),
       ],
     });
 

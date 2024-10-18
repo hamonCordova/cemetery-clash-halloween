@@ -2,7 +2,7 @@
   <primitive
       ref="enemyRef"
       :object="model"
-      :position="[0, 1.01, 0]"
+      :position="[0, -10, 0]"
   >
     <Html
       v-if="isSpawned"
@@ -107,7 +107,6 @@ import GameAudioPlayer from "../../models/game-audio-player";
   })
 
   onMounted(() => {
-    setLayer(BattleLayersEnum.POOL)
   })
 
   onLoop(({ delta }) => {
@@ -147,6 +146,7 @@ import GameAudioPlayer from "../../models/game-audio-player";
 
   const unspawnEnemy = () => {
 
+    if (isDead.value) return;
     isDead.value = true;
 
     gsap.to(enemyRef.value.scale, {
@@ -165,7 +165,6 @@ import GameAudioPlayer from "../../models/game-audio-player";
   const spawnEnemy = () => {
 
     isDead.value = false;
-    setLayer(BattleLayersEnum.ACTIVE)
 
     enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, EnemyTypeEnum.SLIME);
     enemyRef.value.scale.set(0, 0, 0);
@@ -174,6 +173,8 @@ import GameAudioPlayer from "../../models/game-audio-player";
         props.config?.spawnPosition.y,
         props.config?.spawnPosition.z,
     )
+
+    idle();
 
     gsap.to(enemyRef.value.scale, {
       x: props.config?.scale || 1.5,
@@ -186,11 +187,10 @@ import GameAudioPlayer from "../../models/game-audio-player";
   };
 
   const reset = () => {
-    setLayer(BattleLayersEnum.POOL)
 
     isSpawned.value = false;
     isAttackingByDistance = false;
-    enemyRef.value.position.set(0, 1.01, 0);
+    enemyRef.value.position.set(0, -10, 0);
     enemyRef.value?.rotation.set(0, 0, 0);
     resetActions();
   }

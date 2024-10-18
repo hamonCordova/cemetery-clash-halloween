@@ -80,28 +80,29 @@
     if (!gameState.isPlaying.value) return;
 
     const active = type === 'keydown';
-    switch (event.code) {
-      case 'ArrowUp':
-      case 'KeyW':
+    switch (event.key.toLowerCase()) {
+      case 'w':
+      case 'z':
+      case 'arrowup':
         activeMovements.up = active;
         return;
-      case 'ArrowDown':
-      case 'KeyS':
+      case 's':
+      case 'arrowdown':
         activeMovements.down = active;
         return;
-      case 'ArrowLeft':
-      case 'KeyA':
+      case 'a':
+      case 'q':
+      case 'arrowleft':
         activeMovements.left = active;
         return;
-      case 'ArrowRight':
-      case 'KeyD':
+      case 'd':
+      case 'arrowright':
         activeMovements.right = active;
         return;
-      case 'ShiftLeft':
-      case 'ShiftRight':
+      case 'shift':
         activeMovements.run = active;
         return;
-      case 'Space':
+      case ' ':
         activeMovements.jump = active;
         return;
     }

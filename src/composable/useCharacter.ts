@@ -30,7 +30,7 @@ export default function useCharacter(
 
     const isWalking = ref(false);
     const isIdle = ref(false);
-    const isDead = ref(false);
+    const isDead = ref(true);
     const isAttacking = ref(false);
     const isReceivingHit = ref(false);
 
@@ -39,7 +39,7 @@ export default function useCharacter(
     const resetActions = () => {
         isWalking.value = false;
         isIdle.value = false;
-        isDead.value = false;
+        isDead.value = true;
         isAttacking.value = false;
         isReceivingHit.value = false;
     }

@@ -2,7 +2,7 @@
   <primitive
       ref="enemyRef"
       :object="model"
-      :position="[0, 1.01, 0]"
+      :position="[0, -10, 0]"
   >
     <Html
       v-if="isSpawned"
@@ -57,7 +57,7 @@
   const isSpawned = ref(false);
   let isCrawling = false;
   let isFreezing = false;
-  let isDead = false;
+  let isDead = true;
 
   const soundActions = {
     hitReceived: sounds.createAudioPlayer(['zombieHitReceived1', 'zombieHitReceived2', 'zombieHitReceived3'], model, 1),
@@ -70,7 +70,6 @@
   })
 
   onMounted(() => {
-    setLayer(BattleLayersEnum.POOL)
   });
 
   onUnmounted(() => {
@@ -117,6 +116,7 @@
 
   const unspawnEnemy = () => {
 
+    if (isDead) return;
     isDead = true;
 
     gsap.to(enemyRef.value.scale, {
@@ -134,7 +134,6 @@
 
   const spawnEnemy = () => {
     isDead = false;
-    setLayer(BattleLayersEnum.ACTIVE)
 
     enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, EnemyTypeEnum.ZOMBIE);
     enemyRef.value.scale.set(0, 0, 0);
@@ -174,13 +173,11 @@
   }
 
   const reset = () => {
-    setLayer(BattleLayersEnum.POOL)
-
     isSpawned.value = false;
-    isDead = false;
+    isDead = true;
     isCrawling = false;
     isFreezing = false;
-    enemyRef.value.position.set(0, 1.01, 0);
+    enemyRef.value.position.set(0, -10, 0);
     enemyRef.value?.rotation.set(0, 0, 0);
   }
 
