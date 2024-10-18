@@ -156,6 +156,8 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
   }
 
   const unspawnEnemy = () => {
+
+    isDead.value = true;
     gsap.to(enemyRef.value.scale, {
       x: 0,
       y: 0,
@@ -170,6 +172,8 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
   }
 
   const spawnEnemy = () => {
+
+    isDead.value = false;
     setLayer(BattleLayersEnum.ACTIVE)
     spiderBallMesh.layers.set(BattleLayersEnum.ACTIVE)
 
@@ -330,7 +334,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
       setTimeout(() => {
         isAttackingByDistance.value = false;
-      }, props.config.attackDelayLongRange || 4000)
+      }, props.config?.attackDelayLongRange || 4000)
     }, attackDuration * 1000)
 
   }

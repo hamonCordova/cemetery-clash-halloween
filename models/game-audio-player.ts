@@ -1,5 +1,5 @@
 import {Audio} from "three/src/audio/Audio";
-import type {PositionalAudio} from "three";
+import {PositionalAudio} from "three";
 import {useGameState} from "@/composable/useGameState";
 
 export default class GameAudioPlayer {
@@ -23,7 +23,18 @@ export default class GameAudioPlayer {
         const audio = this.audios[Math.floor(Math.random() * this.audios.length)];
         if (!audio || audio.isPlaying) return;
 
-        audio.play();
+        if (audio instanceof PositionalAudio) {
+            const { x, y, z } = audio.position;
+
+            if (isFinite(x) && isFinite(y) && isFinite(z)) {
+                audio.play();
+            } else {
+                console.warn('Positional audio has an invalid position', audio.position);
+            }
+        } else {
+            audio.play();
+        }
+
         this.lastPlayedTime = now;
     }
 
@@ -40,9 +51,7 @@ export default class GameAudioPlayer {
 
         Object.keys(players).forEach(key => {
             const player = players[key];
-            if (typeof player === GameAudioPlayer) {
-                player.audios.forEach(audio => audio.stop());
-            }
+            player.audios.forEach(audio => audio.stop());
         })
     }
 }

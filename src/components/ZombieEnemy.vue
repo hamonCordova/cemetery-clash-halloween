@@ -115,6 +115,7 @@
   }
 
   const unspawnEnemy = () => {
+    isDead = true;
     gsap.to(enemyRef.value.scale, {
       x: 0,
       y: 0,
@@ -129,6 +130,7 @@
   }
 
   const spawnEnemy = () => {
+    isDead = false;
     setLayer(BattleLayersEnum.ACTIVE)
 
     enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, EnemyTypeEnum.ZOMBIE);

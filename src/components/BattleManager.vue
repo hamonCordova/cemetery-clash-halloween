@@ -345,39 +345,48 @@ import {ref, onMounted, markRaw, watch} from 'vue';
 
     const stages: RoundStage[] = [];
 
-    stages.push({
-      enemies: [
-        //createZombieEnemy(1.5, 1, 10),
-//        createSpiderEnemy(1, 3.5, 500, 300, 6.5),
-     //   createSlimeEnemy(0.5, 3.5, 1, 1000, 2500),
-        createSkeletonEnemy(1.5, 0.5, 2, 800),
-        createSkeletonEnemy(1.5, 2.5, 5, 2000),
-      ],
-    });
 
     stages.push({
       enemies: [
-        createZombieEnemy(1.5, 1),
-        /*createSkeletonEnemy(1, 2.5, 800),
-        createSkeletonEnemy(1, 2.5, 1000),
-        createSkeletonEnemy(1, 2.5, 1200),
-        createZombieEnemy(1.5, 1),*/
         createSlimeEnemy(0.5, 3.5, 1000),
-
-      //  createSkeletonEnemy(1, 2.5, 800),
-      //  createSpiderEnemy(1, 2.5, 1000),
-      //  createSpiderEnemy(1, 2.5, 1000),
-      //  createSpiderEnemy(1, 2.5, 1000),
-      //  createSpiderEnemy(1, 2.5, 1000),
-      ],
-    });
-
-    stages.push({
-      enemies: [
+        createSlimeEnemy(0.5, 3.5, 1500),
+        createSpiderEnemy(0.7, 3, 1000),
         createSkeletonEnemy(1, 2.5, 800),
-        createSlimeEnemy(0.5, 3.5, 1000),
-        createSpiderEnemy(1, 2.5, 1000),
         createZombieEnemy(1.5, 1),
+      ],
+    });
+
+
+
+    stages.push({
+      enemies: [
+        createSkeletonEnemy(1.5, 1.5, 3, 1200),
+        createSkeletonEnemy(1.5, 1.2, 5, 1700),
+      ],
+    });
+
+    stages.push({
+      enemies: [
+        createSpiderEnemy(1, 2.5, 2000, 1500, 5),
+        createSpiderEnemy(1, 2.5, 2000, 1200, 5),
+        createSkeletonEnemy(1.5, 1.5, 5, 1200),
+      ],
+    });
+
+    stages.push({
+      enemies: [
+        createSpiderEnemy(1, 2.5, 800, 600, 1.5),
+        createSkeletonEnemy(1.5, 1.5, 3, 1500),
+        createZombieEnemy(1.5, 1, 3),
+      ],
+    });
+
+
+    stages.push({
+      enemies: [
+        createSlimeEnemy(0.5, 4, 5, 1500, 3000),
+        createSkeletonEnemy(1.5, 2, 5, 1200),
+        createZombieEnemy(1.5, 1.6, 5),
       ],
     });
 

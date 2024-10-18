@@ -136,6 +136,7 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
   }
 
   const unspawnEnemy = () => {
+    isDead.value = true;
     gsap.to(enemyRef.value.scale, {
       x: 0,
       y: 0,
@@ -151,6 +152,8 @@ import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 
 
 const spawnEnemy = () => {
+
+    isDead.value = false;
     setLayer(BattleLayersEnum.ACTIVE)
 
     enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, EnemyTypeEnum.SKELETON);

@@ -145,6 +145,7 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
   };
 
   const unspawnEnemy = () => {
+    isDead.value = true;
     gsap.to(enemyRef.value.scale, {
       x: 0,
       y: 0,
@@ -159,6 +160,8 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
   }
 
   const spawnEnemy = () => {
+
+    isDead.value = false;
     setLayer(BattleLayersEnum.ACTIVE)
 
     enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, EnemyTypeEnum.SLIME);
@@ -349,7 +352,7 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
           // Reset enemy position or other logic after attack completes
           setTimeout(() => {
             isAttackingByDistance = false;
-          }, props.config.attackDelayLongRange || 4000);
+          }, props.config?.attackDelayLongRange || 4000);
         },
       });
 
