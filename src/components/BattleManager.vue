@@ -55,6 +55,7 @@ export interface Enemy {
   health: number; // Máximo 50
   spawnPosition: Vector3;
   attackDelay: number; // Em ms, mínimo 800
+  firstAttackDelay: number; // Em ms
   attackDelayLongRange?: number; // Em ms, mínimo 1000 - Apenas para spider e slime
   scale: number; // Para slimes mínimo de 0.3. Spider mínimo de 0.3. Skeleton mínimo de 0.5 (quanto menor, mais move speed precisa ter)
   isDead: boolean;
@@ -383,8 +384,8 @@ import {ref, onMounted, markRaw, watch} from 'vue';
 
     stages.push({
       enemies: [
-        createSkeletonEnemy(1.5, 1.5, 3, 1200),
-        createSkeletonEnemy(1.5, 1.2, 5, 1700),
+        createSkeletonEnemy(1.5, 1.5, 3, 1200, 500),
+        createSkeletonEnemy(1.5, 1.2, 5, 1700, 800),
       ],
     });
 
@@ -525,6 +526,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
       attackDelay: number,
       attackDelayLongRange: number,
       rotationSpeed: number,
+      firstAttackDelay: number = 500,
       isBoss = false
   ): Enemy => {
 
@@ -539,6 +541,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
       health: isBoss ? 80 : 40,
       attackDelay: attackDelay || 2000,
       attackDelayLongRange: attackDelayLongRange || 4000,
+      firstAttackDelay,
       scale,
       isDead: false,
       type: EnemyTypeEnum.SPIDER,
@@ -550,6 +553,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
       moveSpeed = 1.5,
       rotationSpeed = 3,
       attackDelay = 2000,
+      firstAttackDelay = 500,
       isBoss = false
   ): Enemy => {
 
@@ -563,6 +567,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
       damage: isBoss ? 15 : 10,
       health: isBoss ? 90 : 50,
       attackDelay,
+      firstAttackDelay,
       scale,
       isDead: false,
       type: EnemyTypeEnum.SKELETON,

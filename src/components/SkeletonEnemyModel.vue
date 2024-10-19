@@ -88,6 +88,7 @@ import GameAudioPlayer from "../../models/game-audio-player";
   const attackConfig = computed(() => {
     return {
       nextAttackDelay: props.config?.attackDelay || 2000,
+      firstAttackDelay: props.config?.firstAttackDelay || 500,
     }
   })
 
@@ -247,11 +248,9 @@ const spawnEnemy = () => {
 
       if (distanceToPlayer <= attackDistance) {
 
-        if (!isAttacking.value) {
+        attack(() => {
           soundActions.attack?.playRandom();
-        }
-
-        attack()
+        });
         stopWalk();
         followPlayerRotation(playerPos, delta);
         return;

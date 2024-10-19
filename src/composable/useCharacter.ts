@@ -12,7 +12,8 @@ interface CharacterActionsName {
 }
 
 interface CharacterAttackConfig {
-    nextAttackDelay: string;
+    nextAttackDelay: number;
+    firstAttackDelay: number;
 }
 
 interface CharacterEvents {
@@ -44,10 +45,17 @@ export default function useCharacter(
         isReceivingHit.value = false;
     }
 
-    const attack = () => {
+    const attack = (onAttack: () => void) => {
 
         if (isAttacking.value || isDead.value) return;
         isAttacking.value = true;
+
+        if (isWalking.value) {
+            _createNextAttackTimeout(toValue(attackConfig).firstAttackDelay || 500);
+            stopWalk()
+            idle();
+            return;
+        }
 
         if (nextAttackTimeout) {
             clearTimeout(nextAttackTimeout);
@@ -59,15 +67,20 @@ export default function useCharacter(
         attackAction.reset();
         attackAction.play();
         attackAction.crossFadeFrom(actions[isWalking.value ? actionsName.walk : actionsName.idle], 0.1);
+        if (onAttack) onAttack();
 
         setTimeout(() => {
             eventsCallbacks.finishAttack ? eventsCallbacks.finishAttack() : undefined;
             idle();
         }, attackActionDuration * 1000)
 
+        _createNextAttackTimeout(toValue(attackConfig).nextAttackDelay);
+    }
+
+    const _createNextAttackTimeout = (timeout: number) => {
         nextAttackTimeout = setTimeout(() => {
             isAttacking.value = false;
-        }, toValue(attackConfig).nextAttackDelay);
+        }, timeout);
     }
 
     const stopAttack = () => {

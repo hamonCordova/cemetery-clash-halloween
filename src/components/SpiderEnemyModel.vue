@@ -99,6 +99,7 @@ import GameAudioPlayer from "../../models/game-audio-player";
   const attackConfig = computed(() => {
     return {
       nextAttackDelay: props.config?.attackDelay || 2000,
+      firstAttackDelay: props.config?.firstAttackDelay || 500,
     }
   })
 
@@ -359,8 +360,9 @@ import GameAudioPlayer from "../../models/game-audio-player";
 
       if (distanceToPlayer <= attackDistance) {
         if (!isAttacking.value) {
-          soundActions.attack?.playRandom();
-          attack()
+          attack(() => {
+            soundActions.attack?.playRandom();
+          })
         }
 
         stopWalk();
