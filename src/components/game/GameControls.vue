@@ -5,7 +5,7 @@
       <button class="button button--jump"
               @touchstart="activeMovements.jump = true; $event.preventDefault(); $event.stopPropagation()"
               @touchend="activeMovements.jump = false; $event.stopPropagation()">
-        <img src="../../../static/img/arrow_n.svg" alt="Jump icon" />
+        <img src="/img/arrow_n.svg" alt="Jump icon" />
       </button>
       <button class="button button--attack"
               @touchstart="attack(); $event.preventDefault(); $event.stopPropagation()"

@@ -383,13 +383,13 @@
 
     gsap.to(textMesh.position, {
       y: textMesh.position.y + 2,
-      duration: 1,
+      duration: 2,
       ease: 'power1.out'
     });
 
     gsap.to(textMesh.material, {
       opacity: 0,
-      duration: 1,
+      duration: 2,
       ease: 'power1.out',
       onComplete: () => {
         scene.value.remove(textMesh);

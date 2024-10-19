@@ -26,7 +26,11 @@
       <GamePlayerStats v-if="gameState.isPlaying.value && !showingDeadPlayerScore" />
     </transition>
 
-    <GameControls />
+    <GameControls v-show="!showingDeadPlayerScore" />
+
+    <transition name="fade" :duration="1000" mode="out-in">
+      <GameControlsInstruction v-if="showingPlayerControlsInstruction" @finish="onFinishShowingControlsInstruction" />
+    </transition>
 
     <transition name="fade" :duration="500" mode="out-in">
       <GamePlayerDiedScore v-if="showingDeadPlayerScore" @restart="restart" />
@@ -58,6 +62,7 @@
   import {useSounds} from "@/composable/useSounds";
   import GameSoundStats from "@/components/game/GameSoundStats.vue";
   import GamePlayerDiedScore from "@/components/game/GamePlayerDiedScore.vue";
+  import GameControlsInstruction from "@/components/game/GameControlsInstruction.vue";
 
   const gameState = useGameState();
   const resources = useResources();
@@ -68,6 +73,7 @@
   const gameMenuRef = ref();
   const battleManagerRef = ref();
   const showingDeadPlayerScore = ref(false);
+  const showingPlayerControlsInstruction = ref(false);
   const isMobile = DocumentUtils.isMobile();
   let themeMusic;
 
@@ -119,9 +125,22 @@
       gameState.isPlaying.value = true;
     }, 1000)
 
+    if (isMobile) {
+      setTimeout(() => {
+        battleManagerRef.value.startRound();
+      }, withTimeout ? 3000 : 0)
+      return;
+    }
+
     setTimeout(() => {
-      battleManagerRef.value.startRound();
-    }, withTimeout ? 3000 : 0)
+      showingPlayerControlsInstruction.value = true;
+    }, 1000)
+
+  }
+
+  const onFinishShowingControlsInstruction = () => {
+    showingPlayerControlsInstruction.value = false;
+    battleManagerRef.value.startRound();
   }
 
   const onPlayerDied = () => {

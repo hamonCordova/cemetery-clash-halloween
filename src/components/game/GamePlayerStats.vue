@@ -47,7 +47,8 @@
   }
 
   .avatar-container {
-    width: 100px;
+    width: 50px;
+    min-width: 50px;
     background: #ee5e0a;
     border-radius: 5px;
     overflow: hidden;
@@ -73,7 +74,7 @@
 
   .player-name {
     color: #fff;
-    font-size: 20px;
+    font-size: 16px;
     font-family: "Metal Mania", system-ui;
     line-height: 0;
   }
@@ -106,6 +107,17 @@
     width: 100%;
     height: 100%;
     transition: width ease-out 105ms;
+  }
+
+  @media only screen and (min-width: 768px) {
+    .avatar-container {
+      width: 100px;
+    }
+
+    .player-name {
+      font-size: 20px;
+    }
+
   }
 
 </style>
