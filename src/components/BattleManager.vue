@@ -217,11 +217,11 @@ import {ref, onMounted, markRaw, watch} from 'vue';
     particlesGeometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
 
     const particlesMaterial = new PointsMaterial({
-      color: 0xff0000,
+      color: '#28A745',
       size: 0.15,
       blending: AdditiveBlending,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.7,
       depthWrite: false,
     });
 

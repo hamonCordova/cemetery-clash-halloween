@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
   import gsap from 'gsap'
-  import {onMounted, shallowRef} from "vue";
+  import {onMounted, shallowRef, watch} from "vue";
   import {useAnimations} from "@tresjs/cientos";
   import {SkeletonAnimationEnum} from "../../enum/skeleton-animation.enum";
   import {AnimationAction, MathUtils, Mesh, Quaternion, Vector3} from "three";
@@ -364,6 +364,13 @@
       ease: 'circ.in'
     });
   };
+
+  watch(() => playerState.health.value, (newHealth: number, oldHealth: number) => {
+    if (newHealth > oldHealth) {
+      const healthIncreased = newHealth - oldHealth;
+      console.warn(healthIncreased)
+    }
+  })
 
   defineExpose({
     restart

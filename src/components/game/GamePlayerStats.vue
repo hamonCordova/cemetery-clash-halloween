@@ -101,7 +101,7 @@
   }
 
   .health-progress-bar {
-    background: red;
+    background: #28A745;
     border-radius: 3px;
     width: 100%;
     height: 100%;

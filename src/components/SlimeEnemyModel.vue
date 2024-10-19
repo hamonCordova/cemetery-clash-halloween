@@ -386,12 +386,12 @@ import GameAudioPlayer from "../../models/game-audio-player";
     });
     const trailMesh = new Mesh(geometry, material);
 
+    trailMesh.renderOrder = 9999;
     trailMesh.position.copy(position);
     scene.value.add(trailMesh);
 
-    // Fade out and remove the trail mesh over time
     gsap.to(trailMesh.material, {
-      duration: 2,
+      duration: 1.5,
       opacity: 0,
       onComplete: () => {
         scene.value.remove(trailMesh);
