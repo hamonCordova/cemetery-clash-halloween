@@ -17,6 +17,7 @@
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
   import {useSounds} from "@/composable/useSounds";
   import {LoopOnce} from "three/src/constants";
+  import { Text } from 'troika-three-text';
 
   const resources = useResources();
   const {scene: model, animations} = resources.get('skeleton');
@@ -124,6 +125,7 @@
       newAnimation.crossFadeFrom(oldAnimation, duration, false);
     }
   };
+
 
   const die = () => {
     animate(SkeletonAnimationEnum.Death);
@@ -365,10 +367,43 @@
     });
   };
 
+  const createFloatingText = (textContent) => {
+    const textMesh = new Text();
+    textMesh.text = textContent;
+    textMesh.fontSize = 0.4;
+    textMesh.color = '#28A745';
+    textMesh.position.copy(playerModelRef.value.position.clone());
+    textMesh.position.y += 2;
+
+    textMesh.material.transparent = true;
+    textMesh.material.opacity = 1;
+
+    scene.value.add(textMesh);
+    textMesh.sync();
+
+    gsap.to(textMesh.position, {
+      y: textMesh.position.y + 2,
+      duration: 1,
+      ease: 'power1.out'
+    });
+
+    gsap.to(textMesh.material, {
+      opacity: 0,
+      duration: 1,
+      ease: 'power1.out',
+      onComplete: () => {
+        scene.value.remove(textMesh);
+        textMesh.dispose();
+      }
+    });
+  }
+
+
   watch(() => playerState.health.value, (newHealth: number, oldHealth: number) => {
     if (newHealth > oldHealth) {
       const healthIncreased = newHealth - oldHealth;
       console.warn(healthIncreased)
+      createFloatingText(`+${healthIncreased}`)
     }
   })
 

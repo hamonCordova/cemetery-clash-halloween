@@ -21,6 +21,7 @@
     "postprocessing": "^6.36.3",
     "prettier": "^3.3.3",
     "three": "^0.169.0",
+    "troika-three-text": "^0.50.1",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3"
   },
