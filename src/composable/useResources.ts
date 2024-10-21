@@ -247,6 +247,26 @@ export const useResources = createGlobalState(() => {
             type: 'AudioLoader'
         },
         {
+            name: 'round1',
+            path: '/sounds/voices/round_1.ogg',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'round2',
+            path: '/sounds/voices/round_2.ogg',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'round3',
+            path: '/sounds/voices/round_3.ogg',
+            type: 'AudioLoader'
+        },
+        {
+            name: 'finalRound',
+            path: '/sounds/voices/final_round.ogg',
+            type: 'AudioLoader'
+        },
+        {
             name: 'swordSwing1',
             path: '/sounds/sword-swing/sword_swing_1.wav',
             type: 'AudioLoader'

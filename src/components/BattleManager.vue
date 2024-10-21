@@ -80,6 +80,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
   import gsap from "gsap";
   import {useSounds} from "@/composable/useSounds";
   import {useGameState} from "@/composable/useGameState";
+import {useEventBus} from "@vueuse/core";
 
   const emit = defineEmits(['playerDied']);
 
@@ -97,6 +98,8 @@ import {ref, onMounted, markRaw, watch} from 'vue';
 
   const currentRound = ref<Round>();
   const currentStage = ref<RoundStage>();
+
+  const battleManagerEventBus =  useEventBus('battleManager');
 
   const arenaSize = 25;
   const minSpawnDistance = 4;
@@ -251,18 +254,24 @@ import {ref, onMounted, markRaw, watch} from 'vue';
   };
 
   const startRound = () => {
+
     if (currentRoundNum.value > rounds.value.length) {
       allRoundsCompleted();
+      battleManagerEventBus.emit('beforeBattleEnd');
       console.warn('all rounds completed')
       return;
     }
 
     currentRound.value = rounds.value[currentRoundNum.value - 1];
     currentStageNum.value = 1;
+    battleManagerEventBus.emit('stageChange', {stageNum: currentStageNum.value});
+    battleManagerEventBus.emit('roundChange', {roundNum: currentRoundNum.value});
 
     console.warn('currentRound', currentRound.value)
 
-    startStage();
+    setTimeout(() => {
+      startStage();
+    }, 4500)
   };
 
   const startStage = () => {
@@ -304,6 +313,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
     });
 
     console.warn('currentStage', currentStage.value)
+    battleManagerEventBus.emit('stageChange', {stageNum: currentStageNum.value});
     currentStage.value = stage;
   };
 
@@ -345,42 +355,6 @@ import {ref, onMounted, markRaw, watch} from 'vue';
   const getRound1 = (): Round => {
 
     const stages: RoundStage[] = [];
-/*
-    stages.push({
-      enemies: [
-        createSlimeEnemy(0.5, 3.5, 1000),
-      ],
-    });
-
-   stages.push({
-      enemies:[
-        createSlimeEnemy(0.5, 3.5, 1000),
-        createSlimeEnemy(0.5, 3.5, 1500),
-        createSpiderEnemy(0.7, 3, 1000),
-        createSkeletonEnemy(1, 2.5, 800),
-        createZombieEnemy(1.5, 1),
-      ]
-    })
-
-    stages.push({
-      enemies: [
-        createSlimeEnemy(0.5, 3.5, 1000),
-      ],
-    });
-
-    stages.push({
-      enemies: [
-        createSlimeEnemy(0.5, 3.5, 1000),
-      ],
-    });*/
-
-  /*  stages.push({
-      enemies: [
-        createSpiderEnemy(1, 2.5, 2000, 5000, 5),
-        createSpiderEnemy(1, 2.5, 2000, 5000, 5),
-        createSpiderEnemy(1, 2.5, 2000, 5000, 5),
-      ],
-    });*/
 
     stages.push({
       enemies: [
@@ -389,7 +363,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
       ],
     });
 
-    stages.push({
+  /*  stages.push({
       enemies: [
         createSpiderEnemy(1, 2.5, 2000, 1500, 5),
         createSpiderEnemy(1, 2.5, 2000, 1200, 5),
@@ -413,7 +387,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
         createZombieEnemy(1.5, 1.6, 5),
       ],
     });
-
+*/
     return { num: 1, stages };
   };
 
@@ -631,6 +605,8 @@ import {ref, onMounted, markRaw, watch} from 'vue';
   };
 
   const handleOnPlayerDie = () => {
+
+    battleManagerEventBus.emit('battleEnd');
 
     if (gameState.isSoundsEnabled.value) {
       setTimeout(() => {

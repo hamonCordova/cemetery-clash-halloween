@@ -39,7 +39,7 @@
   onMounted(() => {
     setTimeout(() => {
       emit('finish')
-    }, 5000)
+    }, 4000)
   })
 </script>
 
@@ -52,6 +52,7 @@
     align-items: center;
     position: fixed;
     bottom: 5vh;
+    user-select: none;
   }
 
   .wrapper {

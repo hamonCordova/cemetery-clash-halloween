@@ -17,6 +17,8 @@
     </TresCanvas>
 
     <GameSoundStats />
+    <GameControls v-show="!showingDeadPlayerScore" />
+    <GameRoundsState />
 
     <transition name="fade" :duration="1000" mode="out-in">
       <GameMenu v-if="isShowingMenu" ref="gameMenuRef" @startGame="startGame()" />
@@ -25,8 +27,6 @@
     <transition name="fade" :duration="500" mode="out-in">
       <GamePlayerStats v-if="gameState.isPlaying.value && !showingDeadPlayerScore" />
     </transition>
-
-    <GameControls v-show="!showingDeadPlayerScore" />
 
     <transition name="fade" :duration="1000" mode="out-in">
       <GameControlsInstruction v-if="showingPlayerControlsInstruction" @finish="onFinishShowingControlsInstruction" />
@@ -63,6 +63,7 @@
   import GameSoundStats from "@/components/game/GameSoundStats.vue";
   import GamePlayerDiedScore from "@/components/game/GamePlayerDiedScore.vue";
   import GameControlsInstruction from "@/components/game/GameControlsInstruction.vue";
+  import GameRoundsState from "@/components/game/GameRoundsState.vue";
 
   const gameState = useGameState();
   const resources = useResources();
