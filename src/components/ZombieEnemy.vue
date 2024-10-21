@@ -13,7 +13,7 @@
       :scale="[0.6, 0.6, 0.6]"
     >
     <div class="enemy-health" :class="{'enemy-health--dead': isDead || !isSpawned}">
-      <div class="enemy-health__progress" :style="{width: (enemyStoreInstance?.health || 0) + '%'}"></div>
+      <div class="enemy-health__progress" :style="{width: (((enemyStoreInstance?.health || 0) / props.config?.health) * 100) + '%'}"></div>
     </div>
     </Html>
   </primitive>
@@ -135,7 +135,7 @@
   const spawnEnemy = () => {
     isDead = false;
 
-    enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, EnemyTypeEnum.ZOMBIE);
+    enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, props.config?.health,  EnemyTypeEnum.ZOMBIE);
     enemyRef.value.scale.set(0, 0, 0);
     enemyRef.value.position.set(
         props.config?.spawnPosition.x,
@@ -314,8 +314,10 @@
       return;
     }
 
-    spawnEnemy();
-    listenEvents();
+    setTimeout(() => {
+      spawnEnemy();
+      listenEvents();
+    }, props.config?.spawnDelay || 0)
   })
 
   watch(() => playerState.isDead.value, (isPlayerDead: boolean) => {
@@ -345,6 +347,7 @@
   border-radius: 5px;
   height: 100%;
   width: 100%;
+  max-width: 100%;
   transition: width ease-in 120ms;
 }
 </style>

@@ -8,8 +8,8 @@ export const useEnemiesSpawned = createGlobalState(() => {
     const enemies = ref<Array<{ id: string, position: Vector3, health: number, type: EnemyTypeEnum }>>([]);
     const enemyEventBus = useEventBus('enemyEventBus');
 
-    const registerEnemy = (id: string, position: Vector3, type: EnemyTypeEnum) => {
-        enemies.value.push({ id, position, health: 100, type });
+    const registerEnemy = (id: string, position: Vector3, health: number, type: EnemyTypeEnum) => {
+        enemies.value.push({ id, position, health: health || 100, type });
     };
 
     const updateEnemyPosition = (id: string, position: Vector3) => {

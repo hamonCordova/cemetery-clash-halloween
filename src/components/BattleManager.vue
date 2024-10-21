@@ -358,36 +358,37 @@ import {useEventBus} from "@vueuse/core";
 
     stages.push({
       enemies: [
-        createSkeletonEnemy(1.5, 1.5, 3, 1200, 500),
-        createSkeletonEnemy(1.5, 1.2, 5, 1700, 800),
-      ],
-    });
-
-  /*  stages.push({
-      enemies: [
-        createSpiderEnemy(1, 2.5, 2000, 1500, 5),
-        createSpiderEnemy(1, 2.5, 2000, 1200, 5),
-        createSkeletonEnemy(1.5, 1.5, 5, 1200),
+        createSkeletonEnemy(1.5, 1.5, 3, 1200, 500, 10, 70),
+        createSkeletonEnemy(1.5, 1.2, 5, 1700, 800, 10, 100),
       ],
     });
 
     stages.push({
       enemies: [
-        createSpiderEnemy(1, 2.5, 800, 600, 1.5),
-        createSkeletonEnemy(1.5, 1.5, 3, 1500),
-        createZombieEnemy(1.5, 1, 3),
+        createSpiderEnemy(1, 2.5, 2000, 1300, 3, 50, 8, 100),
+        createSpiderEnemy(1, 2.5, 2000, 2800, 5, 800, 10, 80),
+        createSkeletonEnemy(1.5, 2, 5, 1200, 700, 8, 100),
+      ],
+    });
+
+    stages.push({
+      enemies: [
+        createSpiderEnemy(1, 2.5, 800, 1200, 3, 500, 10, 100),
+        createSkeletonEnemy(1.5, 1.8, 5, 1200, 500, 7, 100),
+        createZombieEnemy(1.5, 2, 3, 70),
       ],
     });
 
 
     stages.push({
       enemies: [
-        createSlimeEnemy(0.5, 4, 5, 1500, 3000),
-        createSkeletonEnemy(1.5, 2, 5, 1200),
-        createZombieEnemy(1.5, 1.6, 5),
+        createSpiderEnemy(1, 2.5, 2000, 1300, 3, 50, 8, 100),
+        createSkeletonEnemy(1.5, 1.8, 5, 1200, 500, 7, 80),
+        createZombieEnemy(1.5, 1.5, 3, 70),
+        createSlimeEnemy(0.5, 5, 5, 1500, 2000, 7, 100),
       ],
     });
-*/
+
     return { num: 1, stages };
   };
 
@@ -396,30 +397,47 @@ import {useEventBus} from "@vueuse/core";
 
     stages.push({
       enemies: [
-        createSlimeEnemy(0.5, 3.5, 1000),
-        createSlimeEnemy(0.5, 3.5, 1500),
-        createSpiderEnemy(0.7, 3, 1000),
-        createSkeletonEnemy(1, 2.5, 800),
-        createZombieEnemy(1.5, 1),
+        createZombieEnemy(1.5, 2.5, 5, 110),
+        createZombieEnemy(1.5, 1.5, 2.5, 120),
+        createSpiderEnemy(1, 2.5, 2000, 1500, 3, 250, 12, 100),
+        createSpiderEnemy(1, 2.5, 1500, 1300, 5, 400, 9, 70),
+        createSpiderEnemy(1, 2.5, 1500, 900, 5, 200, 7, 100, 5000),
       ],
     });
 
     stages.push({
       enemies: [
-        createSkeletonEnemy(0.7, 3.5, 1000),
-        createSkeletonEnemy(0.7, 3.5, 1000),
-        createSkeletonEnemy(0.7, 3.5, 1200),
-        createZombieEnemy(1.5, 1),
+        createZombieEnemy(1.5, 3, 5, 110),
+        createSkeletonEnemy(1.5, 2, 5, 1200, 400, 10, 130),
+        createSkeletonEnemy(1.5, 2.2, 5, 1200, 200, 7, 100),
+        createSlimeEnemy(0.5, 3, 5, 2000, 1500, 7, 100),
+
+        createZombieEnemy(1.5, 3, 5, 110, 8000),
+        createSlimeEnemy(0.5, 2, 5, 2000, 1500, 8, 100, 10000),
       ],
     });
 
     stages.push({
       enemies: [
-        createSpiderEnemy(2, 2, 800, true),
-        createSlimeEnemy(0.5, 3.5, 1000),
-        createSkeletonEnemy(1, 2.5, 800),
-        createZombieEnemy(1.5, 1),
-        createZombieEnemy(1.5, 1),
+        createZombieEnemy(1.5, 3.5, 5, 70),
+        createSkeletonEnemy(1.5, 1.8, 5, 1200, 400, 8, 130),
+
+        createZombieEnemy(1.5, 3, 5, 110, 6000),
+        createSkeletonEnemy(1.5, 2, 5, 1200, 400, 8, 110, 6000),
+        createSkeletonEnemy(1.5, 1.9, 5, 1200, 400, 8, 110, 10000),
+        createSlimeEnemy(0.5, 3, 5, 2000, 1500, 6, 100, 12000),
+      ],
+    });
+
+    stages.push({
+      enemies: [
+        createSpiderEnemy(2, 2.5, 2000, 2000, 1.5, 200, 13, 350),
+        createSpiderEnemy(1, 3, 1500, 1500, 5, 300, 8, 110),
+        createSlimeEnemy(0.5, 3, 5, 1500, 1500, 8, 100),
+
+        createSpiderEnemy(0.6, 4, 1100, 1100, 5, 400, 7, 100, 7000),
+        createSpiderEnemy(0.6, 4, 1100, 1100, 5, 400, 7, 100, 8500),
+        createSlimeEnemy(0.4, 2, 5, 1500, 1900, 8, 100, 9000),
       ],
     });
 
@@ -474,7 +492,9 @@ import {useEventBus} from "@vueuse/core";
       rotationSpeed: number = 2,
       attackDelay: number = 2000,
       attackDelayLongRange: number = 3000,
-      isBoss = false
+      damage: number = 10,
+      health: number = 50,
+      spawnDelay: number = 0,
   ): Enemy => {
 
     const spawnPosition = getStrategicPosition();
@@ -484,11 +504,12 @@ import {useEventBus} from "@vueuse/core";
       spawnPosition,
       moveSpeed,
       rotationSpeed,
-      damage: isBoss ? 15 : 10,
-      health: isBoss ? 70 : 30,
+      damage,
+      health,
       attackDelay: attackDelay || 2000,
       attackDelayLongRange: attackDelayLongRange || 3000,
       scale,
+      spawnDelay,
       isDead: false,
       type: EnemyTypeEnum.SLIME,
     };
@@ -499,9 +520,11 @@ import {useEventBus} from "@vueuse/core";
       moveSpeed: number,
       attackDelay: number,
       attackDelayLongRange: number,
-      rotationSpeed: number,
+      rotationSpeed: number = 2,
       firstAttackDelay: number = 500,
-      isBoss = false
+      damage: number = 10,
+      health: number = 50,
+      spawnDelay: number = 0
   ): Enemy => {
 
     const spawnPosition = getStrategicPosition();
@@ -510,12 +533,13 @@ import {useEventBus} from "@vueuse/core";
       enemyId: undefined,
       spawnPosition,
       moveSpeed,
-      rotationSpeed: rotationSpeed || 2,
-      damage: isBoss ? 15 : 10,
-      health: isBoss ? 80 : 40,
+      rotationSpeed: rotationSpeed,
+      damage,
+      health,
       attackDelay: attackDelay || 2000,
       attackDelayLongRange: attackDelayLongRange || 4000,
       firstAttackDelay,
+      spawnDelay,
       scale,
       isDead: false,
       type: EnemyTypeEnum.SPIDER,
@@ -528,7 +552,9 @@ import {useEventBus} from "@vueuse/core";
       rotationSpeed = 3,
       attackDelay = 2000,
       firstAttackDelay = 500,
-      isBoss = false
+      damage: number = 10,
+      health: number = 50,
+      spawnDelay: number = 0
   ): Enemy => {
 
     const spawnPosition = getStrategicPosition();
@@ -538,12 +564,13 @@ import {useEventBus} from "@vueuse/core";
       spawnPosition,
       moveSpeed: moveSpeed,
       rotationSpeed: rotationSpeed,
-      damage: isBoss ? 15 : 10,
-      health: isBoss ? 90 : 50,
+      damage,
+      health,
       attackDelay,
       firstAttackDelay,
       scale,
       isDead: false,
+      spawnDelay,
       type: EnemyTypeEnum.SKELETON,
     } as Enemy;
   };
@@ -551,7 +578,9 @@ import {useEventBus} from "@vueuse/core";
   const createZombieEnemy = (
       scale: number,
       moveSpeed: number = 2,
-      rotationSpeed = 5
+      rotationSpeed: number = 5,
+      health: number = 50,
+      spawnDelay: number = 0
   ): Enemy => {
 
     return {
@@ -560,9 +589,10 @@ import {useEventBus} from "@vueuse/core";
       moveSpeed,
       rotationSpeed,
       damage: 0,
-      health: 100,
+      health,
       attackDelay: 0,
       scale,
+      spawnDelay,
       isDead: false,
       type: EnemyTypeEnum.ZOMBIE,
     };
