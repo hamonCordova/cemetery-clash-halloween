@@ -73,7 +73,7 @@
         }
       });
     });
-    changeTopFencesOpacity(0.2);
+    changeTopFencesOpacity(0.06);
   });
 
   onLoop(() => {
