@@ -93,8 +93,8 @@ import {useEventBus} from "@vueuse/core";
   const playerCharacterRef = ref();
 
   const rounds = ref<Round[]>([]);
-  const currentRoundNum = ref<number>(3);
-  const currentStageNum = ref<number>(3);
+  const currentRoundNum = ref<number>(1);
+  const currentStageNum = ref<number>(1);
 
   const currentRound = ref<Round>();
   const currentStage = ref<RoundStage>();

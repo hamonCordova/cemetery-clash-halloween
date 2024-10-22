@@ -1,13 +1,4 @@
 <template>
-  <!-- Plano principal de 25x25 -->
-<!--
-  <TresMesh :rotate-x="Math.PI / 2" :position="[0, 0.01, 0]" receive-shadow>
-    <TresPlaneGeometry :args="[25, 25]" />
-    <TresMeshStandardMaterial color="#383f35" :side="DoubleSide" />
-  </TresMesh>
--->
-
-
   <!-- Fences on the left side (-X), spaced by 6 units -->
   <primitive :object="resources.get('fence').scene" :scale="[1.5, 1.5, 1.5]" :position="[-12.5, 0, 9]" :rotate-y="Math.PI / 2"></primitive>
   <primitive :object="resources.get('fence').scene" :scale="[1.5, 1.5, 1.5]" :position="[-12.5, 0, 3]" :rotate-y="Math.PI / 2"></primitive>
@@ -25,6 +16,12 @@
   <primitive :object="resources.get('fence').scene" :scale="[1.5, 1.5, 1.5]" :position="[12.5, 0, -3]" :rotate-y="Math.PI / 2"></primitive>
   <primitive :object="resources.get('fence').scene" :scale="[1.5, 1.5, 1.5]" :position="[12.5, 0, 3]" :rotate-y="Math.PI / 2"></primitive>
   <primitive :object="resources.get('fenceBroken').scene" :scale="[1.5, 1.5, 1.5]" :position="[12.5, 0, 9]" :rotate-y="Math.PI / 2"></primitive>
+
+  <!-- Fences on the top (+Z), spaced by 6 units -->
+  <primitive :ref="(ref) => topFencesRefs.push(ref)" :object="resources.get('fence', 1).scene" :scale="[1.5, 1.5, 1.5]" :position="[-9, 0, 12.5]"></primitive>
+  <primitive :ref="(ref) => topFencesRefs.push(ref)" :object="resources.get('fence', 1).scene" :scale="[1.5, 1.5, 1.5]" :position="[-3, 0, 12.5]"></primitive>
+  <primitive :ref="(ref) => topFencesRefs.push(ref)" :object="resources.get('fenceBroken', 1).scene" :scale="[1.5, 1.5, 1.5]" :position="[3, 0, 12.5]"></primitive>
+  <primitive :ref="(ref) => topFencesRefs.push(ref)" :object="resources.get('fence', 1).scene" :scale="[1.5, 1.5, 1.5]" :position="[9, 0, 12.5]"></primitive>
 
   <!-- Distributed rocks (rockPathThin and rockPathSmall), much more -->
   <primitive :object="resources.get('rockPathThin').scene" :scale="[1.5, 1.5, 1.5]" :position="[-10, 0, 5]" :rotate-y="Math.PI / 2"></primitive>
@@ -55,10 +52,42 @@
 </template>
 
 <script setup lang="ts">
-import {useResources} from "@/composable/useResources";
-import {DoubleSide, RepeatWrapping, SRGBColorSpace} from "three";
-import {useTexture} from "@tresjs/core";
-import Pumpkin from "@/components/objects/Pumpkin.vue";
+  import { useResources } from "@/composable/useResources";
+  import { onMounted, ref } from "vue";
+  import { useRenderLoop, useTresContext } from "@tresjs/core";
+  import { MathUtils, Vector3 } from "three";
 
-const resources = useResources();
+  const resources = useResources();
+  const topFencesRefs = ref<any[]>([]);
+  const topFencesMaterials = ref<any[]>([]);
+  const { onLoop } = useRenderLoop();
+  const { camera } = useTresContext();
+
+  onMounted(() => {
+    topFencesRefs.value.forEach(fence => {
+      fence.traverse(obj => {
+        if (obj.isMesh) {
+          obj.material = obj.material.clone();
+          obj.material.transparent = true;
+          topFencesMaterials.value.push(obj.material);
+        }
+      });
+    });
+    changeTopFencesOpacity(0.2);
+  });
+
+  onLoop(() => {
+ /*   const distance = camera.value?.position.distanceTo(new Vector3(0, 0, 12.5));
+
+    if (distance > 6) {
+      const opacity = MathUtils.clamp(6 / distance, 0.03, 1);
+      changeTopFencesOpacity(opacity);
+    }*/
+  });
+
+  const changeTopFencesOpacity = (opacity = 1) => {
+    topFencesMaterials.value.forEach(material => {
+      material.opacity = opacity;
+    });
+  };
 </script>

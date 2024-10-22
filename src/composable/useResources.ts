@@ -543,8 +543,8 @@ export const useResources = createGlobalState(() => {
             scene.traverse((obj) => {
                 if (obj.isMesh) {
                     obj.material = obj.material.clone();
-                    obj.material.transparent = true;
                     if (opacity) {
+                        obj.material.transparent = true;
                         obj.material.opacity = opacity;
                     }
                 }

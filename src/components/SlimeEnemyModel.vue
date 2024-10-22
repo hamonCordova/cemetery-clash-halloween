@@ -45,6 +45,7 @@ import {computed, onMounted, ref, shallowRef, watch} from 'vue';
   import {useSounds} from "@/composable/useSounds";
   import {BattleLayersEnum} from "../../enum/battle-layers.enum";
 import GameAudioPlayer from "../../models/game-audio-player";
+import {throttle} from "@/utils/timeout-utils";
 
   const emit = defineEmits(['die']);
   const props = defineProps({
@@ -372,8 +373,7 @@ import GameAudioPlayer from "../../models/game-audio-player";
     }, attackDuration * 1000);
   };
 
-  function createTrailEffect(position: Vector3) {
-    // Create a simple green sphere at the given position
+  const createTrailEffect = throttle((position: Vector3) => {
     const geometry = new SphereGeometry(0.5, 8, 8); // Adjust size as needed
     const material = new MeshBasicMaterial({
       color: 0x00ff00,
@@ -396,7 +396,7 @@ import GameAudioPlayer from "../../models/game-audio-player";
         trailMesh.material.dispose();
       },
     });
-  }
+  }, 50);
 
   const moveTowardsPlayer = (delta: number) => {
     if (isDead.value) return;
