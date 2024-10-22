@@ -19,8 +19,8 @@
 
   <!-- Fences on the top (+Z), spaced by 6 units -->
   <primitive :ref="(ref) => topFencesRefs.push(ref)" :object="resources.get('fence', 1).scene" :scale="[1.5, 1.5, 1.5]" :position="[-9, 0, 12.5]"></primitive>
-  <primitive :ref="(ref) => topFencesRefs.push(ref)" :object="resources.get('fence', 1).scene" :scale="[1.5, 1.5, 1.5]" :position="[-3, 0, 12.5]"></primitive>
   <primitive :ref="(ref) => topFencesRefs.push(ref)" :object="resources.get('fenceBroken', 1).scene" :scale="[1.5, 1.5, 1.5]" :position="[3, 0, 12.5]"></primitive>
+  <primitive :ref="(ref) => topFencesRefs.push(ref)" :object="resources.get('fence', 1).scene" :scale="[1.5, 1.5, 1.5]" :position="[-3, 0, 12.5]"></primitive>
   <primitive :ref="(ref) => topFencesRefs.push(ref)" :object="resources.get('fence', 1).scene" :scale="[1.5, 1.5, 1.5]" :position="[9, 0, 12.5]"></primitive>
 
   <!-- Distributed rocks (rockPathThin and rockPathSmall), much more -->
@@ -73,16 +73,16 @@
         }
       });
     });
-    changeTopFencesOpacity(0.06);
+    changeTopFencesOpacity(0.09);
   });
 
   onLoop(() => {
- /*   const distance = camera.value?.position.distanceTo(new Vector3(0, 0, 12.5));
+   const distance = camera.value?.position.distanceTo(new Vector3(0, 0, 12.5));
 
     if (distance > 6) {
-      const opacity = MathUtils.clamp(6 / distance, 0.03, 1);
+      const opacity = MathUtils.clamp(6 / distance, 0.06, 1);
       changeTopFencesOpacity(opacity);
-    }*/
+    }
   });
 
   const changeTopFencesOpacity = (opacity = 1) => {

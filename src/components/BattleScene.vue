@@ -7,6 +7,9 @@
   <TresPointLight v-if="isMobile" :color="'#c74902'" :intensity="20" :distance="20" :decay="0.3" :power="300" :position="[12, 2, -16]" cast-shadow :mapSize="[256, 256]" />
   <TresPointLight v-if="isMobile" :color="'#c74902'" :intensity="20" :distance="20" :decay="0.3" :power="300" :position="[26, 1.6, 2]"  cast-shadow :mapSize="[256, 256]" />
   <TresPointLight v-if="isMobile" :color="'#6f0eff'" :intensity="2" :distance="5" :decay="0.3" :power="100" :position="[-8, 2, -16]"  cast-shadow :mapSize="[256, 256]" />
+
+  <TresPointLight v-if="isMobile" :color="'#6f0eff'" :intensity="2.5" :distance="13" :decay="0.35" :power="100" :position="[-0.5, 2, 25]"  cast-shadow :mapSize="[256, 256]" />
+
   <TresPointLight v-if="isMobile" :color="'#d67a26'" :intensity="20" :distance="20" :decay="0.3" :power="300" :position="[-19, 2, -18]"  cast-shadow :mapSize="[256, 256]" />
   <TresHemisphereLight v-if="isMobile" :args="['#6f0eff', '#d67a26', 1]" />
   <TresAmbientLight v-if="isMobile" :intensity="0.4" />
@@ -144,6 +147,17 @@
   <primitive :object="resources.get('grave').scene" :scale="[0.8, 0.8, 0.8]" :position="[27, 0, 11]" :rotation="[0, 0.3, 0]"></primitive>
   <primitive :object="resources.get('skull').scene" :scale="[0.6, 0.6, 0.6]" :position="[18, 0, 6]" :rotation="[0, -0.2, 0]"></primitive>
   <Lantern :render-light="!isMobile" :position="[26, 0, 2]" />
+
+  <!--Front-->
+  <Pumpkin :render-light="!isMobile" :position="[-11.5, 0.65, 14]" :rotation="[0, -2.9, 0]" />
+  <primitive :object="resources.get('damagedGrave', 0.2).scene" :scale="[0.8, 0.8, 0.8]" :position="[-5.5, -0.35, 18]" :rotation="[0, -0.4, 0]"></primitive>
+  <primitive :object="resources.get('damagedGrave', 0.2).scene" :scale="[0.7, 0.7, 0.7]" :position="[-4, -0.25, 17]" :rotation="[0, 0.5, 0]"></primitive>
+  <primitive :object="resources.get('damagedGrave', 0.2).scene" :scale="[0.7, 0.7, 0.7]" :position="[2, -0.25, 18]" :rotation="[0, -0.5, 0]"></primitive>
+  <primitive :object="resources.get('gravestone', 0.2).scene" :scale="[0.8, 0.8, 0.8]" :position="[7, -0.3, 16]" :rotation="[0, -0.2, 0]"></primitive>
+  <primitive :object="resources.get('skull', 0.2).scene" :scale="[0.6, 0.6, 0.6]" :position="[9, 0, 18]" :rotation="[0, -0.4, 0]"></primitive>
+  <primitive :object="resources.get('graveMarker', 0.2).scene" :scale="[0.9, 0.9, 0.9]" :position="[-6, 0, 16]" :rotation="[0, -0.4, 0]"></primitive>
+  <primitive :object="resources.get('graveMarker', 0.2).scene" :scale="[0.9, 0.9, 0.9]" :position="[5, 0, 17]" :rotation="[0, -0.4, 0]"></primitive>
+
 
   <BattleRing />
 

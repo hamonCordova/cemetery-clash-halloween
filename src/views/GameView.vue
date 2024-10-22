@@ -29,7 +29,7 @@
     </transition>
 
     <transition name="fade" :duration="1000" mode="out-in">
-      <GameControlsInstruction v-if="showingPlayerControlsInstruction" @finish="onFinishShowingControlsInstruction" />
+      <GameControlsInstruction v-if="showingPlayerControlsInstruction" />
     </transition>
 
     <transition name="fade" :duration="500" mode="out-in">
@@ -121,7 +121,7 @@
     }
 
     isShowingMenu.value = false;
-    DocumentUtils.enterFullScreen();
+    //DocumentUtils.enterFullScreen();
 
     setTimeout(() => {
       gameState.isPlaying.value = true;
@@ -130,19 +130,23 @@
     if (isMobile) {
       setTimeout(() => {
         battleManagerRef.value.startRound();
-      }, withTimeout ? 4000 : 0)
+      }, withTimeout ? 7000 : 0)
       return;
     }
 
     setTimeout(() => {
       showingPlayerControlsInstruction.value = true;
+
+      setTimeout(() => {
+        battleManagerRef.value.startRound();
+      }, 6000)
+
+      setTimeout(() => {
+        showingPlayerControlsInstruction.value = false;
+      }, 11000)
+
     }, 1000)
 
-  }
-
-  const onFinishShowingControlsInstruction = () => {
-    showingPlayerControlsInstruction.value = false;
-    battleManagerRef.value.startRound();
   }
 
   const onPlayerDied = () => {
@@ -155,9 +159,7 @@
   }
 
   watch(() => gameState.isSoundsEnabled.value, () => {
-    console.warn('change audio state')
     if (!themeMusic) return
-
     gameState.isSoundsEnabled.value ? themeMusic.play() : themeMusic.stop();
   })
 

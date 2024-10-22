@@ -272,7 +272,7 @@
       const targetRotationY = Math.atan2(direction.x, direction.z);
       const currentQuaternion = playerModelRef.value.quaternion.clone();
       const targetQuaternion = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), targetRotationY);
-      currentQuaternion.rotateTowards(targetQuaternion, delta * 10);
+      currentQuaternion.rotateTowards(targetQuaternion, delta * (activeMovements.usingJoystick ? 8 : 10));
       playerModelRef.value.quaternion.copy(currentQuaternion);
 
 
@@ -307,9 +307,7 @@
 
     const enemies = enemiesState.enemies.value;
 
-
-    // TODO old angle = 45
-    const attackAngle = Math.cos(65 * (Math.PI / 180)); // 65 degrees
+    const attackAngle = Math.cos(65 * (Math.PI / 180));
 
     enemies.forEach((enemy) => {
       const enemyPos = enemy.position;
@@ -402,7 +400,6 @@
   watch(() => playerState.health.value, (newHealth: number, oldHealth: number) => {
     if (newHealth > oldHealth) {
       const healthIncreased = newHealth - oldHealth;
-      console.warn(healthIncreased)
       createFloatingText(`+${healthIncreased}`)
     }
   })

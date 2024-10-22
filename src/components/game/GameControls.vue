@@ -37,7 +37,7 @@
         mode: 'static',
         position: { left: '50%', top: '50%' },
         color: '#c9c3b2',
-        threshold: 0.25,
+        threshold: 0.35,
         fadeTime: 400,
         maxNumberOfNipples: 1,
       });
@@ -116,8 +116,8 @@
 
     const radianAngle = angle.radian - Math.PI / 2;
 
-    const movementX = -Math.sin(radianAngle) * (distance / 100);
-    const movementZ = -Math.cos(radianAngle) * (distance / 100);
+    const movementX = -Math.sin(radianAngle) * (distance / 150);
+    const movementZ = -Math.cos(radianAngle) * (distance / 150);
 
     activeMovements.run = true;
     activeMovements.joystickMovement = new Vector3(movementX, 0, movementZ);

@@ -32,15 +32,6 @@
 </template>
 
 <script setup lang="ts">
-  import {onMounted} from "vue";
-
-  const emit = defineEmits(['finish'])
-
-  onMounted(() => {
-    setTimeout(() => {
-      emit('finish')
-    }, 4000)
-  })
 </script>
 
 <style scoped>
