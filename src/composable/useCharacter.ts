@@ -154,8 +154,8 @@ export default function useCharacter(
             gsap.to(
                 toValue(characterRef).position,
                 {
-                    y: -3,
-                    duration: 2.2,
+                    y: -10,
+                    duration: 4,
                     ease: 'power2.in',
                     onComplete: () => {
                         dieAction.reset();

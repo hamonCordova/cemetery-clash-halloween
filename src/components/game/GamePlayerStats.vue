@@ -42,7 +42,7 @@
     background: rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(5px);
     padding: 5px;
-    box-shadow: 0 0 2px 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 15px 5px rgba(0, 0, 0, 0.3);
     user-select: none;
   }
 

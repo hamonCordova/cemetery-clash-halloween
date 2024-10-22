@@ -93,8 +93,8 @@ import {useEventBus} from "@vueuse/core";
   const playerCharacterRef = ref();
 
   const rounds = ref<Round[]>([]);
-  const currentRoundNum = ref<number>(1);
-  const currentStageNum = ref<number>(1);
+  const currentRoundNum = ref<number>(3);
+  const currentStageNum = ref<number>(3);
 
   const currentRound = ref<Round>();
   const currentStage = ref<RoundStage>();
@@ -109,6 +109,7 @@ import {useEventBus} from "@vueuse/core";
   const activeHealthParticles = [];
 
   const spiderEnemiesIdPool = [
+      generateUUID(),
       generateUUID(),
       generateUUID(),
       generateUUID(),
@@ -128,6 +129,7 @@ import {useEventBus} from "@vueuse/core";
   ]
 
   const slimeEnemiesIdPool = [
+    generateUUID(),
     generateUUID(),
     generateUUID(),
     generateUUID(),
@@ -179,7 +181,6 @@ import {useEventBus} from "@vueuse/core";
         if (distanceSquared <= 0.5) {
           particlesReached[index] = true;
 
-          // Visually remove particle
           positions[j] = 9999;
           positions[j + 1] = 9999;
           positions[j + 2] = 9999;
@@ -194,14 +195,16 @@ import {useEventBus} from "@vueuse/core";
         scene.value.remove(particles);
         particles.geometry.dispose();
         particles.material.dispose();
+
+        const healthAmount = activeHealthParticles[i]?.health || 10;
         activeHealthParticles.splice(i, 1);
 
-        playerState.increaseHealth(10);
+        playerState.increaseHealth(healthAmount);
       }
     }
   });
 
-  const spawnHealthParticles = (startPosition: Vector3) => {
+  const spawnHealthParticles = (startPosition: Vector3, health = 10) => {
 
     if (playerState.isDead.value) {
       return
@@ -242,7 +245,7 @@ import {useEventBus} from "@vueuse/core";
       });
     }
 
-    activeHealthParticles.push({ particles, individualOffsets, particlesReached });
+    activeHealthParticles.push({ particles, individualOffsets, particlesReached, health });
   };
 
   const createRounds = () => {
@@ -326,7 +329,7 @@ import {useEventBus} from "@vueuse/core";
 
     if (enemyIndex > -1) {
       if (position) {
-        spawnHealthParticles(position);
+        spawnHealthParticles(position, currentStage.value?.enemies[enemyIndex]?.health > 300 ? 30 : 10);
       }
 
       currentStage.value?.enemies.splice(enemyIndex, 1);
@@ -449,37 +452,45 @@ import {useEventBus} from "@vueuse/core";
 
     stages.push({
       enemies: [
-        createSlimeEnemy(0.5, 4, 800),
-        createSlimeEnemy(0.5, 4, 1000),
-        createSlimeEnemy(0.5, 4, 1200),
-        createSkeletonEnemy(0.7, 4.5, 800),
-        createSkeletonEnemy(0.7, 4.5, 1000),
-        createSkeletonEnemy(0.7, 4.5, 1200),
-        createZombieEnemy(1.5, 1),
-        createZombieEnemy(1.5, 1),
+        createSlimeEnemy(0.5, 4, 800, 2000, 2000, 8, 150),
+        createSlimeEnemy(0.5, 4, 800, 2000, 1500, 7, 130),
+        createSkeletonEnemy(1.5, 2, 5, 2000, 300, 6, 110),
+        createSkeletonEnemy(1.5, 2.5, 5, 2000, 500, 6, 120),
+        createSkeletonEnemy(1.5, 3.5, 3, 1200, 700, 8, 140),
+        createZombieEnemy(1.5, 1.5, 5, 150),
+        createZombieEnemy(1.5, 3.5, 5, 130, 7000),
       ],
     });
 
     stages.push({
       enemies: [
-        createSkeletonEnemy(1.5, 2, 800, true),
-        createSkeletonEnemy(0.7, 4.5, 800),
-        createSlimeEnemy(0.5, 4, 1000),
-        createZombieEnemy(1.5, 1),
-        createZombieEnemy(1.5, 1),
+        createSlimeEnemy(0.5, 5, 800, 2200, 2000, 8, 150),
+        createSlimeEnemy(0.5, 4, 800, 1700, 1700, 7, 130),
+        createSlimeEnemy(0.5, 3, 800, 1600, 1000, 6, 170),
+        createZombieEnemy(1.5, 3.3, 5, 110, 6000),
+        createZombieEnemy(1.5, 4.2, 5, 110, 9000),
+        createSkeletonEnemy(1.5, 2.5, 12, 2000, 300, 7, 100, 10000),
+        createSkeletonEnemy(1.5, 2.5, 12, 2000, 300, 7, 100, 13000),
+        createSpiderEnemy(0.8, 3.5, 1200, 1200, 2, 800, 7, 70,22000),
+        createSpiderEnemy(0.8, 3.5, 1200, 1000, 2, 800, 7, 70, 25000),
+        createZombieEnemy(1.5, 4, 5, 80, 30000),
       ],
     });
 
     stages.push({
       enemies: [
-        createSpiderEnemy(2, 2, 800, true),
-        createSkeletonEnemy(1, 2.5, 800),
-        createSkeletonEnemy(0.7, 4.5, 1000),
-        createSlimeEnemy(0.5, 4, 800),
-        createSlimeEnemy(0.5, 4, 1200),
-        createZombieEnemy(1.5, 1),
-        createZombieEnemy(1.5, 1),
-        createZombieEnemy(1.5, 1),
+        createSpiderEnemy(0.8, 3.5, 1200, 1300, 2, 800, 9, 120),
+        createSpiderEnemy(1.2, 3.5, 1500, 1500, 2, 800, 13, 160),
+        createSkeletonEnemy(1.5, 2.5, 12, 1500, 300, 7, 100),
+        createZombieEnemy(1.5, 3, 5, 100),
+        createSlimeEnemy(0.5, 2, 800, 2000, 1000, 5, 100),
+        createSlimeEnemy(0.5, 2, 800, 2000, 1000, 5, 100, 12000),
+        createZombieEnemy(1.5, 3.5, 5, 110, 12000),
+        createSpiderEnemy(0.8, 3.5, 1200, 1500, 2, 800, 7, 90, 20000),
+        createSpiderEnemy(0.8, 3.5, 1700, 1000, 2, 800, 9, 110, 20000),
+        createSlimeEnemy(0.5, 2, 800, 2000, 1200, 7, 100, 26000),
+        createSkeletonEnemy(1.5, 2.8, 12, 1400, 300, 6, 110, 27000),
+        createSkeletonEnemy(1.5, 3.5, 12, 1600, 350, 8, 80, 27000),
       ],
     });
 

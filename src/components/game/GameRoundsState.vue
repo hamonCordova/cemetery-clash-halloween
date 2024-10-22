@@ -13,12 +13,14 @@
   import {useGameState} from "@/composable/useGameState";
   import gsap from "gsap";
   import {useSounds} from "@/composable/useSounds";
+  import {DocumentUtils} from "@/utils/document-utils";
 
   const battleManagerEventBus =  useEventBus('battleManager');
   const gameState = useGameState();
   const isVisible = ref(false);
   const currentRound = ref(0);
   const currentStage = ref(0);
+  const isMobile = DocumentUtils.isMobile();
   const sounds = useSounds();
   const roundSounds = {
     round1: sounds.getAudio('round1'),
@@ -63,12 +65,14 @@
           });
 
           gsapTimeline.to(roundRef.value, {
-            fontSize: '80px',
-            left: 'calc(50% - 130px)',
+            fontSize: isMobile ? '60px' : '80px',
+            left: isMobile ? 'calc(50% - 90px)' : 'calc(50% - 130px)',
             top: '20%',
             ease: 'power2.in',
             duration:  0.7,
             onComplete() {
+
+              if (!gameState.isSoundsEnabled.value) return
 
               if (!isFinalRound.value) {
                 roundSounds[`round${currentRound.value}`]?.play();
@@ -83,7 +87,7 @@
           gsapTimeline.to(roundRef.value, {
             fontSize: '25px',
             left: '10px',
-            top: '70px',
+            top: isMobile ? '60px' : '65px',
             ease: 'power2.out',
             duration:  0.6,
             delay: 2
@@ -105,7 +109,7 @@
 
   .container {
     position: fixed;
-    top: 50px;
+    top: 40px;
     left: 10px;
     user-select: none;
   }
@@ -113,7 +117,7 @@
   .round {
     font-size: 25px;
     left: 10px;
-    top: 70px;
+    top: 40px;
     position: fixed;
     color: #ee5e0a;
     font-family: "Metal Mania", system-ui;
@@ -127,7 +131,7 @@
 
   .round-stage {
     position: fixed;
-    top: 103px;
+    top: 97px;
     color: #fff;
     font-weight: normal;
     font-size: 14px;

@@ -121,6 +121,7 @@
     }
 
     isShowingMenu.value = false;
+    DocumentUtils.enterFullScreen();
 
     setTimeout(() => {
       gameState.isPlaying.value = true;
@@ -129,7 +130,7 @@
     if (isMobile) {
       setTimeout(() => {
         battleManagerRef.value.startRound();
-      }, withTimeout ? 3000 : 0)
+      }, withTimeout ? 4000 : 0)
       return;
     }
 
