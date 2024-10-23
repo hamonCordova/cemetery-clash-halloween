@@ -318,7 +318,6 @@
       const distance = playerPos.distanceTo(enemyPos);
 
       if (distance > attackRange) {
-        console.warn('enemy out of range')
         return; // Enemy is out of range
       }
 
@@ -331,7 +330,6 @@
       if (dot > attackAngle) {
         // Enemy is within 45 degrees in front of player
         // Attack hits
-        console.warn('enemy hit')
         enemiesState.damageEnemy(enemy.id, 30);
       }
     });

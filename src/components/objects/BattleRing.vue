@@ -63,6 +63,9 @@
   const { onLoop } = useRenderLoop();
   const { camera } = useTresContext();
 
+  let lastOpacity = 1;
+  const opacityChangeThreshold = 0.05;
+
   onMounted(() => {
     topFencesRefs.value.forEach(fence => {
       fence.traverse(obj => {
@@ -73,11 +76,12 @@
         }
       });
     });
+    lastOpacity = 0.09;
     changeTopFencesOpacity(0.09);
   });
 
   onLoop(() => {
-   const distance = camera.value?.position.distanceTo(new Vector3(0, 0, 12.5));
+    const distance = camera.value?.position.distanceTo(new Vector3(0, 0, 12.5));
 
     if (distance > 6) {
       const opacity = MathUtils.clamp(6 / distance, 0.06, 1);
@@ -86,8 +90,15 @@
   });
 
   const changeTopFencesOpacity = (opacity = 1) => {
+
+    if (Math.abs(opacity - lastOpacity) < opacityChangeThreshold) {
+      return;
+    }
+
+    lastOpacity = opacity;
     topFencesMaterials.value.forEach(material => {
       material.opacity = opacity;
     });
+
   };
 </script>
