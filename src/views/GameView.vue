@@ -16,7 +16,7 @@
       </Suspense>
     </TresCanvas>
 
-    <GameSoundStats />
+    <GamePreferencesStats />
     <GameControls v-show="!showingDeadPlayerScore" />
     <GameRoundsState />
 
@@ -50,7 +50,7 @@
   import {StatsGl, Stars, OrbitControls} from "@tresjs/cientos";
   import BattleScene from "@/components/BattleScene.vue";
   import BattleManager from "@/components/BattleManager.vue";
-  import {computed, ref, watch} from "vue";
+  import {computed, onMounted, ref, watch} from "vue";
   import {useResources} from "@/composable/useResources";
   import GameLoader from "@/components/game/GameLoader.vue";
   import {useGameState} from "@/composable/useGameState";
@@ -60,7 +60,7 @@
   import GameMenu from "@/components/game/GameMenu.vue";
   import GamePlayerStats from "@/components/game/GamePlayerStats.vue";
   import {useSounds} from "@/composable/useSounds";
-  import GameSoundStats from "@/components/game/GameSoundStats.vue";
+  import GamePreferencesStats from "@/components/game/GamePreferencesStats.vue";
   import GamePlayerDiedScore from "@/components/game/GamePlayerDiedScore.vue";
   import GameControlsInstruction from "@/components/game/GameControlsInstruction.vue";
   import GameRoundsState from "@/components/game/GameRoundsState.vue";
@@ -96,6 +96,12 @@
     return gameState.mode.value === GameStateModeEnum.DEV_SCENARIO
   })
 
+  onMounted(() => {
+    document.addEventListener('contextmenu', function(event) {
+      event.preventDefault();
+    });
+  })
+
   const showIntro = () => {
     isLoading.value = false;
 
@@ -121,7 +127,6 @@
     }
 
     isShowingMenu.value = false;
-    //DocumentUtils.enterFullScreen();
 
     setTimeout(() => {
       gameState.isPlaying.value = true;
