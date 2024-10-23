@@ -4,25 +4,23 @@
       :object="model"
       :position="[0, -10, 0]"
   >
-    <Html
-      v-if="isSpawned"
-      center
-      transform
-      :distance-factor="4"
-      :position="[0, 0.7, 0.4]"
-      :scale="[0.6, 0.6, 0.6]"
-    >
-    <div class="enemy-health" :class="{'enemy-health--dead': isDead || !isSpawned}">
-      <div class="enemy-health__progress" :style="{width: (((enemyStoreInstance?.health || 0) / props.config?.health) * 100) + '%'}"></div>
-    </div>
-    </Html>
+    <TresGroup :scale="[1, 1, 1]" :position="[0, 0.7, 0.4]" v-if="!isDead && isSpawned">
+      <TresMesh>
+        <TresPlaneGeometry :args="[0.4, 0.02, 1]"  />
+        <TresMeshBasicMaterial color="gray" :side="DoubleSide" :transparent="true" :opacity="0.6" />
+      </TresMesh>
+      <TresMesh ref="healthBarRef" :position-z="0.001">
+        <TresPlaneGeometry :args="[0.4, 0.02, 1]"  />
+        <TresMeshBasicMaterial color="red" :side="DoubleSide" />
+      </TresMesh>
+    </TresGroup>
   </primitive>
 </template>
 
 <script setup lang="ts">
   import {computed, onMounted, onUnmounted, shallowRef, watch, ref} from 'vue';
   import {Html, useAnimations} from '@tresjs/cientos';
-  import {Mesh, Quaternion, Vector3} from 'three';
+  import {DoubleSide, Mesh, Quaternion, Vector3} from 'three';
   import {useRenderLoop} from '@tresjs/core';
   import {ZombieAnimationEnum} from '../../enum/zombie-animation.enum';
   import {useEventBus} from "@vueuse/core";
@@ -53,11 +51,12 @@
   const enemiesState = useEnemiesSpawned();
   const enemyEventBus = useEventBus('enemyEventBus');
   const enemyRef = shallowRef<Mesh>();
+  const healthBarRef = shallowRef<Mesh>();
   const freezeDistance = 2;
   const isSpawned = ref(false);
   let isCrawling = false;
   let isFreezing = false;
-  let isDead = true;
+  let isDead = ref(true);
 
   const soundActions = {
     hitReceived: sounds.createAudioPlayer(['zombieHitReceived1', 'zombieHitReceived2', 'zombieHitReceived3'], model, 1),
@@ -69,11 +68,13 @@
     return enemiesState.enemies.value.find(e => e.id === props.config?.enemyId);
   })
 
-  onMounted(() => {
+  const healthPercentage = computed(() => {
+    const health = Math.max(0, enemyStoreInstance.value?.health || 0);
+    const maxHealth = props.config?.health || 1;
+    return health / maxHealth;
   });
 
-  onUnmounted(() => {
-    enemiesState.removeEnemy(props.config?.enemyId);
+  onMounted(() => {
   });
 
   onLoop(({ delta }) => {
@@ -95,11 +96,13 @@
     moveTowardsPlayer(delta);
   });
 
-  const setLayer = (layer: number) => {
-    model.traverse((mesh) => {
-      mesh.layers.set(layer)
-    })
-  }
+  const updateHealthBar = () => {
+    if (healthBarRef.value) {
+      const percentage = healthPercentage.value;
+      healthBarRef.value.scale.x = percentage;
+      healthBarRef.value.position.x = -0.2 * (1 - percentage);
+    }
+  };
 
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
@@ -110,14 +113,15 @@
 
       if (event === 'damageReceived' && props.config?.enemyId === payload) {
         soundActions.hitReceived?.playRandom();
+        updateHealthBar();
       }
     });
   }
 
   const unspawnEnemy = () => {
 
-    if (isDead) return;
-    isDead = true;
+    if (isDead.value) return;
+    isDead.value = true;
 
     gsap.to(enemyRef.value.scale, {
       x: 0,
@@ -133,7 +137,7 @@
   }
 
   const spawnEnemy = () => {
-    isDead = false;
+    isDead.value = false;
 
     enemiesState.registerEnemy(props.config?.enemyId, props.config?.spawnPosition, props.config?.health,  EnemyTypeEnum.ZOMBIE);
     enemyRef.value.scale.set(0, 0, 0);
@@ -155,7 +159,7 @@
 
   const die = () => {
 
-    isDead = true;
+    isDead.value = true;
     playerState.unfreeze(props.config?.enemyId);
 
     gsap.to(
@@ -174,7 +178,7 @@
 
   const reset = () => {
     isSpawned.value = false;
-    isDead = true;
+    isDead.value = true;
     isCrawling = false;
     isFreezing = false;
     enemyRef.value.position.set(0, -10, 0);
@@ -182,7 +186,7 @@
   }
 
   const crawl = () => {
-    if (isCrawling || isDead) return;
+    if (isCrawling || isDead.value) return;
 
     const crawlAction = actions[ZombieAnimationEnum.Crawl].setLoop(LoopRepeat);
     crawlAction.reset();
@@ -245,7 +249,7 @@
 
   const moveTowardsPlayer = (delta: number) => {
 
-    if (isDead) return;
+    if (isDead.value) return;
 
     if (enemyRef.value && playerState.playerPosition.value) {
 
@@ -327,27 +331,3 @@
   })
 
 </script>
-<style>
-.enemy-health {
-  background: #ccc;
-  width: 70px;
-  height: 5px;
-  border-radius: 5px;
-  padding: 1px;
-  opacity: 100;
-  transition: opacity ease-out 120ms;
-}
-
-.enemy-health--dead {
-  opacity: 0;
-}
-
-.enemy-health__progress {
-  background: red;
-  border-radius: 5px;
-  height: 100%;
-  width: 100%;
-  max-width: 100%;
-  transition: width ease-in 120ms;
-}
-</style>

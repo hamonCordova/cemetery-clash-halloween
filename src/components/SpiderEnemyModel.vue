@@ -4,24 +4,24 @@
     :object="model"
     :position="[0, -10, 0]"
   >
-    <Html
-      v-if="isSpawned"
-      center
-      transform
-      :distance-factor="4"
-      :position="[0, 1.6, -0.1]"
-    >
-    <div class="enemy-health" :class="{'enemy-health--dead': isDead || !isSpawned}">
-      <div class="enemy-health__progress" :style="{width: (((enemyStoreInstance?.health || 0) / props.config?.health) * 100) + '%'}"></div>
-    </div>
-    </Html>
+    <TresGroup :position="[0, 1.6, -0.1]" v-if="!isDead && isSpawned">
+      <TresMesh>
+        <TresPlaneGeometry :args="[0.4, 0.02, 1]"  />
+        <TresMeshBasicMaterial color="gray" :side="DoubleSide" :transparent="true" :opacity="0.6" />
+      </TresMesh>
+      <TresMesh ref="healthBarRef" :position-z="0.001">
+        <TresPlaneGeometry :args="[0.4, 0.02, 1]"  />
+        <TresMeshBasicMaterial color="red" :side="DoubleSide" />
+      </TresMesh>
+    </TresGroup>
   </primitive>
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
-  import {useAnimations, Html} from '@tresjs/cientos';
+  import {computed, onMounted, ref, shallowRef, watch} from 'vue';
+  import {useAnimations} from '@tresjs/cientos';
   import {
+    DoubleSide,
     Mesh,
     MeshToonMaterial,
     Quaternion, SphereGeometry,
@@ -39,8 +39,6 @@ import {computed, onMounted, onUnmounted, ref, shallowRef, watch} from 'vue';
   import {usePlayer} from "@/composable/usePlayer";
   import {useEnemiesSpawned} from "@/composable/useEnemiesSpawned";
   import {useSounds} from "@/composable/useSounds";
-import {BattleLayersEnum} from "../../enum/battle-layers.enum";
-import GameAudioPlayer from "../../models/game-audio-player";
 
   const emit = defineEmits(['die'])
   const props = defineProps({
@@ -56,6 +54,7 @@ import GameAudioPlayer from "../../models/game-audio-player";
   const { onLoop } = useRenderLoop();
   const { scene } = useTresContext();
   const enemyRef = shallowRef<Mesh>();
+  const healthBarRef = shallowRef<Mesh>();
   const sounds = useSounds();
   const playerState = usePlayer();
   const enemiesState = useEnemiesSpawned();
@@ -96,6 +95,12 @@ import GameAudioPlayer from "../../models/game-audio-player";
     return enemiesState.enemies.value.find(e => e.id === props.config?.enemyId);
   })
 
+  const healthPercentage = computed(() => {
+    const health = Math.max(0, enemyStoreInstance.value?.health || 0);
+    const maxHealth = props.config?.health || 1;
+    return health / maxHealth;
+  });
+
   const attackConfig = computed(() => {
     return {
       nextAttackDelay: props.config?.attackDelay || 2000,
@@ -123,11 +128,13 @@ import GameAudioPlayer from "../../models/game-audio-player";
     moveTowardsPlayer(delta);
   });
 
-  const setLayer = (layer: number) => {
-    model.traverse((mesh) => {
-      mesh.layers.set(layer)
-    })
-  }
+  const updateHealthBar = () => {
+    if (healthBarRef.value) {
+      const percentage = healthPercentage.value;
+      healthBarRef.value.scale.x = percentage;
+      healthBarRef.value.position.x = -0.2 * (1 - percentage);
+    }
+  };
 
   const createSpiderBall = () => {
 
@@ -151,6 +158,7 @@ import GameAudioPlayer from "../../models/game-audio-player";
 
       if (event === 'damageReceived' && props.config?.enemyId === payload) {
         soundActions.hitReceived?.playRandom();
+        updateHealthBar();
       }
     });
   }

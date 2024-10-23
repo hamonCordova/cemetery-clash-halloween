@@ -4,24 +4,23 @@
       :object="model"
       :position="[0, -10, 0]"
   >
-    <Html
-      v-if="isSpawned"
-      center
-      transform
-      :distance-factor="4"
-      :position="[0, 1.6, -0.1]"
-    >
-    <div class="enemy-health" :class="{'enemy-health--dead': isDead || !isSpawned}">
-      <div class="enemy-health__progress" :style="{width: (((enemyStoreInstance?.health || 0) / props.config?.health) * 100) + '%'}"></div>
-    </div>
-    </Html>
+    <TresGroup :position="[0, 1.6, -0.1]" v-if="!isDead && isSpawned">
+      <TresMesh>
+        <TresPlaneGeometry :args="[0.4, 0.02, 1]"  />
+        <TresMeshBasicMaterial color="gray" :side="DoubleSide" :transparent="true" :opacity="0.6" />
+      </TresMesh>
+      <TresMesh ref="healthBarRef" :position-z="0.001">
+        <TresPlaneGeometry :args="[0.4, 0.02, 1]"  />
+        <TresMeshBasicMaterial color="red" :side="DoubleSide" />
+      </TresMesh>
+    </TresGroup>
   </primitive>
 </template>
 
 <script setup lang="ts">
 import {computed, onMounted, onUnmounted, shallowRef, watch, ref} from 'vue';
 import {Html, useAnimations} from '@tresjs/cientos';
-import {Mesh, Quaternion, Vector3} from 'three';
+import {DoubleSide, Mesh, Quaternion, Vector3} from 'three';
 import {useRenderLoop} from '@tresjs/core';
 import {SkeletonAnimationEnum} from '../../enum/skeleton-animation.enum';
 import {useEventBus} from "@vueuse/core";
@@ -49,6 +48,7 @@ import GameAudioPlayer from "../../models/game-audio-player";
   const { actions } = useAnimations(animations, model);
   const { onLoop } = useRenderLoop();
   const enemyRef = shallowRef<Mesh>();
+  const healthBarRef = shallowRef<Mesh>();
   const playerState = usePlayer();
   const enemiesState = useEnemiesSpawned();
   const sounds = useSounds();
@@ -85,6 +85,12 @@ import GameAudioPlayer from "../../models/game-audio-player";
     return enemiesState.enemies.value.find(e => e.id === props.config?.enemyId);
   })
 
+  const healthPercentage = computed(() => {
+    const health = Math.max(0, enemyStoreInstance.value?.health || 0);
+    const maxHealth = props.config?.health || 1;
+    return health / maxHealth;
+  });
+
   const attackConfig = computed(() => {
     return {
       nextAttackDelay: props.config?.attackDelay || 2000,
@@ -93,10 +99,6 @@ import GameAudioPlayer from "../../models/game-audio-player";
   })
 
   onMounted(() => {
-  });
-
-  onUnmounted(() => {
-    enemiesState.removeEnemy(props.config?.enemyId);
   });
 
   onLoop(({ delta }) => {
@@ -115,11 +117,13 @@ import GameAudioPlayer from "../../models/game-audio-player";
     moveTowardsPlayer(delta);
   });
 
-  const setLayer = (layer: number) => {
-    model.traverse((mesh) => {
-      mesh.layers.set(layer)
-    })
-  }
+  const updateHealthBar = () => {
+    if (healthBarRef.value) {
+      const percentage = healthPercentage.value;
+      healthBarRef.value.scale.x = percentage;
+      healthBarRef.value.position.x = -0.2 * (1 - percentage);
+    }
+  };
 
   const listenEvents = () => {
     enemyEventBus.on((event, payload) => {
@@ -130,6 +134,7 @@ import GameAudioPlayer from "../../models/game-audio-player";
 
       if (event === 'damageReceived' && props.config?.enemyId === payload) {
         soundActions.hitReceived?.playRandom();
+        updateHealthBar();
         receiveHit()
       }
     });
@@ -155,7 +160,7 @@ import GameAudioPlayer from "../../models/game-audio-player";
   }
 
 
-const spawnEnemy = () => {
+  const spawnEnemy = () => {
 
     isDead.value = false;
 
@@ -313,28 +318,3 @@ const spawnEnemy = () => {
   })
 
 </script>
-
-<style>
-.enemy-health {
-  background: #ccc;
-  width: 70px;
-  height: 5px;
-  border-radius: 5px;
-  padding: 1px;
-  opacity: 100;
-  transition: opacity ease-out 120ms;
-}
-
-.enemy-health--dead {
-  opacity: 0;
-}
-
-.enemy-health__progress {
-  background: red;
-  border-radius: 5px;
-  height: 100%;
-  width: 100%;
-  max-width: 100%;
-  transition: width ease-in 120ms;
-}
-</style>
