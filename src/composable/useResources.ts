@@ -17,11 +17,6 @@ export const useResources = createGlobalState(() => {
             type: 'TextureLoader'
         },
         {
-            name: 'moon',
-            path: '/models/scene/Moon.glb',
-            type: 'GLTFLoader'
-        },
-        {
             name: 'candles',
             path: '/models/scene/Candles.glb',
             type: 'GLTFLoader',
@@ -64,16 +59,6 @@ export const useResources = createGlobalState(() => {
             castShadow: true,
         },
         {
-            name: 'grass',
-            path: '/models/scene/Grass.glb',
-            type: 'GLTFLoader'
-        },
-        {
-            name: 'rockGrass',
-            path: '/models/scene/RockGrass.glb',
-            type: 'GLTFLoader'
-        },
-        {
             name: 'graveUnder',
             path: '/models/scene/GraveUnder.glb',
             type: 'GLTFLoader',
@@ -88,12 +73,6 @@ export const useResources = createGlobalState(() => {
         {
             name: 'gravestone',
             path: '/models/scene/Gravestone.glb',
-            type: 'GLTFLoader',
-            castShadow: true
-        },
-        {
-            name: 'postWithSkull',
-            path: '/models/scene/PostWithSkull.glb',
             type: 'GLTFLoader',
             castShadow: true
         },
@@ -146,12 +125,6 @@ export const useResources = createGlobalState(() => {
             castShadow: true
         },
         {
-            name: 'plaqueCandles',
-            path: '/models/scene/PlaqueCandles.glb',
-            type: 'GLTFLoader',
-            castShadow: true
-        },
-        {
             name: 'shovel',
             path: '/models/scene/Shovel.glb',
             type: 'GLTFLoader',
@@ -166,12 +139,6 @@ export const useResources = createGlobalState(() => {
         {
             name: 'fence',
             path: '/models/scene/Fence.glb',
-            type: 'GLTFLoader',
-            castShadow: true
-        },
-        {
-            name: 'fenceGate',
-            path: '/models/scene/FenceGate.glb',
             type: 'GLTFLoader',
             castShadow: true
         },
@@ -194,11 +161,6 @@ export const useResources = createGlobalState(() => {
         {
             name: 'rockPathThin',
             path: '/models/scene/RockPathThin.glb',
-            type: 'GLTFLoader'
-        },
-        {
-            name: 'floorSmall',
-            path: '/models/scene/FloorSmall.glb',
             type: 'GLTFLoader'
         },
         {
