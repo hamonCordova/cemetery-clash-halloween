@@ -65,10 +65,17 @@ export const usePlayer = createGlobalState(() => {
     }
 
     const reset = (resetPosition: Vector3) => {
-        playerPosition.value.copy(resetPosition);
-        freezedByEnemiesId.value = new Map();
+        activeMovements.jump = false;
+        activeMovements.run = false;
+        activeMovements.up = false;
+        activeMovements.right = false;
+        activeMovements.down = false;
+        activeMovements.left = false;
         health.value = 100;
         isDead.value = false;
+
+        playerPosition.value.copy(resetPosition);
+        freezedByEnemiesId.value = new Map();
     }
 
     return {

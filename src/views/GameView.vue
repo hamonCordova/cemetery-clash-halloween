@@ -10,7 +10,7 @@
       <TresPerspectiveCamera :args="[50, 1, 0.5, 100]" :position="[0, 10, 10]" />
       <OrbitControls v-if="isDevScenarioMode" />
       <TresAmbientLight :intensity="0.5" />
-      <BattleManager v-if="!isDevScenarioMode" ref="battleManagerRef" @playerDied="onPlayerDied()" />
+      <BattleManager v-if="!isDevScenarioMode" ref="battleManagerRef" @playerDied="onPlayerDied()" @playerWin="onPlayerWin()" />
       <Suspense>
         <BattleFloor />
       </Suspense>
@@ -34,6 +34,10 @@
 
     <transition name="fade" :duration="500" mode="out-in">
       <GamePlayerDiedScore v-if="showingDeadPlayerScore" @restart="restart" />
+    </transition>
+
+    <transition name="fade" :duration="500" mode="out-in">
+      <GamePlayerWinScore v-if="showingWinnerPlayerScore" @restart="restart(true)" />
     </transition>
 
   </template>
@@ -64,6 +68,7 @@
   import GamePlayerDiedScore from "@/components/game/GamePlayerDiedScore.vue";
   import GameControlsInstruction from "@/components/game/GameControlsInstruction.vue";
   import GameRoundsState from "@/components/game/GameRoundsState.vue";
+  import GamePlayerWinScore from "@/components/game/GamePlayerWinScore.vue";
 
   const gameState = useGameState();
   const resources = useResources();
@@ -74,6 +79,7 @@
   const gameMenuRef = ref();
   const battleManagerRef = ref();
   const showingDeadPlayerScore = ref(false);
+  const showingWinnerPlayerScore = ref(false);
   const showingPlayerControlsInstruction = ref(false);
   const isMobile = DocumentUtils.isMobile();
   let themeMusic;
@@ -158,9 +164,14 @@
     showingDeadPlayerScore.value = true;
   }
 
-  const restart = () => {
+  const onPlayerWin = () => {
+    showingWinnerPlayerScore.value = true;
+  }
+
+  const restart = (afterWin = false) => {
     showingDeadPlayerScore.value = false;
-    battleManagerRef.value.restart()
+    showingWinnerPlayerScore.value = false;
+    afterWin ? battleManagerRef.value.restartAfterWin() : battleManagerRef.value.restart()
   }
 
   watch(() => gameState.isSoundsEnabled.value, () => {

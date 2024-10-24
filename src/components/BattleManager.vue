@@ -82,7 +82,7 @@ import {ref, onMounted, markRaw, watch} from 'vue';
   import {useGameState} from "@/composable/useGameState";
 import {useEventBus} from "@vueuse/core";
 
-  const emit = defineEmits(['playerDied']);
+  const emit = defineEmits(['playerDied', 'playerWin']);
 
   const resources = useResources();
   const playerState = usePlayer();
@@ -93,8 +93,8 @@ import {useEventBus} from "@vueuse/core";
   const playerCharacterRef = ref();
 
   const rounds = ref<Round[]>([]);
-  const currentRoundNum = ref<number>(1);
-  const currentStageNum = ref<number>(1);
+  const currentRoundNum = ref<number>(4);
+  const currentStageNum = ref<number>(4);
 
   const currentRound = ref<Round>();
   const currentStage = ref<RoundStage>();
@@ -253,6 +253,7 @@ import {useEventBus} from "@vueuse/core";
       getRound1(),
       getRound2(),
       getRound3(),
+      getRound4()
     ];
   };
 
@@ -350,10 +351,6 @@ import {useEventBus} from "@vueuse/core";
     }
   };
 
-  const allRoundsCompleted = () => {
-    // Método chamado quando o jogador completa todos os rounds
-    // Você pode adicionar lógica aqui futuramente
-  };
 
   const getRound1 = (): Round => {
 
@@ -496,6 +493,18 @@ import {useEventBus} from "@vueuse/core";
 
     return { num: 3, stages };
   };
+
+  const getRound4 = (): Round => {
+    const stages: RoundStage[] = [];
+
+    stages.push({
+      enemies: [
+        createSkeletonEnemy(1.5, 2, 5, 2000, 300, 6, 110),
+      ],
+    });
+
+    return { num: 4, stages };
+  }
 
   const createSlimeEnemy = (
       scale: number,
@@ -651,8 +660,8 @@ import {useEventBus} from "@vueuse/core";
 
     if (gameState.isSoundsEnabled.value) {
       setTimeout(() => {
-        const enemyDiedSound = sounds.getAudio('evilLaugh', false, 2)
-        enemyDiedSound.play();
+        const evilLaughSound = sounds.getAudio('evilLaugh', false, 2)
+        evilLaughSound.play();
       }, 500)
     }
 
@@ -709,7 +718,6 @@ import {useEventBus} from "@vueuse/core";
       duration: 1.5,
       ease: 'power2.out',
       onComplete() {
-        playerCharacterRef.value.restart();
       }
     }, '<');
 
@@ -744,6 +752,108 @@ import {useEventBus} from "@vueuse/core";
 
   }
 
+  const restartAfterWin = () => {
+
+    gameState.isPlaying.value = false;
+
+    const timeline = gsap.timeline({});
+
+    const lookAtPlayerTimeline = gsap.timeline({
+      delay: 0.2,
+      onComplete() {
+
+        gameState.isPlaying.value = true;
+
+        setTimeout(() => {
+          createRounds();
+          currentRound.value = undefined;
+          currentStage.value = undefined;
+          currentRoundNum.value = 1;
+          currentStageNum.value = 1;
+
+          startRound();
+        }, 2000)
+      }
+    })
+
+    timeline.to(camera.value?.position, {
+      x: 0,
+      z: 13,
+      y: 8,
+      duration: 1.5,
+      ease: 'power2.out',
+      onComplete() {
+      }
+    }, '<');
+
+    timeline.to(camera.value.rotation, {
+      x: 0.7,
+      duration: 1.5,
+      ease: 'power2.out',
+      onComplete() {
+        playerCharacterRef.value.restart();
+      }
+    }, '<');
+
+    timeline.add(lookAtPlayerTimeline);
+
+    lookAtPlayerTimeline.to(camera.value.position, {
+      x: 0,
+      y: 7.65,
+      z: 15,
+      duration: 1.5,
+      ease: 'power2.out',
+      onUpdate() {
+      }
+    }, '<');
+
+    lookAtPlayerTimeline.to(camera.value.rotation, {
+      x: -0.42,
+      duration: 1.5,
+      ease: 'power2.out',
+      onUpdate() {
+      }
+    }, '<');
+
+  }
+
+  const allRoundsCompleted = () => {
+    gameState.isPlaying.value = false;
+    playerCharacterRef.value.doWinnerPositioning();
+
+    setTimeout(() => {
+      const playerPosition = playerState.playerPosition.value;
+      const isNearTopFences = playerPosition.z >= 6.5;
+
+      if (gameState.isSoundsEnabled.value) {
+        setTimeout(() => {
+          const evilLaughWinSound = sounds.getAudio('evilLaughWin', false, 0.7)
+          evilLaughWinSound.play();
+        }, 100)
+      }
+
+      const timeline = gsap.timeline({
+        onComplete: () => {
+          emit('playerWin')
+        }
+      });
+      timeline.to(camera.value.position, {
+        z: playerPosition.z + (isNearTopFences ? 12 : 6),
+        y: isNearTopFences ? 8 : 0.7,
+        ease: 'power2.out',
+        duration: 2
+      })
+
+        gsap.to(camera.value.rotation, {
+          x: isNearTopFences ? - 0.5 : 0.3,
+          ease: 'power2.out',
+          duration: 2
+        }, "<")
+    }, 100)
+
+  };
+
+
   watch(() => playerState.isDead.value, (isPlayerDead: boolean) => {
     if (isPlayerDead) {
       setTimeout(() => {
@@ -755,6 +865,7 @@ import {useEventBus} from "@vueuse/core";
   defineExpose({
     startRound,
     restart,
+    restartAfterWin,
   });
 
 </script>

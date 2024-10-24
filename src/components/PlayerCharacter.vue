@@ -65,7 +65,8 @@
   })
 
   onLoop(({delta}) => {
-    if (playerState.isDead.value) return;
+    if (playerState.isDead.value || !gameState.isPlaying.value) return;
+
     move(delta)
     moveCamera();
   })
@@ -125,7 +126,6 @@
       newAnimation.crossFadeFrom(oldAnimation, duration, false);
     }
   };
-
 
   const die = () => {
     animate(SkeletonAnimationEnum.Death);
@@ -394,6 +394,12 @@
     });
   }
 
+  const doWinnerPositioning = () => {
+    const playerQuaternion = playerModelRef.value.quaternion.clone();
+    playerModelRef.value.quaternion.copy(playerQuaternion.rotateTowards(new Quaternion(0, 0, 0), 20));
+    animate(SkeletonAnimationEnum.Yes, 1);
+  }
+
 
   watch(() => playerState.health.value, (newHealth: number, oldHealth: number) => {
     if (newHealth > oldHealth) {
@@ -403,7 +409,8 @@
   })
 
   defineExpose({
-    restart
+    restart,
+    doWinnerPositioning
   })
 
 </script>

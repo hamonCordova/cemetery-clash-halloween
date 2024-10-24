@@ -209,6 +209,11 @@ export const useResources = createGlobalState(() => {
             type: 'AudioLoader'
         },
         {
+            name: 'evilLaughWin',
+            path: '/sounds/voices/evil_laugh_win.ogg',
+            type: 'AudioLoader'
+        },
+        {
             name: 'round1',
             path: '/sounds/voices/round_1.ogg',
             type: 'AudioLoader'
