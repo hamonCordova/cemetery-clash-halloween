@@ -120,15 +120,19 @@ import {useEventBus} from "@vueuse/core";
     generateUUID(),
     generateUUID(),
     generateUUID(),
+    generateUUID(),
   ]
 
   const zombieEnemiesIdPool = [
     generateUUID(),
     generateUUID(),
     generateUUID(),
+    generateUUID(),
+    generateUUID(),
   ]
 
   const slimeEnemiesIdPool = [
+    generateUUID(),
     generateUUID(),
     generateUUID(),
     generateUUID(),
@@ -352,142 +356,165 @@ import {useEventBus} from "@vueuse/core";
   };
 
 
+  // Attack delay = 1400 - 1800
+  // Long range delay = 1400 - 2000
+  // First delay = 500 - 800
+  // Damage = 6 - 8
+  // Move = 1.2 - 1.8
+  // Health = 60 - 90
+  // Slime speed = 5 - 5
   const getRound1 = (): Round => {
 
     const stages: RoundStage[] = [];
 
     stages.push({
       enemies: [
-        createSkeletonEnemy(1.5, 1.5, 3, 1200, 500, 10, 70),
-        createSkeletonEnemy(1.5, 1.2, 5, 1700, 800, 10, 100),
+        createSkeletonEnemy(1.5, 1.5, 3, 1600, 500, 8, 60),
+        createSkeletonEnemy(1.5, 1.2, 5, 1500, 700, 8, 60),
       ],
     });
 
     stages.push({
       enemies: [
-        createSpiderEnemy(1, 2.5, 2000, 1300, 3, 50, 8, 100),
-        createSpiderEnemy(1, 2.5, 2000, 2800, 5, 800, 10, 80),
-        createSkeletonEnemy(1.5, 2, 5, 1200, 700, 8, 100),
+        createSpiderEnemy(1, 1.8, 1500, 1400, 3, 500, 8, 90),
+        createSpiderEnemy(1, 1.8, 1400, 2000, 5, 800, 8, 60),
+        createSkeletonEnemy(1.5, 1.8, 5, 1400, 700, 8, 90),
       ],
     });
 
     stages.push({
       enemies: [
-        createSpiderEnemy(1, 2.5, 800, 1200, 3, 500, 10, 100),
-        createSkeletonEnemy(1.5, 1.8, 5, 1200, 500, 7, 100),
-        createZombieEnemy(1.5, 2, 3, 70),
+        createSpiderEnemy(1, 1.8, 1400, 1400, 3, 500, 7, 60),
+        createSkeletonEnemy(1.5, 1.4, 5, 1200, 500, 9, 90),
+        createZombieEnemy(1.5, 1.8, 3, 90),
       ],
     });
 
-
     stages.push({
       enemies: [
-        createSpiderEnemy(1, 2.5, 2000, 1300, 3, 50, 8, 100),
-        createSkeletonEnemy(1.5, 1.8, 5, 1200, 500, 7, 80),
-        createZombieEnemy(1.5, 1.5, 3, 70),
-        createSlimeEnemy(0.5, 5, 5, 1500, 2000, 7, 100),
+        createSpiderEnemy(1, 1.8, 2000, 1400, 3, 50, 8, 90),
+        createSkeletonEnemy(1.5, 1.8, 5, 1400, 500, 8, 90),
+        createZombieEnemy(1.5, 1.8, 3, 60),
+        createSlimeEnemy(0.5, 5, 5, 1500, 2000, 8, 90),
       ],
     });
 
     return { num: 1, stages };
   };
 
+  // Attack delay = 1100 - 1400
+  // Long range delay = 1100 - 1700
+  // First delay = 400 - 700
+  // Damage = 7 - 9
+  // Move = 1.5 - 3
+  // Health = 60 - 120
+  // Slime speed = 3 - 5
   const getRound2 = (): Round => {
     const stages: RoundStage[] = [];
 
     stages.push({
       enemies: [
-        createZombieEnemy(1.5, 2.5, 5, 110),
-        createZombieEnemy(1.5, 1.5, 2.5, 120),
-        createSpiderEnemy(1, 2.5, 2000, 1500, 3, 250, 12, 100),
-        createSpiderEnemy(1, 2.5, 1500, 1300, 5, 400, 9, 70),
-        createSpiderEnemy(1, 2.5, 1500, 900, 5, 200, 7, 100, 5000),
+        createZombieEnemy(1.5, 2.2, 5, 110),
+        createZombieEnemy(1.5, 1.5, 2.5, 90),
+        createSpiderEnemy(1, 2.0, 1200, 1500, 3, 500, 8, 90),
+        createSpiderEnemy(1, 2.1, 1400, 1300, 5, 400, 9, 110),
+        createSpiderEnemy(1, 2.2, 1200, 900, 5, 400, 9, 110, 4000),
       ],
     });
 
     stages.push({
       enemies: [
-        createZombieEnemy(1.5, 3, 5, 110),
-        createSkeletonEnemy(1.5, 2, 5, 1200, 400, 10, 130),
-        createSkeletonEnemy(1.5, 2.2, 5, 1200, 200, 7, 100),
-        createSlimeEnemy(0.5, 3, 5, 2000, 1500, 7, 100),
+        createZombieEnemy(1.5, 2.2, 5, 110),
+        createSkeletonEnemy(1.5, 1.9, 4, 1200, 400, 9, 110),
+        createSkeletonEnemy(1.5, 2.1, 3, 1100, 400, 8, 90),
+        createSlimeEnemy(0.5, 3, 5, 1400, 1600, 8, 110),
 
-        createZombieEnemy(1.5, 3, 5, 110, 8000),
-        createSlimeEnemy(0.5, 2, 5, 2000, 1500, 8, 100, 10000),
+        createZombieEnemy(1.5, 2.2, 5, 90, 7000),
+        createSlimeEnemy(0.5, 3, 5, 1200, 1200, 8, 110, 8500),
       ],
     });
 
     stages.push({
       enemies: [
-        createZombieEnemy(1.5, 3.5, 5, 70),
-        createSkeletonEnemy(1.5, 1.8, 5, 1200, 400, 8, 130),
+        createZombieEnemy(1.5, 2.3, 5, 90),
+        createSkeletonEnemy(1.5, 1.8, 5, 1300, 300, 8, 110),
 
-        createZombieEnemy(1.5, 3, 5, 110, 6000),
-        createSkeletonEnemy(1.5, 2, 5, 1200, 400, 8, 110, 6000),
-        createSkeletonEnemy(1.5, 1.9, 5, 1200, 400, 8, 110, 10000),
-        createSlimeEnemy(0.5, 3, 5, 2000, 1500, 6, 100, 12000),
+        createZombieEnemy(1.5, 3, 5, 90, 3000),
+        createSkeletonEnemy(1.5, 2, 5, 1200, 400, 8, 110, 3500),
+        createSkeletonEnemy(1.5, 1.6, 5, 1100, 400, 9, 90, 4000),
+        createSlimeEnemy(0.5, 3, 5, 1300, 1000, 9, 110, 4000),
       ],
     });
 
     stages.push({
       enemies: [
-        createSpiderEnemy(2, 2.5, 2000, 2000, 1.5, 200, 13, 350),
-        createSpiderEnemy(1, 3, 1500, 1500, 5, 300, 8, 110),
-        createSlimeEnemy(0.5, 3, 5, 1500, 1500, 8, 100),
+        createSpiderEnemy(2, 2.5, 1200, 1300, 1.5, 200, 12, 350), // Boss
+        createSpiderEnemy(1, 3, 1300, 1300, 5, 400, 8, 110),
+        createSlimeEnemy(0.5, 3, 5, 1200, 1100, 9, 110),
 
-        createSpiderEnemy(0.6, 4, 1100, 1100, 5, 400, 7, 100, 7000),
-        createSpiderEnemy(0.6, 4, 1100, 1100, 5, 400, 7, 100, 8500),
-        createSlimeEnemy(0.4, 2, 5, 1500, 1900, 8, 100, 9000),
+        createSpiderEnemy(0.6, 2.2, 1200, 1100, 5, 400, 8, 110, 5000),
+        createSpiderEnemy(0.6, 2.2, 1100, 1200, 5, 300, 9, 90, 6000),
+        createSlimeEnemy(0.4, 3, 5, 1400, 1300, 9, 90, 6500),
       ],
     });
 
     return { num: 2, stages };
   };
 
+  // Attack delay = 1000 - 1200
+  // Long range delay = 1000 - 1500
+  // First delay = 300 - 600
+  // Damage = 8 - 10
+  // Move = 1.8 - 3.5
+  // Health = 90 - 140
+  // Slime speed = 1.5 - 3
   const getRound3 = (): Round => {
     const stages: RoundStage[] = [];
 
+    // Recovery stage after boss. Config above not exactly applied
     stages.push({
       enemies: [
-        createSlimeEnemy(0.5, 4, 800, 2000, 2000, 8, 150),
-        createSlimeEnemy(0.5, 4, 800, 2000, 1500, 7, 130),
-        createSkeletonEnemy(1.5, 2, 5, 2000, 300, 6, 110),
-        createSkeletonEnemy(1.5, 2.5, 5, 2000, 500, 6, 120),
-        createSkeletonEnemy(1.5, 3.5, 3, 1200, 700, 8, 140),
-        createZombieEnemy(1.5, 1.5, 5, 150),
-        createZombieEnemy(1.5, 3.5, 5, 130, 7000),
+        createSlimeEnemy(0.5, 3, 5, 1500, 1500, 7, 90),
+        createSlimeEnemy(0.5, 2.5, 5, 1200, 1500, 7, 90),
+        createSkeletonEnemy(1.5, 2, 5, 1600, 400, 8, 90),
+        createSkeletonEnemy(1.5, 2.2, 5, 1600, 500, 8, 110),
+        createSkeletonEnemy(1.5, 2.5, 3, 1500, 300, 7, 110),
+        createZombieEnemy(1.5, 1.5, 5, 150, 1500),
+        createSpiderEnemy(1, 3, 1300, 1300, 2, 600, 8, 110, 5000),
+        createZombieEnemy(1.5, 3.5, 5, 110, 5000),
+        createZombieEnemy(1.5, 3.5, 5, 90, 8000),
       ],
     });
 
     stages.push({
       enemies: [
-        createSlimeEnemy(0.5, 5, 800, 2200, 2000, 8, 150),
-        createSlimeEnemy(0.5, 4, 800, 1700, 1700, 7, 130),
-        createSlimeEnemy(0.5, 3, 800, 1600, 1000, 6, 170),
-        createZombieEnemy(1.5, 3.3, 5, 110, 6000),
-        createZombieEnemy(1.5, 4.2, 5, 110, 9000),
-        createSkeletonEnemy(1.5, 2.5, 12, 2000, 300, 7, 100, 10000),
-        createSkeletonEnemy(1.5, 2.5, 12, 2000, 300, 7, 100, 13000),
-        createSpiderEnemy(0.8, 3.5, 1200, 1200, 2, 800, 7, 70,22000),
-        createSpiderEnemy(0.8, 3.5, 1200, 1000, 2, 800, 7, 70, 25000),
-        createZombieEnemy(1.5, 4, 5, 80, 30000),
+        createSlimeEnemy(0.5, 1.5, 5, 1500, 2000, 8, 140),
+        createSlimeEnemy(0.5, 2, 5, 1600, 1500, 8, 130),
+        createSlimeEnemy(0.5, 2.5, 5, 1300, 1100, 9, 110),
+        createZombieEnemy(1.5, 2.7, 5, 90, 4000),
+        createZombieEnemy(1.5, 3.5, 5, 110, 6000),
+        createSkeletonEnemy(1.5, 2.5, 5, 1300, 300, 8, 90, 9000),
+        createSkeletonEnemy(1.5, 2.6, 5, 1400, 400, 7, 110, 12000),
+        createSpiderEnemy(0.8, 2.5, 1200, 1200, 2, 400, 7, 140,15000),
+        createSpiderEnemy(0.8, 3, 1300, 1100, 2, 500, 8, 90, 17000),
+        createZombieEnemy(1.5, 3.5, 5, 90, 18000),
       ],
     });
 
     stages.push({
       enemies: [
-        createSpiderEnemy(0.8, 3.5, 1200, 1300, 2, 800, 9, 120),
-        createSpiderEnemy(1.2, 3.5, 1500, 1500, 2, 800, 13, 160),
-        createSkeletonEnemy(1.5, 2.5, 12, 1500, 300, 7, 100),
-        createZombieEnemy(1.5, 3, 5, 100),
-        createSlimeEnemy(0.5, 2, 800, 2000, 1000, 5, 100),
-        createSlimeEnemy(0.5, 2, 800, 2000, 1000, 5, 100, 12000),
-        createZombieEnemy(1.5, 3.5, 5, 110, 12000),
-        createSpiderEnemy(0.8, 3.5, 1200, 1500, 2, 800, 7, 90, 20000),
-        createSpiderEnemy(0.8, 3.5, 1700, 1000, 2, 800, 9, 110, 20000),
-        createSlimeEnemy(0.5, 2, 800, 2000, 1200, 7, 100, 26000),
-        createSkeletonEnemy(1.5, 2.8, 12, 1400, 300, 6, 110, 27000),
-        createSkeletonEnemy(1.5, 3.5, 12, 1600, 350, 8, 80, 27000),
+        createSpiderEnemy(0.8, 3, 1100, 1200, 3, 400, 8, 90),
+        createSpiderEnemy(0.9, 3.5, 1100, 1500, 4, 300, 8, 110),
+        createSkeletonEnemy(1.5, 2, 5, 1400, 300, 8, 90),
+        createZombieEnemy(1.5, 3.5, 5, 110),
+        createSlimeEnemy(0.5, 1.5, 8, 1500, 1400, 7, 110),
+        createSlimeEnemy(0.5, 1.5, 8, 1400, 1200, 7, 90, 12000),
+        createZombieEnemy(1.5, 3.4, 5, 90, 13000),
+        createSpiderEnemy(1.1, 2.4, 1300, 1300, 2, 800, 9, 90, 16000),
+        createSpiderEnemy(1, 3.5, 1300, 1200, 3, 800, 8, 110, 18000),
+        createSlimeEnemy(0.5, 2.2, 5, 1300, 1600, 7, 110, 22000),
+        createSkeletonEnemy(1.5, 3, 5, 1200, 400, 8, 110, 26000),
+        createSkeletonEnemy(1.5, 2.5, 5, 1400, 450, 9, 110, 29000),
       ],
     });
 
@@ -497,9 +524,28 @@ import {useEventBus} from "@vueuse/core";
   const getRound4 = (): Round => {
     const stages: RoundStage[] = [];
 
+
     stages.push({
       enemies: [
-        createSkeletonEnemy(1.5, 2, 5, 2000, 300, 6, 110),
+        createSlimeEnemy(0.5, 1.7, 8, 2000, 1600, 7, 90),
+        createSlimeEnemy(0.5, 1.3, 8, 1500, 1800, 7, 90),
+        createZombieEnemy(1.5, 2.5, 5, 90),
+        createSkeletonEnemy(1.5, 3, 5, 1200, 300, 8, 90),
+        createSkeletonEnemy(1.5, 2.7, 5, 1300, 400, 7, 90, 5000),
+        createSpiderEnemy(1.1, 2.4, 1600, 1800, 2, 700, 8, 110, 6000),
+        createZombieEnemy(1.5, 3.5, 5, 90, 10000),
+        createZombieEnemy(1.5, 2.5, 5, 110, 10000),
+        createSpiderEnemy(1, 3, 1400, 1600, 2.5, 500, 7, 90, 15000),
+        createSpiderEnemy(1, 3.5, 1300, 1200, 3, 800, 7, 110, 16000),
+        createSkeletonEnemy(1.5, 2.5, 5, 1400, 400, 8, 110, 19000),
+        createSkeletonEnemy(1.5, 3, 5, 1500, 300, 7, 90, 23000),
+        createSlimeEnemy(0.5, 1, 8, 1500, 2200, 7, 90, 27000),
+        createZombieEnemy(1.5, 3, 5, 90, 29000),
+        createSlimeEnemy(0.5, 1, 8, 1500, 1200, 7, 90, 30000),
+        createSkeletonEnemy(2.5, 1.3, 1.4, 2300, 700, 12, 300, 34000),
+        createSpiderEnemy(2, 1.7, 1400, 1400, 1.5, 800, 10, 350, 40000),
+        createSlimeEnemy(0.5, 1.4, 8, 2000, 1500, 8, 110, 45000),
+        createZombieEnemy(1.5, 2.5, 5, 110, 46000),
       ],
     });
 
