@@ -403,10 +403,10 @@
 
   watch(() => playerState.health.value, (newHealth: number, oldHealth: number) => {
     if (newHealth > oldHealth) {
-      const healthIncreased = newHealth - oldHealth;
-      createFloatingText(`+${healthIncreased}`)
+      const healthIncreased = Math.round((newHealth - oldHealth) * 10) / 10;
+      createFloatingText(`+${healthIncreased}`);
     }
-  })
+  });
 
   defineExpose({
     restart,
