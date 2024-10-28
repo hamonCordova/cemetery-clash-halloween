@@ -165,7 +165,7 @@
 
 <script setup lang="ts">
 import {useRenderLoop, useTresContext} from "@tresjs/core";
-  import {onMounted} from "vue";
+import {onMounted, ref, watch} from "vue";
   import {useResources} from "@/composable/useResources";
   import Pumpkin from "@/components/objects/Pumpkin.vue";
   import BattleRing from "@/components/objects/BattleRing.vue";
@@ -190,6 +190,7 @@ import {AdditiveBlending, BufferAttribute, BufferGeometry, Color, Euler, Points,
 
   onMounted(() => {
     createParticles();
+    listenEvents();
     camera.value.add(sounds.listener);
     camera.value?.layers.enableAll();
 
@@ -197,6 +198,12 @@ import {AdditiveBlending, BufferAttribute, BufferGeometry, Color, Euler, Points,
       renderer.value.shadowMap.autoUpdate = false;
     }, 1000)
   });
+
+  const listenEvents = () => {
+    document.addEventListener('visibilitychange', () => {
+      renderer.value.shadowMap.needsUpdate = true;
+    })
+  }
 
   const createParticles = () => {
     const particlesCount = 1000;
