@@ -40,6 +40,10 @@
       <GamePlayerWinScore v-if="showingWinnerPlayerScore" @restart="restart(true)" />
     </transition>
 
+    <transition name="fade" :duration="100" mode="out-in">
+      <MODALCredits v-if="modalCredits.isOpen.value" />
+    </transition>
+
   </template>
 </template>
 
@@ -69,9 +73,12 @@
   import GameControlsInstruction from "@/components/game/GameControlsInstruction.vue";
   import GameRoundsState from "@/components/game/GameRoundsState.vue";
   import GamePlayerWinScore from "@/components/game/GamePlayerWinScore.vue";
+  import MODALCredits from "@/components/modal/MODALCredits.vue";
+  import {useModalCredits} from "@/composable/useModalCredits";
 
   const gameState = useGameState();
   const resources = useResources();
+  const modalCredits = useModalCredits();
   const sounds = useSounds();
   const isLoading = ref(true);
   const isShowingMenu = ref(false);

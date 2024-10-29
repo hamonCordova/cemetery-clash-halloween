@@ -9,7 +9,10 @@
           <button @click="emit('startGame')">Start game</button>
         </li>
         <li>
-          <button @click="gameState.toggleSoundState()">{{gameState.isSoundsEnabled.value ? 'Disable' : 'Enable'}} sounds</button>
+          <button class="secondary-btn" @click="gameState.toggleSoundState()">{{gameState.isSoundsEnabled.value ? 'Disable' : 'Enable'}} sounds</button>
+        </li>
+        <li>
+          <button class="secondary-btn" style="margin-top: 15px" @click="modalCredits.open()">Credits</button>
         </li>
       </ul>
       <footer>
@@ -24,10 +27,12 @@
 <script setup lang="ts">
 
   import {useGameState} from "@/composable/useGameState";
+  import {useModalCredits} from "@/composable/useModalCredits";
 
   const emit = defineEmits(['startGame'])
 
   const gameState = useGameState();
+  const modalCredits = useModalCredits();
 
 </script>
 
@@ -61,12 +66,14 @@
   }
 
   ul {
+    padding: 0;
     list-style: none;
     width: 100%;
   }
 
   li {
     width: 100%;
+    text-align: center;
   }
 
   footer {
@@ -93,5 +100,9 @@
    .container {
      width: 600px;
    }
+
+    button {
+      width: 90%;
+    }
   }
 </style>
