@@ -164,8 +164,8 @@
 </template>
 
 <script setup lang="ts">
-import {useRenderLoop, useTresContext} from "@tresjs/core";
-import {onMounted, ref, watch} from "vue";
+  import {useRenderLoop, useTresContext} from "@tresjs/core";
+  import {onMounted} from "vue";
   import {useResources} from "@/composable/useResources";
   import Pumpkin from "@/components/objects/Pumpkin.vue";
   import BattleRing from "@/components/objects/BattleRing.vue";
@@ -175,9 +175,9 @@ import {onMounted, ref, watch} from "vue";
   import {DocumentUtils} from "@/utils/document-utils";
   import { vLightHelper } from '@tresjs/core'
   import gsap from 'gsap';
-import {AdditiveBlending, BufferAttribute, BufferGeometry, Color, Euler, Points, PointsMaterial, Vector3} from "three";
+  import {Euler, Vector3} from "three";
   import {useSounds} from "@/composable/useSounds";
-
+  import {FireFlies} from "@/threejs-fireflies/FireFly";
 
   const emit = defineEmits(['finishIntro'])
 
@@ -186,10 +186,14 @@ import {AdditiveBlending, BufferAttribute, BufferGeometry, Color, Euler, Points,
   const { renderer, scene, camera } = useTresContext();
   const { onLoop } = useRenderLoop();
   const isMobile = true; //DocumentUtils.isMobile()
-  let particles: Points;
+
+  const fireflies = new FireFlies(scene.value, {
+    groupCount: 16,
+    firefliesPerGroup: 17,
+    groupRadius: 20,
+  });
 
   onMounted(() => {
-    createParticles();
     listenEvents();
     camera.value.add(sounds.listener);
     camera.value?.layers.enableAll();
@@ -199,47 +203,15 @@ import {AdditiveBlending, BufferAttribute, BufferGeometry, Color, Euler, Points,
     }, 1000)
   });
 
+  onLoop(({delta, elapsed}) => {
+    fireflies.update(delta * 0.2);
+  })
+
   const listenEvents = () => {
     document.addEventListener('visibilitychange', () => {
       renderer.value.shadowMap.needsUpdate = true;
     })
   }
-
-  const createParticles = () => {
-    const particlesCount = 1000;
-    const positionsArray = new Float32Array(particlesCount * 3);
-    const particleMap = resources.get('blackSmoke');
-
-    for (let i = 0; i < particlesCount; i++) {
-      positionsArray[i * 3] = (Math.random() - 0.5) * 70;
-      positionsArray[i * 3 + 1] = Math.random() * 5;
-      positionsArray[i * 3 + 2] = (Math.random() - 0.5) * 70;
-    }
-
-    const particlesGeometry = new BufferGeometry();
-    particlesGeometry.setAttribute('position', new BufferAttribute(positionsArray, 3));
-
-    const particlesMaterial = new PointsMaterial({
-      color: new Color('#d67a26'),
-      size: 0.15,
-      transparent: true,
-      opacity: 0.7,
-      map: particleMap,
-      blending: AdditiveBlending,
-      depthWrite: false,
-      depthTest: false
-    });
-
-    particles = new Points(particlesGeometry, particlesMaterial);
-    scene.value.add(particles);
-  }
-
-  onLoop(({delta, elapsed}) => {
-    if (!particles) return;
-    particles.rotation.y = Math.cos(elapsed) * 0.02;
-    particles.position.y = Math.cos(elapsed) * 0.02;
-    particles.position.x = Math.sin(elapsed) * 0.02;
-  })
 
   const startIntro = (duration = 3000) => {
     camera.value.position.set(-40, 20, 50);
