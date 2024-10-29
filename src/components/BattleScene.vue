@@ -188,8 +188,8 @@
   const isMobile = true; //DocumentUtils.isMobile()
 
   const fireflies = new FireFlies(scene.value, {
-    groupCount: 16,
-    firefliesPerGroup: 17,
+    groupCount: 20,
+    firefliesPerGroup: 20,
     groupRadius: 20,
   });
 

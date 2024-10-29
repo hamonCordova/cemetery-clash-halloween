@@ -12,11 +12,6 @@ export const useResources = createGlobalState(() => {
 
     const sources = [
         {
-            name: 'blackSmoke',
-            path: '/img/blackSmoke00.png',
-            type: 'TextureLoader'
-        },
-        {
             name: 'candles',
             path: '/models/scene/Candles.glb',
             type: 'GLTFLoader',
