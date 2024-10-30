@@ -7,44 +7,48 @@
 </template>
 
 <script setup lang="ts">
+  import { onMounted, ref } from 'vue'
+  import gsap from 'gsap'
 
-  import {onMounted, ref} from "vue";
-  import gsap from "gsap";
+  const emit = defineEmits(['restart'])
 
-  const emit = defineEmits(['restart']);
-
-  const titleRef = ref();
-  const descriptionRef = ref();
-  const buttonRef = ref();
+  const titleRef = ref()
+  const descriptionRef = ref()
+  const buttonRef = ref()
 
   onMounted(() => {
-
-    const timeline = gsap.timeline({delay: 0.6});
+    const timeline = gsap.timeline({ delay: 0.6 })
     timeline.to(titleRef.value, {
-      transform: "scale(1)",
+      transform: 'scale(1)',
       visibility: 'visible',
       ease: 'power4.out',
       duration: 1,
     })
 
-    timeline.to(descriptionRef.value, {
-      opacity: "1",
-      ease: 'power2.out',
-      duration: 0.7,
-      delay: 0.6,
-    }, '<')
+    timeline.to(
+      descriptionRef.value,
+      {
+        opacity: '1',
+        ease: 'power2.out',
+        duration: 0.7,
+        delay: 0.6,
+      },
+      '<'
+    )
 
-    timeline.to(buttonRef.value, {
-      opacity: "1",
-      ease: 'power2.out',
-      duration: 0.7,
-    }, '<')
+    timeline.to(
+      buttonRef.value,
+      {
+        opacity: '1',
+        ease: 'power2.out',
+        duration: 0.7,
+      },
+      '<'
+    )
   })
-
 </script>
 
 <style scoped>
-
   .container {
     background: rgba(0, 0, 0, 0.45);
     width: 100vw;
@@ -64,7 +68,7 @@
   .title {
     color: #c74902;
     font-size: 80px;
-    font-family: "Metal Mania", system-ui;
+    font-family: 'Metal Mania', system-ui;
     transform: scale(3);
     visibility: hidden;
   }
@@ -96,6 +100,4 @@
       width: 400px;
     }
   }
-
-
 </style>

@@ -11,11 +11,10 @@
 </template>
 
 <script setup lang="ts">
-import {useTexture} from "@tresjs/core";
-import {DoubleSide, SRGBColorSpace} from "three";
+  import { useTexture } from '@tresjs/core'
+  import { DoubleSide, SRGBColorSpace } from 'three'
 
-const { alphaMap } = await useTexture({
+  const { alphaMap } = await useTexture({
     alphaMap: '/textures/floor/alpha.webp',
-  });
-
+  })
 </script>

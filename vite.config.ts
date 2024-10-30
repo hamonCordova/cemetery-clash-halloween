@@ -11,9 +11,9 @@ export default defineConfig({
   plugins: [
     vue({
       // Other config
-      ...templateCompilerOptions
+      ...templateCompilerOptions,
     }),
-    glsl() // Handle shader files
+    glsl(), // Handle shader files
   ],
   hmr: {
     protocol: 'wss',
@@ -29,19 +29,16 @@ export default defineConfig({
       usePolling: true,
     },
     host: true, // Open to local network and display URL
-    open: !('SANDBOX_URL' in process.env || 'CODESANDBOX_HOST' in process.env) // Open if it's not a CodeSandbox
+    open: !('SANDBOX_URL' in process.env || 'CODESANDBOX_HOST' in process.env), // Open if it's not a CodeSandbox
   },
   build: {
     outDir: 'dist', // Output in the dist/ folder
     emptyOutDir: true, // Empty the folder first
-    sourcemap: true // Add sourcemap
+    sourcemap: true, // Add sourcemap
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  }
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
 })
-
-
-

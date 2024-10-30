@@ -2,43 +2,58 @@
   <div class="container">
     <div class="content">
       <div class="logo-container">
-        <img src="/img/cemetery-clash-halloween-logo.webp" alt="Cemetery Clash: Halloween game logo" class="logo-img" width="1024" height="828" >
+        <img
+          src="/img/cemetery-clash-halloween-logo.webp"
+          alt="Cemetery Clash: Halloween game logo"
+          class="logo-img"
+          width="1024"
+          height="828"
+        />
       </div>
-      <h1 class="font-metal">{{ isWaitingRender ? 'Preparing your game...' : `Loading... ${Math.floor(loadingCounter)}%` }}</h1>
+      <h1 class="font-metal">
+        {{
+          isWaitingRender ? 'Preparing your game...' : `Loading... ${Math.floor(loadingCounter)}%`
+        }}
+      </h1>
       <div class="loading-progress-container">
-        <div class="loading-progress__bar" :style="{width: loadingCounter + '%'}"></div>
+        <div class="loading-progress__bar" :style="{ width: loadingCounter + '%' }"></div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import {useResources} from "@/composable/useResources";
-  import {onMounted, ref} from "vue";
-  import {useGameState} from "@/composable/useGameState";
-  import {GameStateModeEnum} from "../../../enum/game-mode.enum";
+  import { useResources } from '@/composable/useResources'
+  import { onMounted, ref } from 'vue'
+  import { useGameState } from '@/composable/useGameState'
+  import { GameStateModeEnum } from '../../../enum/game-mode.enum'
 
   const emit = defineEmits(['loaded'])
 
-  const resources = useResources();
-  const gameState = useGameState();
-  const isWaitingRender = ref(false);
-  const loadingCounter = ref(0);
+  const resources = useResources()
+  const gameState = useGameState()
+  const isWaitingRender = ref(false)
+  const loadingCounter = ref(0)
 
   onMounted(() => {
-    resources.load(() => {
-      isWaitingRender.value = true;
-      setTimeout(() => {
-        emit('loaded');
-      }, gameState.mode.value === GameStateModeEnum.PRODUCTION ? 5000 : 500)
-    }, (total: number) => {
-      loadingCounter.value = total > 95 ? 100 : total;
-    });
+    resources.load(
+      () => {
+        isWaitingRender.value = true
+        setTimeout(
+          () => {
+            emit('loaded')
+          },
+          gameState.mode.value === GameStateModeEnum.PRODUCTION ? 5000 : 500
+        )
+      },
+      (total: number) => {
+        loadingCounter.value = total > 95 ? 100 : total
+      }
+    )
   })
 </script>
 
 <style scoped>
-
   .container {
     width: 100%;
     height: 100%;
@@ -98,5 +113,4 @@
       transform: translateY(35%);
     }
   }
-
 </style>

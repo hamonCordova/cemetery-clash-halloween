@@ -1,52 +1,50 @@
-import {Audio} from "three/src/audio/Audio";
-import {PositionalAudio} from "three";
-import {useGameState} from "@/composable/useGameState";
+import { Audio } from 'three/src/audio/Audio'
+import { PositionalAudio } from 'three'
+import { useGameState } from '@/composable/useGameState'
 
 export default class GameAudioPlayer {
-    private lastPlayedTime: number = 0;
-    private cooldown: number = 0;
-    private gameState = useGameState();
+  private lastPlayedTime: number = 0
+  private cooldown: number = 0
+  private gameState = useGameState()
 
-    constructor(
-        public audios: Audio[] | PositionalAudio[],
-    ) {}
+  constructor(public audios: Audio[] | PositionalAudio[]) {}
 
-    public playRandom() {
-        if (!this.gameState.isSoundsEnabled.value) return;
+  public playRandom() {
+    if (!this.gameState.isSoundsEnabled.value) return
 
-        const now = Date.now();
+    const now = Date.now()
 
-        if (now - this.lastPlayedTime < this.cooldown) {
-            return;
-        }
-
-        const audio = this.audios[Math.floor(Math.random() * this.audios.length)];
-        if (!audio || audio.isPlaying) return;
-
-        try {
-            audio.play();
-        } catch (e) {
-            console.warn('Error playing audio', e);
-        }
-        this.lastPlayedTime = now;
+    if (now - this.lastPlayedTime < this.cooldown) {
+      return
     }
 
-    public setCooldown(cooldown: number) {
-        this.cooldown = cooldown;
-    }
+    const audio = this.audios[Math.floor(Math.random() * this.audios.length)]
+    if (!audio || audio.isPlaying) return
 
-    public stopAll() {
-        this.audios.forEach(audio => audio.stop());
+    try {
+      audio.play()
+    } catch (e) {
+      console.error('Error playing audio', e)
     }
+    this.lastPlayedTime = now
+  }
 
-    public static stopAllAudioPlayers(players: {[key: string]: GameAudioPlayer}) {
-        if (!players) return;
+  public setCooldown(cooldown: number) {
+    this.cooldown = cooldown
+  }
 
-        Object.keys(players).forEach(key => {
-            const player = players[key];
-            player.audios.forEach(audio => {
-                audio.stop();
-            });
-        })
-    }
+  public stopAll() {
+    this.audios.forEach((audio) => audio.stop())
+  }
+
+  public static stopAllAudioPlayers(players: { [key: string]: GameAudioPlayer }) {
+    if (!players) return
+
+    Object.keys(players).forEach((key) => {
+      const player = players[key]
+      player.audios.forEach((audio) => {
+        audio.stop()
+      })
+    })
+  }
 }

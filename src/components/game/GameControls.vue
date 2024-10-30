@@ -1,15 +1,44 @@
 <template>
-  <div v-if="isMobile" :class="['mobile-controls', {'mobile-controls--enabled': gameState.isPlaying.value}]">
+  <div
+    v-if="isMobile"
+    :class="['mobile-controls', { 'mobile-controls--enabled': gameState.isPlaying.value }]"
+  >
     <div class="nipple-container" @click="$event.stopPropagation()" ref="nippleContainer"></div>
     <div class="buttons-container">
-      <button class="button button--jump"
-              @touchstart="activeMovements.jump = true; $event.preventDefault(); $event.stopPropagation()"
-              @touchend="activeMovements.jump = false; $event.stopPropagation()">
+      <button
+        class="button button--jump"
+        @touchstart="
+          () => {
+            activeMovements.jump = true
+            $event.preventDefault()
+            $event.stopPropagation()
+          }
+        "
+        @touchend="
+          () => {
+            activeMovements.jump = false
+            $event.stopPropagation()
+          }
+        "
+      >
         <img src="/img/arrow_n.svg" alt="Jump icon" />
       </button>
-      <button class="button button--attack"
-              @touchstart="attack(); $event.preventDefault(); $event.stopPropagation()"
-              @touchend="$event.preventDefault(); $event.stopPropagation()">
+      <button
+        class="button button--attack"
+        @touchstart="
+          () => {
+            attack()
+            $event.preventDefault()
+            $event.stopPropagation()
+          }
+        "
+        @touchend="
+          () => {
+            $event.preventDefault()
+            $event.stopPropagation()
+          }
+        "
+      >
         <img src="/img/tool_sword_b.svg" alt="Attack icon" />
       </button>
     </div>
@@ -17,18 +46,18 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted } from 'vue';
-  import nipplejs from 'nipplejs';
-  import { DocumentUtils } from '@/utils/document-utils';
-  import { usePlayer } from '@/composable/usePlayer';
-  import { Vector3 } from 'three';
-  import {useGameState} from "@/composable/useGameState";
+  import { ref, onMounted, onUnmounted } from 'vue'
+  import nipplejs from 'nipplejs'
+  import { DocumentUtils } from '@/utils/document-utils'
+  import { usePlayer } from '@/composable/usePlayer'
+  import { Vector3 } from 'three'
+  import { useGameState } from '@/composable/useGameState'
 
-  const isMobile = DocumentUtils.isMobile();
-  const { activeMovements, attack } = usePlayer();
-  const nippleInstance = ref(null);
-  const nippleContainer = ref(null);
-  const gameState = useGameState();
+  const isMobile = DocumentUtils.isMobile()
+  const { activeMovements, attack } = usePlayer()
+  const nippleInstance = ref(null)
+  const nippleContainer = ref(null)
+  const gameState = useGameState()
 
   onMounted(() => {
     if (isMobile && nippleContainer.value) {
@@ -40,100 +69,96 @@
         threshold: 0.35,
         fadeTime: 400,
         maxNumberOfNipples: 1,
-      });
+      })
 
-      activeMovements.usingJoystick = true;
+      activeMovements.usingJoystick = true
     }
 
-    initEventListeners();
-  });
+    initEventListeners()
+  })
 
   onUnmounted(() => {
     if (nippleInstance.value) {
-      nippleInstance.value.off('move', handleNippleMove);
-      nippleInstance.value.off('end', handleNippleMoveEnd);
+      nippleInstance.value.off('move', handleNippleMove)
+      nippleInstance.value.off('end', handleNippleMoveEnd)
     }
-  });
+  })
 
   const initEventListeners = () => {
     if (isMobile && nippleInstance.value) {
-      nippleInstance.value.on('move', handleNippleMove);
-      nippleInstance.value.on('end', handleNippleMoveEnd);
+      nippleInstance.value.on('move', handleNippleMove)
+      nippleInstance.value.on('end', handleNippleMoveEnd)
     } else {
       window.addEventListener('keydown', (event) => {
-        handleKeyEvent('keydown', event);
-      });
+        handleKeyEvent('keydown', event)
+      })
 
       window.addEventListener('keyup', (event) => {
-        handleKeyEvent('keyup', event);
-      });
+        handleKeyEvent('keyup', event)
+      })
     }
 
     window.addEventListener('click', (event) => {
-      if (!gameState.isPlaying.value) return;
-      attack();
-    });
-  };
+      if (!gameState.isPlaying.value) return
+      attack()
+    })
+  }
 
   const handleKeyEvent = (type: 'keyup' | 'keydown', event: KeyboardEvent) => {
+    if (!gameState.isPlaying.value) return
 
-    if (!gameState.isPlaying.value) return;
-
-    const active = type === 'keydown';
+    const active = type === 'keydown'
     switch (event.key.toLowerCase()) {
       case 'w':
       case 'z':
       case 'arrowup':
-        activeMovements.up = active;
-        return;
+        activeMovements.up = active
+        return
       case 's':
       case 'arrowdown':
-        activeMovements.down = active;
-        return;
+        activeMovements.down = active
+        return
       case 'a':
       case 'q':
       case 'arrowleft':
-        activeMovements.left = active;
-        return;
+        activeMovements.left = active
+        return
       case 'd':
       case 'arrowright':
-        activeMovements.right = active;
-        return;
+        activeMovements.right = active
+        return
       case 'shift':
-        activeMovements.run = active;
-        return;
+        activeMovements.run = active
+        return
       case ' ':
-        activeMovements.jump = active;
-        return;
+        activeMovements.jump = active
+        return
     }
-  };
+  }
 
   const handleNippleMove = (event: any, data: any) => {
+    const { angle, distance } = data
 
-    const { angle, distance } = data;
+    if (!angle || !gameState.isPlaying.value) return
 
-    if (!angle || !gameState.isPlaying.value) return;
+    const radianAngle = angle.radian - Math.PI / 2
 
-    const radianAngle = angle.radian - Math.PI / 2;
+    const movementX = -Math.sin(radianAngle) * (distance / 150)
+    const movementZ = -Math.cos(radianAngle) * (distance / 150)
 
-    const movementX = -Math.sin(radianAngle) * (distance / 150);
-    const movementZ = -Math.cos(radianAngle) * (distance / 150);
-
-    activeMovements.run = true;
-    activeMovements.joystickMovement = new Vector3(movementX, 0, movementZ);
-  };
+    activeMovements.run = true
+    activeMovements.joystickMovement = new Vector3(movementX, 0, movementZ)
+  }
 
   const handleNippleMoveEnd = () => {
-    if (!gameState.isPlaying) return;
+    if (!gameState.isPlaying) return
 
-    activeMovements.run = false;
-    activeMovements.joystickMovement = new Vector3(0, 0, 0);
-  };
-
+    activeMovements.run = false
+    activeMovements.joystickMovement = new Vector3(0, 0, 0)
+  }
 </script>
 
 <style>
-
   .mobile-controls {
     display: flex;
     justify-content: space-between;
@@ -193,6 +218,4 @@
     height: 70px;
     border-radius: 50%;
   }
-
-
 </style>

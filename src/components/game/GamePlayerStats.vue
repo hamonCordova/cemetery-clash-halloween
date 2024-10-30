@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="avatar-container">
-      <img class="avatar-img" src="/img/player-avatar.png" alt="Player avatar">
+      <img class="avatar-img" src="/img/player-avatar.png" alt="Player avatar" />
     </div>
     <div class="stats-container">
       <div class="player-name-container">
@@ -9,7 +9,7 @@
       </div>
       <div class="health-container">
         <div class="health-progress-container">
-          <div class="health-progress-bar" :style="{width: healthBarWidth}"></div>
+          <div class="health-progress-bar" :style="{ width: healthBarWidth }"></div>
         </div>
       </div>
     </div>
@@ -17,16 +17,14 @@
 </template>
 
 <script setup lang="ts">
+  import { usePlayer } from '@/composable/usePlayer'
+  import { computed } from 'vue'
 
-  import {usePlayer} from "@/composable/usePlayer";
-  import {computed} from "vue";
-
-  const playerState = usePlayer();
+  const playerState = usePlayer()
 
   const healthBarWidth = computed(() => {
-    return playerState.health.value >= 0 ?  + playerState.health.value + '%' : '0%';
+    return playerState.health.value >= 0 ? +playerState.health.value + '%' : '0%'
   })
-
 </script>
 
 <style scoped>
@@ -70,12 +68,13 @@
     gap: 5px;
   }
 
-  .player-name-container {}
+  .player-name-container {
+  }
 
   .player-name {
     color: #fff;
     font-size: 16px;
-    font-family: "Metal Mania", system-ui;
+    font-family: 'Metal Mania', system-ui;
     line-height: 0;
   }
 
@@ -102,7 +101,7 @@
   }
 
   .health-progress-bar {
-    background: #28A745;
+    background: #28a745;
     border-radius: 3px;
     width: 100%;
     height: 100%;
@@ -117,7 +116,5 @@
     .player-name {
       font-size: 20px;
     }
-
   }
-
 </style>

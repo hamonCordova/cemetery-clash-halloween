@@ -1,30 +1,56 @@
 <template>
   <div class="container">
-    <div class="option" @click="$event.stopPropagation(); gameState.toggleSoundState()">
-      <img :src="gameState.isSoundsEnabled.value ? '/img/audioOn.png' : '/img/audioOff.png'" alt="Mute icon" width="30" height="30">
+    <div
+      class="option"
+      @click="
+        () => {
+          $event.stopPropagation()
+          gameState.toggleSoundState()
+        }
+      "
+    >
+      <img
+        :src="gameState.isSoundsEnabled.value ? '/img/audioOn.png' : '/img/audioOff.png'"
+        alt="Mute icon"
+        width="30"
+        height="30"
+      />
     </div>
-    <div class="option" @click="$event.stopPropagation(); gameState.toggleFullScreenState()">
-      <img :src="gameState.isFullScreen.value ? '/img/fullScreenOffIcon.png' : '/img/fullScreenOnIcon.png'" alt="Full screen icon" width="30" height="30">
+    <div
+      class="option"
+      @click="
+        () => {
+          $event.stopPropagation()
+          gameState.toggleFullScreenState()
+        }
+      "
+    >
+      <img
+        :src="
+          gameState.isFullScreen.value ? '/img/fullScreenOffIcon.png' : '/img/fullScreenOnIcon.png'
+        "
+        alt="Full screen icon"
+        width="30"
+        height="30"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import {useGameState} from "@/composable/useGameState";
-  import {onMounted, ref} from "vue";
+  import { useGameState } from '@/composable/useGameState'
+  import { onMounted, ref } from 'vue'
 
-  const gameState = useGameState();
+  const gameState = useGameState()
 
   onMounted(() => {
     document.addEventListener('fullscreenchange', () => {
       gameState.isFullScreen.value = document.fullscreenElement != null
-    });
+    })
   })
-
 </script>
 
 <style scoped>
-
   .container {
     display: flex;
     flex-direction: column;

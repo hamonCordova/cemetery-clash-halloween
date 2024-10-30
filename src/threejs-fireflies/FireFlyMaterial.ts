@@ -23,35 +23,35 @@
  *    SOFTWARE.
  *    **/
 
-import { ShaderMaterial, AdditiveBlending, Color } from 'three';
+import { ShaderMaterial, AdditiveBlending, Color } from 'three'
 
 /**
  * Options for the FireFlyMaterial constructor.
  */
 interface FireFlyMaterialOptions {
-    uTime?: number; // Time for animation
-    uFireFlyRadius?: number; // Radius for fireflies
-    uColor?: Color; // Color for fireflies
+  uTime?: number // Time for animation
+  uFireFlyRadius?: number // Radius for fireflies
+  uColor?: Color // Color for fireflies
 }
 
 /**
  * FireFlyMaterial class rendering firefly particles with customizable properties.
  */
 export default class FireFlyMaterial extends ShaderMaterial {
-    constructor(options: FireFlyMaterialOptions = {}) {
-        // Destructure options with default values
-        const { uTime = 0, uFireFlyRadius = 0.1, uColor = new Color('#d67a26') } = options;
+  constructor(options: FireFlyMaterialOptions = {}) {
+    // Destructure options with default values
+    const { uTime = 0, uFireFlyRadius = 0.1, uColor = new Color('#d67a26') } = options
 
-        // Call the parent constructor
-        super({
-            transparent: true,
-            blending: AdditiveBlending,
-            uniforms: {
-                uTime: { value: uTime },
-                uFireFlyRadius: { value: uFireFlyRadius },
-                uColor: { value: uColor }
-            },
-            vertexShader: `uniform float uTime;
+    // Call the parent constructor
+    super({
+      transparent: true,
+      blending: AdditiveBlending,
+      uniforms: {
+        uTime: { value: uTime },
+        uFireFlyRadius: { value: uFireFlyRadius },
+        uColor: { value: uColor },
+      },
+      vertexShader: `uniform float uTime;
             varying vec2 vUv;
             varying float vOffset;
 
@@ -81,7 +81,7 @@ export default class FireFlyMaterial extends ShaderMaterial {
                 vUv = uv;
                 vOffset = float(gl_InstanceID);
             }`,
-            fragmentShader: `varying vec2 vUv;
+      fragmentShader: `varying vec2 vUv;
             uniform float uTime;
             uniform float uFireFlyRadius;
             uniform vec3 uColor;
@@ -102,31 +102,31 @@ export default class FireFlyMaterial extends ShaderMaterial {
                 vec3 finalColor = mix(glowColor, fireFlyColor, disk);
 
                 gl_FragColor = vec4(finalColor, alpha);
-            }`
-        });
-    }
+            }`,
+    })
+  }
 
-    /**
-     * Update time uniform for animation.
-     * @param {number} time - The time to update the uniform with.
-     */
-    updateTime(time: number): void {
-        this.uniforms.uTime.value = time;
-    }
+  /**
+   * Update time uniform for animation.
+   * @param {number} time - The time to update the uniform with.
+   */
+  updateTime(time: number): void {
+    this.uniforms.uTime.value = time
+  }
 
-    /**
-     * Set the firefly color uniform.
-     * @param {Color} color - The color for the fireflies.
-     */
-    setColor(color: Color): void {
-        this.uniforms.uColor.value.copy(color);
-    }
+  /**
+   * Set the firefly color uniform.
+   * @param {Color} color - The color for the fireflies.
+   */
+  setColor(color: Color): void {
+    this.uniforms.uColor.value.copy(color)
+  }
 
-    /**
-     * Set the firefly radius uniform.
-     * @param {number} radius - The radius for fireflies.
-     */
-    setFireFlyRadius(radius: number): void {
-        this.uniforms.uFireFlyRadius.value = radius;
-    }
+  /**
+   * Set the firefly radius uniform.
+   * @param {number} radius - The radius for fireflies.
+   */
+  setFireFlyRadius(radius: number): void {
+    this.uniforms.uFireFlyRadius.value = radius
+  }
 }

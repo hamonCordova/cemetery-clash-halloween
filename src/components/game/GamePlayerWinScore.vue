@@ -3,10 +3,23 @@
     <div class="wrapper">
       <div class="content">
         <div class="logo-container">
-          <img class="logo-img" src="/img/cemetery-clash-halloween-logo.webp" alt="Cemetery Clash: Halloween logo" width="1024" height="828" />
+          <img
+            class="logo-img"
+            src="/img/cemetery-clash-halloween-logo.webp"
+            alt="Cemetery Clash: Halloween logo"
+            width="1024"
+            height="828"
+          />
         </div>
-        <h1 class="title">Champion of the Night! <br/> The battle is over.</h1>
-        <p class="description">Thank you for playing! Though you've won, the darkness endures. Start a new game and face it again.</p>
+        <h1 class="title">
+          Champion of the Night!
+          <br />
+          The battle is over.
+        </h1>
+        <p class="description">
+          Thank you for playing! Though you've won, the darkness endures. Start a new game and face
+          it again.
+        </p>
         <ul>
           <li>
             <button @click="emit('restart')">New Game</button>
@@ -15,7 +28,8 @@
       </div>
       <footer>
         <div class="footer-container">
-          Developed by <a href="https://www.linkedin.com/in/hamoncordova/" target="_blank">Hamon Córdova</a>
+          Developed by
+          <a href="https://www.linkedin.com/in/hamoncordova/" target="_blank">Hamon Córdova</a>
         </div>
       </footer>
     </div>
@@ -31,7 +45,7 @@
     width: 100vw;
     height: 100%;
     position: fixed;
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0.90) 1%, transparent 100%);
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.9) 1%, transparent 100%);
   }
 
   .wrapper {
@@ -52,17 +66,16 @@
     height: 100%;
   }
 
-
   .title {
     font-size: 50px;
     line-height: 50px;
     text-align: center;
     color: #ee5e0a;
-    font-family: "Metal Mania", system-ui;
+    font-family: 'Metal Mania', system-ui;
     -webkit-text-stroke: 1px #000;
     font-weight: bold;
-    background: #EE5E0A;
-    background: linear-gradient(to right, #EE5E0A 12%, #D31616 100%);
+    background: #ee5e0a;
+    background: linear-gradient(to right, #ee5e0a 12%, #d31616 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0;
@@ -116,9 +129,9 @@
   }
 
   @media only screen and (min-width: 768px) {
-   .container {
-     width: 600px;
-   }
+    .container {
+      width: 600px;
+    }
   }
 
   @media only screen and (min-width: 1328px) {
@@ -134,5 +147,4 @@
       font-size: 60px;
     }
   }
-
 </style>
