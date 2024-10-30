@@ -205,6 +205,7 @@
     border-radius: 50%;
     outline: none;
     border: 1px solid #ccc;
+    box-shadow: none;
     background: rgba(255, 255, 255, 0.22);
     transition: box-shadow linear 80ms;
   }
