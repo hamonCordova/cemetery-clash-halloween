@@ -101,7 +101,7 @@ export class FireFlies {
     }
 
     // Create a firefly geometry
-    const fireflyGeometry = new PlaneGeometry(0.07, 0.07) // Adjust the size of the firefly as desired
+    const fireflyGeometry = new PlaneGeometry(0.08, 0.08) // Adjust the size of the firefly as desired
 
     // Create a firefly material
     this.fireflyMaterial = new FireFlyMaterial()
@@ -139,7 +139,7 @@ export class FireFlies {
         // Calculate a random offset within the group
         const offset = new Vector3(
           this.randomGaussian() * this.groupRadius,
-          Math.random() * 3,
+          Math.random() * 4,
           this.randomGaussian() * this.groupRadius
         )
 

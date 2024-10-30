@@ -699,7 +699,7 @@
 
   const fireflies = new FireFlies(scene.value, {
     groupCount: 20,
-    firefliesPerGroup: 20,
+    firefliesPerGroup: 30,
     groupRadius: 20,
   })
 

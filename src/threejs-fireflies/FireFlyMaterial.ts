@@ -94,7 +94,7 @@ export default class FireFlyMaterial extends ShaderMaterial {
 
                 // Add a flashing effect using the time uniform
                 float flash = sin(uTime * 3.0 + vOffset * 0.12) * 0.5 + 0.5; // Adjust the frequency and amplitude as desired
-                float alpha = clamp((glow + disk) * flash, 0.0, 0.7);
+                float alpha = clamp((glow + disk) * flash, 0.0, 0.3);
 
                 vec3 glowColor = uColor * 3. * flash;
                 vec3 fireFlyColor = uColor * 3.;
