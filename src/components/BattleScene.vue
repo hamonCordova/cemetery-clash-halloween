@@ -695,7 +695,7 @@
   const sounds = useSounds()
   const { renderer, scene, camera } = useTresContext()
   const { onLoop } = useRenderLoop()
-  const isMobile = true //DocumentUtils.isMobile()
+  const isMobile = true
 
   const fireflies = new FireFlies(scene.value, {
     groupCount: 20,
