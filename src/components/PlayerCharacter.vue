@@ -404,11 +404,11 @@
     })
   }
 
-  const createFloatingText = (textContent) => {
+  const createFloatingText = (textContent: string, color: 'green' | 'red' = 'green') => {
     const textMesh = new Text()
     textMesh.text = textContent
     textMesh.fontSize = 0.4
-    textMesh.color = '#28A745'
+    textMesh.color = color === 'green' ? '#28A745' : '#a72828'
     textMesh.position.copy(playerModelRef.value.position.clone())
     textMesh.position.y += 2
 
@@ -446,9 +446,14 @@
   watch(
     () => playerState.health.value,
     (newHealth: number, oldHealth: number) => {
+      if (!gameState.isPlaying.value) return
+
       if (newHealth > oldHealth) {
         const healthIncreased = Math.round((newHealth - oldHealth) * 10) / 10
-        createFloatingText(`+${healthIncreased}`)
+        createFloatingText(`+${healthIncreased}`, 'green')
+      } else {
+        const healthDecreased = Math.round((newHealth - oldHealth) * 10) / 10
+        createFloatingText(`${healthDecreased}`, 'red')
       }
     }
   )
