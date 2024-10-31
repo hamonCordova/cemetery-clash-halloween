@@ -404,11 +404,23 @@
     })
   }
 
-  const createFloatingText = (textContent: string, color: 'green' | 'red' = 'green') => {
+  const createFloatingText = (textContent: string, color: 'green' | 'red' | string = 'green') => {
+    let textColor
+    switch (color) {
+      case 'green':
+        textColor = '#28A745'
+        break
+      case 'red':
+        textColor = '#a72828'
+        break
+      default:
+        textColor = color
+    }
+
     const textMesh = new Text()
     textMesh.text = textContent
     textMesh.fontSize = 0.4
-    textMesh.color = color === 'green' ? '#28A745' : '#a72828'
+    textMesh.color = textColor
     textMesh.position.copy(playerModelRef.value.position.clone())
     textMesh.position.y += 2
 
